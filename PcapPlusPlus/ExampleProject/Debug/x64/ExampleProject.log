@@ -1,0 +1,19 @@
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(476,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(477,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+  main.cpp
+C:\etgar\PcapPlusPlus\header\TLVData.h(35,25): warning C4200: nonstandard extension used: zero-sized array in struct/union
+C:\etgar\PcapPlusPlus\header\TLVData.h(35,25): message : This member will be ignored by a defaulted constructor or copy/move assignment operator
+Pcap++.lib(light_platform.obj) : warning LNK4099: PDB '' was not found with 'Pcap++.lib(light_platform.obj)' or at ''; linking object as if no debug info
+Pcap++.lib(light_pcapng_ext.obj) : warning LNK4099: PDB 'LightPcapNg.pdb' was not found with 'Pcap++.lib(light_pcapng_ext.obj)' or at 'C:\etgar\PcapPlusPlus\ExampleProject\Debug\x64\LightPcapNg.pdb'; linking object as if no debug info
+Pcap++.lib(light_pcapng.obj) : warning LNK4099: PDB 'LightPcapNg.pdb' was not found with 'Pcap++.lib(light_pcapng.obj)' or at 'C:\etgar\PcapPlusPlus\ExampleProject\Debug\x64\LightPcapNg.pdb'; linking object as if no debug info
+Pcap++.lib(light_option.obj) : warning LNK4099: PDB 'LightPcapNg.pdb' was not found with 'Pcap++.lib(light_option.obj)' or at 'C:\etgar\PcapPlusPlus\ExampleProject\Debug\x64\LightPcapNg.pdb'; linking object as if no debug info
+Pcap++.lib(light_null_compression.obj) : warning LNK4099: PDB 'LightPcapNg.pdb' was not found with 'Pcap++.lib(light_null_compression.obj)' or at 'C:\etgar\PcapPlusPlus\ExampleProject\Debug\x64\LightPcapNg.pdb'; linking object as if no debug info
+Pcap++.lib(light_manipulate.obj) : warning LNK4099: PDB 'LightPcapNg.pdb' was not found with 'Pcap++.lib(light_manipulate.obj)' or at 'C:\etgar\PcapPlusPlus\ExampleProject\Debug\x64\LightPcapNg.pdb'; linking object as if no debug info
+Pcap++.lib(light_internal.obj) : warning LNK4099: PDB 'LightPcapNg.pdb' was not found with 'Pcap++.lib(light_internal.obj)' or at 'C:\etgar\PcapPlusPlus\ExampleProject\Debug\x64\LightPcapNg.pdb'; linking object as if no debug info
+Pcap++.lib(light_compression.obj) : warning LNK4099: PDB 'LightPcapNg.pdb' was not found with 'Pcap++.lib(light_compression.obj)' or at 'C:\etgar\PcapPlusPlus\ExampleProject\Debug\x64\LightPcapNg.pdb'; linking object as if no debug info
+Pcap++.lib(light_alloc.obj) : warning LNK4099: PDB '' was not found with 'Pcap++.lib(light_alloc.obj)' or at ''; linking object as if no debug info
+  ExampleProject.vcxproj -> C:\etgar\PcapPlusPlus\ExampleProject\Debug\x64\ExampleProject.exe
+  C:\etgar\pthreads-win32\Pre-built.2\dll\x64\pthreadVC2.dll
+  1 File(s) copied
+  C:1_packet.pcap
+  1 File(s) copied

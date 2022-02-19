@@ -1,0 +1,2 @@
+C:\etgar\PcapPlusPlus\ExampleProject\Debug\x64\ExampleProject.exe
+C:\etgar\PcapPlusPlus\ExampleProject\Debug\x64\ExampleProject.pdb
