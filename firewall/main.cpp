@@ -110,10 +110,13 @@ static void onPacketArrives1(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev,
         ethernet->setSourceMac(pcpp::MacAddress(otherDev->getMacAddress()));
         ethernet->setDestMac(pcpp::MacAddress("08:00:27:7e:ef:c8"));
 
-        parsedPacket.computeCalculateFields();
-        //parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
+        if(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive > 1) {
+            parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
+            parsedPacket.computeCalculateFields();
 
-        otherDev->sendPacket(*parsedPacket.getRawPacket());
+
+            otherDev->sendPacket(*parsedPacket.getRawPacket());
+        }
     }
 }
 static void onPacketArrives2(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie)
@@ -131,10 +134,13 @@ static void onPacketArrives2(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev,
         ethernet->setSourceMac(pcpp::MacAddress(otherDev->getMacAddress()));
         ethernet->setDestMac(pcpp::MacAddress("08:00:27:f7:c7:e5"));
 
-        parsedPacket.computeCalculateFields();
-        //parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
-        if(parsedPacket.getLayerOfType<pcpp::TcpLayer>() == NULL || parsedPacket.getLayerOfType<pcpp::TcpLayer>()->getDstPort() != 7777)
-            otherDev->sendPacket(*parsedPacket.getRawPacket());
+        if(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive > 1) {
+            parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
+            parsedPacket.computeCalculateFields();
+
+            if(parsedPacket.getLayerOfType<pcpp::TcpLayer>() == NULL || parsedPacket.getLayerOfType<pcpp::TcpLayer>()->getDstPort() != 7777)
+                otherDev->sendPacket(*parsedPacket.getRawPacket());
+        }
     }
 }
 
