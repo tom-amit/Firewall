@@ -7,6 +7,7 @@ Rule::Rule(const string &name, const string &direction, const string &src_ip, co
            const string &dest_ip, const string &dest_port, const string &protocol, const string &ack,
            const string &action)
 {
+    //TODO: add parsing for stuff like IP and ports, we don't want to represent them using strings obviously.
     this->name = name;
     this->direction = direction;
     this->src_ip = src_ip;
