@@ -3,4 +3,4 @@ project(RulesDAST)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(RulesDAST main.cpp src/RuleTable.cpp include/RuleTable.h src/Rule.cpp include/Rule.h)
+add_executable(RulesDAST main.cpp src/RuleTable.cpp include/RuleTable.h src/Rule.cpp include/Rule.h src/BadParse.cpp include/BadParse.h)

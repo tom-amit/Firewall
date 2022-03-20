@@ -41,14 +41,14 @@ void RuleTable::DisplayTable(){
     std::cout << std::endl;
     for(auto& r : table){
         std::cout << std::endl;
-        std::cout.width(display_padding); std::cout << std::left << r->name;
-        std::cout.width(display_padding); std::cout << std::left << r->direction;
-        std::cout.width(display_padding); std::cout << std::left << r->src_ip;
-        std::cout.width(display_padding); std::cout << std::left << r->src_port;
-        std::cout.width(display_padding); std::cout << std::left << r->dest_ip;
-        std::cout.width(display_padding); std::cout << std::left << r->dest_port;
-        std::cout.width(display_padding); std::cout << std::left << r->protocol;
-        std::cout.width(display_padding); std::cout << std::left << r->ack;
-        std::cout.width(display_padding); std::cout << std::left << r->action;
+        std::cout.width(display_padding); std::cout << std::left << r->getName();
+        std::cout.width(display_padding); std::cout << std::left << r->getName();
+        //std::cout.width(display_padding); std::cout << std::left << r->getSrcIp().toString();
+        std::cout.width(display_padding); std::cout << std::left << r->getSrcPort();
+        //std::cout.width(display_padding); std::cout << std::left << r->getDestIp().toString();
+        std::cout.width(display_padding); std::cout << std::left << r->getDestPort();
+        std::cout.width(display_padding); std::cout << std::left << r->getProtocol();
+        std::cout.width(display_padding); std::cout << std::left << r->getAck();
+        std::cout.width(display_padding); std::cout << std::left << r->getProtocol();
     }
 }
