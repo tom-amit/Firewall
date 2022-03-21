@@ -10,17 +10,7 @@
 #include <map>
 #include <iostream>
 #include <cstdlib>
-#include "../../PcapPlusPlus/header/SystemUtils.h"
-#include "../../PcapPlusPlus/header/Packet.h"
-#include "../../PcapPlusPlus/header/EthLayer.h"
-#include "../../PcapPlusPlus/header/VlanLayer.h"
-#include "../../PcapPlusPlus/header/IPv4Layer.h"
-#include "../../PcapPlusPlus/header/TcpLayer.h"
-#include "../../PcapPlusPlus/header/HttpLayer.h"
-#include "../../PcapPlusPlus/header/UdpLayer.h"
-#include "../../PcapPlusPlus/header/DnsLayer.h"
-#include "../../PcapPlusPlus/header/PcapFileDevice.h"
-
+#include "IPv4Layer.h"
 #ifndef RULESDAST_RULE_H
 #define RULESDAST_RULE_H
 
@@ -32,7 +22,7 @@ using std::to_string;
 
 class Rule {
 public:
-    Rule(const string& name,const string& direction, const string src_ip, const string& src_port, const string dest_ip, const string& dest_port,const string& protocol, const string& ack, const string& action);
+    Rule(const string& name,const string& direction, const string& src_ip, const string& src_port, const string& dest_ip, const string& dest_port,const string& protocol, const string& ack, const string& action);
 
     string getName() const;
 
@@ -62,7 +52,7 @@ public:
 
     void setDestPort(uint16_t destPort);
 
-    pcpp::ProtocolType getProtocol() const;
+    string getProtocol() const;
 
     void setProtocol(pcpp::ProtocolType protocol);
 
@@ -77,10 +67,11 @@ private:
     pcpp::ProtocolType protocol;
 
     //TODO move to be a global variable
-    std::vector<string> DIR_DEF{"yes", "no"};
+    std::vector<string> DIR_DEF{"in", "out", "any"};
     std::vector<string> ACTION_DEF{"allow", "deny", "any"};
     std::vector<string> ACK_DEF{"yes", "no", "any"};
-    std::map<string, uint64_t> PROTOCOL_DEF{{"TCP", 0x04}, {"UDP", 0x08}};
+    std::map<string, long unsigned int> PROTOCOL_DEF{{"TCP", 0x04}, {"UDP", 0x08}};
+    //std::map<long unsigned int, string> PROTOCOL_HEX_DEF{{0x04, "TCP"}, {0x08, "UDP"}};
 
     std::string ParseDirection(string dir);
     std::string ParseAction(string action);

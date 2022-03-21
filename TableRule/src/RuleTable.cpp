@@ -42,13 +42,14 @@ void RuleTable::DisplayTable(){
     for(auto& r : table){
         std::cout << std::endl;
         std::cout.width(display_padding); std::cout << std::left << r->getName();
-        std::cout.width(display_padding); std::cout << std::left << r->getName();
-        //std::cout.width(display_padding); std::cout << std::left << r->getSrcIp().toString();
+        std::cout.width(display_padding); std::cout << std::left << r->getDirection();
+        std::cout.width(display_padding); std::cout << std::left << r->getSrcIp().toString();
         std::cout.width(display_padding); std::cout << std::left << r->getSrcPort();
-        //std::cout.width(display_padding); std::cout << std::left << r->getDestIp().toString();
+        std::cout.width(display_padding); std::cout << std::left << r->getDestIp().toString();
         std::cout.width(display_padding); std::cout << std::left << r->getDestPort();
         std::cout.width(display_padding); std::cout << std::left << r->getProtocol();
         std::cout.width(display_padding); std::cout << std::left << r->getAck();
         std::cout.width(display_padding); std::cout << std::left << r->getProtocol();
     }
+    std::cout << std::endl;
 }

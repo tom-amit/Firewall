@@ -3,8 +3,8 @@
 //
 
 #include "../include/Rule.h"
-Rule::Rule(const string &name, const string &direction, const string src_ip, const string &src_port,
-           const string dest_ip, const string &dest_port, const string &protocol, const string &ack,
+Rule::Rule(const string &name, const string &direction, const string& src_ip, const string &src_port,
+           const string& dest_ip, const string &dest_port, const string &protocol, const string &ack,
            const string &action)
 {
     //TODO: add parsing for stuff like IP and ports, we don't want to represent them using strings obviously.
@@ -74,12 +74,12 @@ void Rule::setDestPort(uint16_t destPort) {
     dest_port = destPort;
 }
 
-pcpp::ProtocolType Rule::getProtocol() const {
-    return protocol;
+string Rule::getProtocol() const {
+    return "";
 }
 
 void Rule::setProtocol(pcpp::ProtocolType protocol) {
-    Rule::protocol = protocol;
+    //Rule::protocol = ParseProtocol(protocol);
 }
 
 string Rule::getAck() const {
@@ -99,6 +99,7 @@ std::string Rule::ParseDirection(string dir){
     if(std::find(DIR_DEF.begin(), DIR_DEF.end(), dir) != DIR_DEF.end()){
         return dir;
     }
+    std::cout << "PARSE DIR:" << dir << std::endl;
     return ""; //throw BadParse
 }
 std::string Rule::ParseAction(string action){
