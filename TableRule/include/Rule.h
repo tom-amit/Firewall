@@ -2,6 +2,12 @@
 // Created by karkt on 3/19/2022.
 //
 
+#ifndef RULESDAST_RULE_H
+#define RULESDAST_RULE_H
+
+
+#define MAX_PORT 65535
+
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -10,10 +16,9 @@
 #include <map>
 #include <iostream>
 #include <cstdlib>
+#include <utility>
+#include "BadParse.h"
 #include "IPv4Layer.h"
-#ifndef RULESDAST_RULE_H
-#define RULESDAST_RULE_H
-
 
 using std::string;
 using std::to_string;
@@ -26,59 +31,58 @@ public:
 
     string getName() const;
 
-    void setName(const string &name);
+    void setName(const string &p_name);
 
     string getAction() const;
 
-    void setAction(const string &action);
+    void setAction(const string &p_action);
 
     string getDirection() const;
 
-    void setDirection(const string &direction);
+    void setDirection(const string &p_direction);
 
-    pcpp::IPv4Address getSrcIp() const;
+    std::pair<pcpp::IPv4Address, string> getSrcIp() const;
 
-    void setSrcIp(const pcpp::IPv4Address &srcIp);
+    void setSrcIp(const string &p_src_ip);
 
-    pcpp::IPv4Address getDestIp() const;
+    std::pair<pcpp::IPv4Address, string> getDestIp() const;
 
-    void setDestIp(const pcpp::IPv4Address &destIp);
+    void setDestIp(const string &p_dest_ip);
 
-    uint16_t getSrcPort() const;
+    std::pair<uint32_t, string> getSrcPort() const;
 
-    void setSrcPort(uint16_t srcPort);
+    void setSrcPort(string p_src_port);
 
-    uint16_t getDestPort() const;
+    std::pair<uint32_t, string> getDestPort() const;
 
-    void setDestPort(uint16_t destPort);
+    void setDestPort(string p_dest_port);
 
     string getProtocol() const;
 
-    void setProtocol(pcpp::ProtocolType protocol);
+    void setProtocol(string p_protocol);
 
     string getAck() const;
 
-    void setAck(const string& ack);
+    void setAck(const string& p_ack);
 
 private:
     string name, action, direction, ack;
-    pcpp::IPv4Address src_ip, dest_ip;
-    uint16_t src_port, dest_port;
+    std::pair<pcpp::IPv4Address, string> src_ip, dest_ip;
+    uint32_t src_port, dest_port;
     pcpp::ProtocolType protocol;
 
     //TODO move to be a global variable
     std::vector<string> DIR_DEF{"in", "out", "any"};
     std::vector<string> ACTION_DEF{"allow", "deny", "any"};
     std::vector<string> ACK_DEF{"yes", "no", "any"};
-    std::map<string, long unsigned int> PROTOCOL_DEF{{"TCP", 0x04}, {"UDP", 0x08}};
-    //std::map<long unsigned int, string> PROTOCOL_HEX_DEF{{0x04, "TCP"}, {0x08, "UDP"}};
+    std::map<string, long unsigned int> PROTOCOL_DEF{{"ANY", 0x111},{"TCP", 0x04}, {"UDP", 0x08}};
 
-    std::string ParseDirection(string dir);
-    std::string ParseAction(string action);
-    pcpp::IPv4Address ParseIP(string ip_addr);
-    uint16_t ParsePort(const string& port_num);
-    string ParseAck(string ack);
-    pcpp::ProtocolType ParseProtocol(string protocol);
+    std::string ParseDirection(string p_dir);
+    std::string ParseAction(string p_action);
+    std::pair<pcpp::IPv4Address, string> ParseIP(string p_ip_addr);
+    uint32_t ParsePort(string p_port_num);
+    string ParseAck(string p_ack);
+    pcpp::ProtocolType ParseProtocol(string p_protocol);
 
 };
 

@@ -1,10 +1,11 @@
 //
 // Created by karkt on 3/20/2022.
 //
-#include <iostream>
 
 #ifndef RULESDAST_BADPARSE_H
 #define RULESDAST_BADPARSE_H
+
+#include <iostream>
 
 
 class BadParse: virtual public std::exception {
@@ -25,6 +26,8 @@ public:
     explicit
     BadParse(const std::string& msg, int err_num, int err_off);
 
+    explicit
+    BadParse(const std::string& failedAction,const std::string& where, int err_num = -1, int err_off = 0);
     /** Destructor.
      *  Virtual to allow for subclassing.
      */

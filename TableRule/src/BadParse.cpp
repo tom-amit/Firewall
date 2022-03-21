@@ -13,6 +13,11 @@ BadParse::BadParse(const std::string& msg, int err_num, int err_off):
         error_offset(err_off),
         error_message(msg)
 {}
+BadParse::BadParse(const std::string& failedAction,const std::string& where, int err_num, int err_off):error_number(err_num),
+                                                                                                       error_offset(err_off),
+                                                                                                       error_message("Failed to parse " + failedAction + ": \"" + where + "\"")
+                                                                                                       {
+}
 
 /** Destructor.
  *  Virtual to allow for subclassing.

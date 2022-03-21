@@ -3,6 +3,7 @@
 //
 
 #include "../include/Rule.h"
+
 Rule::Rule(const string &name, const string &direction, const string& src_ip, const string &src_port,
            const string& dest_ip, const string &dest_port, const string &protocol, const string &ack,
            const string &action)
@@ -10,84 +11,87 @@ Rule::Rule(const string &name, const string &direction, const string& src_ip, co
     //TODO: add parsing for stuff like IP and ports, we don't want to represent them using strings obviously.
     this->name = name;
     this->direction = ParseDirection(direction);
-    this->src_ip = Rule::ParseIP(src_ip);
-    this->src_port = Rule::ParsePort(src_port);
-    this->dest_ip = Rule::ParseIP(dest_ip);
-    this->dest_port = Rule::ParsePort(dest_port);
-    this->ack = Rule::ParseAck(ack);
-    this->protocol = Rule::ParseProtocol(protocol);;
-    this->action = Rule::ParseAction(action);
+    this->src_ip = ParseIP(src_ip);
+    this->src_port = ParsePort(src_port);
+    this->dest_ip = ParseIP(dest_ip);
+    this->dest_port = ParsePort(dest_port);
+    this->ack = ParseAck(ack);
+    this->protocol = ParseProtocol(protocol);;
+    this->action = ParseAction(action);
 }
 
 string Rule::getName() const {
     return name;
 }
 
-void Rule::setName(const string &name) {
-    Rule::name = name;
+void Rule::setName(const string &p_name) {
+    name = p_name;
 }
 
 string Rule::getAction() const {
     return action;
 }
 
-void Rule::setAction(const string &action) {
-    Rule::action = action;
+void Rule::setAction(const string &p_action) {
+    action = ParseAction(p_action);
 }
 
 string Rule::getDirection() const {
     return direction;
 }
 
-void Rule::setDirection(const string &direction) {
-    Rule::direction = direction;
+void Rule::setDirection(const string &p_direction) {
+    direction = ParseDirection(p_direction);
 }
 
-pcpp::IPv4Address Rule::getSrcIp() const {
+std::pair<pcpp::IPv4Address, string> Rule::getSrcIp() const {
     return src_ip;
 }
-void Rule::setSrcIp(const pcpp::IPv4Address &srcIp) {
-    src_ip = srcIp;
+void Rule::setSrcIp(const string &p_src_ip) {
+    src_ip = ParseIP(p_src_ip);
 }
 
-pcpp::IPv4Address Rule::getDestIp() const {
+std::pair<pcpp::IPv4Address, string> Rule::getDestIp() const {
     return dest_ip;
 }
 
-void Rule::setDestIp(const pcpp::IPv4Address &destIp) {
-    dest_ip = destIp;
+void Rule::setDestIp(const string &p_dest_ip) {
+    dest_ip = ParseIP(p_dest_ip);
 }
 
-uint16_t Rule::getSrcPort() const {
-    return src_port;
+std::pair<uint32_t, string> Rule::getSrcPort() const {
+    return {src_port, src_port > MAX_PORT ? "any" : to_string(src_port)};
 }
 
-void Rule::setSrcPort(uint16_t srcPort) {
-    src_port = srcPort;
+void Rule::setSrcPort(string p_src_port) {
+    src_port = ParsePort(p_src_port);
 }
 
-uint16_t Rule::getDestPort() const {
-    return dest_port;
+std::pair<uint32_t, string> Rule::getDestPort() const {
+    return {dest_port, dest_port > MAX_PORT ? "any" : to_string(dest_port)};
 }
 
-void Rule::setDestPort(uint16_t destPort) {
-    dest_port = destPort;
+void Rule::setDestPort(string p_dest_port) {
+    dest_port = ParsePort(p_dest_port);
 }
 
 string Rule::getProtocol() const {
-    return "";
+    for (const auto & it : PROTOCOL_DEF)
+        if (it.second == protocol)
+            return it.first;
+    throw BadParse("or could not find matching protocol", name);
 }
 
-void Rule::setProtocol(pcpp::ProtocolType protocol) {
-    //Rule::protocol = ParseProtocol(protocol);
+void Rule::setProtocol(string p_protocol) {
+    Rule::protocol = ParseProtocol(std::move(p_protocol));
 }
 
 string Rule::getAck() const {
     return ack;
 }
 
-void Rule::setAck(const string& ack) {
-    Rule::ack = ack;
+void Rule::setAck(const string& p_ack) {
+    Rule::ack = p_ack;
 }
 
 //TODO no critical, but a lot of these use the same pattern of string transform and find, maybe reduce to one implementation?
@@ -100,55 +104,62 @@ std::string Rule::ParseDirection(string dir){
         return dir;
     }
     std::cout << "PARSE DIR:" << dir << std::endl;
-    return ""; //throw BadParse
+    throw BadParse("Rule Direction", dir);
 }
-std::string Rule::ParseAction(string action){
-    std::for_each(action.begin(), action.end(), [](char & c){
+std::string Rule::ParseAction(string p_action){
+    std::for_each(p_action.begin(), p_action.end(), [](char & c){
         c = ::tolower(c);
     });
-    if(std::find(ACTION_DEF.begin(), ACTION_DEF.end(), action) != ACTION_DEF.end()){
-        return action;
+    if(std::find(ACTION_DEF.begin(), ACTION_DEF.end(), p_action) != ACTION_DEF.end()){
+        return p_action;
     }
-    return ""; //throw BadParse
+    throw BadParse("Rule Action", p_action);
 }
-pcpp::IPv4Address Rule::ParseIP(string ip_addr){
-    pcpp::IPv4Address temp(ip_addr);
-    if(temp.toString() == ip_addr){
-        return temp;
+std::pair<pcpp::IPv4Address,string> Rule::ParseIP(string p_ip_addr){
+    std::for_each(p_ip_addr.begin(), p_ip_addr.end(), [](char & c){
+        c = ::tolower(c);
+    });
+    if(p_ip_addr == "any"){
+        return {NULL, "any"};
     }
-    return pcpp::IPv4Address("0.0.0.0"); //throw BadParse
+    pcpp::IPv4Address temp(p_ip_addr);
+    if(temp.toString() == p_ip_addr){
+        return {temp, temp.toString()};
+    }
+    throw BadParse("Rule IP", p_ip_addr);
 }
-uint16_t Rule::ParsePort(const string& port_num){
+uint32_t Rule::ParsePort(string p_port_num){
+    std::for_each(p_port_num.begin(), p_port_num.end(), [](char & c){
+        c = ::tolower(c);
+    });
     try{
-        uint16_t tmp = std::stoi(port_num);
-        if(tmp >= 0 && tmp <= (2e16)-1){
-            return tmp;
-        }
+        if(p_port_num == "any") return MAX_PORT+1;
+        uint32_t tmp = std::stoi(p_port_num);
+        if(tmp >= 0 && tmp <= MAX_PORT) return tmp;
         throw std::exception();
     }
     catch(...){
-        // throw BadParse
+        throw BadParse("Rule Port", p_port_num);
     }
-    return -1;
 
 }
-string Rule::ParseAck(string ack){
-    std::for_each(ack.begin(), ack.end(), [](char & c){
+string Rule::ParseAck(string p_ack){
+    std::for_each(p_ack.begin(), p_ack.end(), [](char & c){
         c = ::tolower(c);
     });
-    if(std::find(ACTION_DEF.begin(), ACTION_DEF.end(), ack) != ACTION_DEF.end()){
-        return ack;
-    } //throw BadParse
-    return "";
+    if(std::find(ACK_DEF.begin(), ACK_DEF.end(), p_ack) != ACK_DEF.end()){
+        return p_ack;
+    }
+    throw BadParse("Rule ACK", p_ack);
+
 }
-pcpp::ProtocolType Rule::ParseProtocol(string protocol){
-    std::for_each(protocol.begin(), protocol.end(), [](char & c){
+pcpp::ProtocolType Rule::ParseProtocol(string p_protocol){
+    std::for_each(p_protocol.begin(), p_protocol.end(), [](char & c){
         c = ::toupper(c);
     });
-    if ( auto it{ PROTOCOL_DEF.find( protocol ) }; it != PROTOCOL_DEF.end() )
+    if ( auto it{ PROTOCOL_DEF.find( p_protocol ) }; it != PROTOCOL_DEF.end() )
     {
-        return PROTOCOL_DEF[protocol];
+        return PROTOCOL_DEF[p_protocol];
     }
-    //throw BadParse
-    return 0;
+    throw BadParse("Rule Protocol", p_protocol);
 }

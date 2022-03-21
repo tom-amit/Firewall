@@ -1,16 +1,14 @@
 //
 // Created by karkt on 3/19/2022.
 //
-
-#include "Rule.h"
-
 #ifndef RULESDAST_RULETABLE_H
 #define RULESDAST_RULETABLE_H
+
 #define TABLE_LENGTH 9
+#include "Rule.h"
+
 
 class RuleTable {
-    std::optional<std::string> AddRule(const Rule& rule);
-
 public:
     RuleTable();
 
@@ -20,6 +18,8 @@ public:
     void DisplayTable();
 
 private:
+    std::optional<std::string> AddRule(const Rule& rule);
+
     std::vector<Rule*> table;
     uint64_t __len;
     uint16_t display_padding;
