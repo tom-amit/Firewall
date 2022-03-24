@@ -5,9 +5,12 @@
 #define RULESDAST_RULETABLE_H
 
 #define TABLE_LENGTH 9
+
+
 #include "Rule.h"
-
-
+#include "Packet.h"
+#include "TcpLayer.h"
+#include "UdpLayer.h"
 class RuleTable {
 public:
     RuleTable();
@@ -16,6 +19,7 @@ public:
                                        const string &dest_ip, const string &dest_port, const string &protocol, const string &ack,
                                        const string &action);
     void DisplayTable();
+    bool ParsePacket(pcpp::Packet& p_packet, const string& dir="any");
 
 private:
     std::optional<std::string> AddRule(const Rule& rule);
@@ -23,6 +27,7 @@ private:
     std::vector<Rule*> table;
     uint64_t __len;
     uint16_t display_padding;
+    bool compare_ip_addresses(const string& rule, const string& target);
 };
 
 

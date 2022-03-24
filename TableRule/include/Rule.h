@@ -27,6 +27,14 @@ using std::to_string;
 
 class Rule {
 public:
+
+    //TODO move to be a global variable
+    const std::vector<string> DIR_DEF{"in", "out", "any"};
+    const std::vector<string> ACTION_DEF{"allow", "deny", "any"};
+    const std::vector<string> ACK_DEF{"yes", "no", "any"};
+    const std::map<string, long unsigned int> PROTOCOL_DEF{{"ANY", 0x111},{"TCP", 0x04}, {"UDP", 0x08}};
+
+
     Rule(const string& name,const string& direction, const string& src_ip, const string& src_port, const string& dest_ip, const string& dest_port,const string& protocol, const string& ack, const string& action);
 
     string getName() const;
@@ -61,7 +69,7 @@ public:
 
     void setProtocol(string p_protocol);
 
-    string getAck() const;
+    std::pair<uint16_t , string> getAck() const;
 
     void setAck(const string& p_ack);
 
@@ -71,11 +79,6 @@ private:
     uint32_t src_port, dest_port;
     pcpp::ProtocolType protocol;
 
-    //TODO move to be a global variable
-    std::vector<string> DIR_DEF{"in", "out", "any"};
-    std::vector<string> ACTION_DEF{"allow", "deny", "any"};
-    std::vector<string> ACK_DEF{"yes", "no", "any"};
-    std::map<string, long unsigned int> PROTOCOL_DEF{{"ANY", 0x111},{"TCP", 0x04}, {"UDP", 0x08}};
 
     std::string ParseDirection(string p_dir);
     std::string ParseAction(string p_action);
@@ -83,7 +86,6 @@ private:
     uint32_t ParsePort(string p_port_num);
     string ParseAck(string p_ack);
     pcpp::ProtocolType ParseProtocol(string p_protocol);
-
 };
 
 

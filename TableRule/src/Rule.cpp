@@ -86,12 +86,12 @@ void Rule::setProtocol(string p_protocol) {
     Rule::protocol = ParseProtocol(std::move(p_protocol));
 }
 
-string Rule::getAck() const {
-    return ack;
+std::pair<uint16_t, string> Rule::getAck() const {
+    return {(ack == "yes") ? 1 : ((ack == "no") ? 0 : -1) , ack};
 }
 
 void Rule::setAck(const string& p_ack) {
-    Rule::ack = p_ack;
+    Rule::ack = ParseAck(p_ack);
 }
 
 //TODO no critical, but a lot of these use the same pattern of string transform and find, maybe reduce to one implementation?
@@ -159,7 +159,7 @@ pcpp::ProtocolType Rule::ParseProtocol(string p_protocol){
     });
     if ( auto it{ PROTOCOL_DEF.find( p_protocol ) }; it != PROTOCOL_DEF.end() )
     {
-        return PROTOCOL_DEF[p_protocol];
+        return PROTOCOL_DEF.at(p_protocol);
     }
     throw BadParse("Rule Protocol", p_protocol);
 }
