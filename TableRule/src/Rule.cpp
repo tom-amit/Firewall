@@ -115,16 +115,48 @@ std::string Rule::ParseAction(string p_action){
     }
     throw BadParse("Rule Action", p_action);
 }
-std::pair<pcpp::IPv4Address,string> Rule::ParseIP(string p_ip_addr){
-    std::for_each(p_ip_addr.begin(), p_ip_addr.end(), [](char & c){
-        c = ::tolower(c);
-    });
-    if(p_ip_addr == "any"){
-        return {NULL, "any"};
+
+std::vector<string> Rule::split_ip(string s) {
+    string delimiter = ".";
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    string token;
+    std::vector<string> res;
+
+    while ((pos_end = s.find (delimiter, pos_start)) != string::npos) {
+        token = s.substr (pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back (token);
     }
+
+    res.push_back (s.substr (pos_start));
+    return res;
+}
+std::pair<pcpp::IPv4Address,string> Rule::ParseIP(string p_ip_addr){
+    std::vector<string> ip_split = split_ip(p_ip_addr);
     pcpp::IPv4Address temp(p_ip_addr);
     if(temp.toString() == p_ip_addr){
         return {temp, temp.toString()};
+    }
+    else{
+        std::for_each(p_ip_addr.begin(), p_ip_addr.end(), [](char & c){
+            c = ::tolower(c);
+        });
+        if(GENERAL_IP.find(p_ip_addr) != GENERAL_IP.end()){
+            return {NULL, GENERAL_IP.at(p_ip_addr)};
+        }
+        string replacement = "";
+        for(auto& c: p_ip_addr){
+            if(c == '*'){
+                replacement+='0';
+            }
+            else{
+                replacement+=c;
+            }
+        }
+        temp = pcpp::IPv4Address(replacement);
+        if(temp.toString() == replacement){
+            return {NULL, p_ip_addr};
+        }
     }
     throw BadParse("Rule IP", p_ip_addr);
 }

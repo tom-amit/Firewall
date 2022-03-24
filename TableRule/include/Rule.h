@@ -27,8 +27,9 @@ using std::to_string;
 
 class Rule {
 public:
-
+    static std::vector<string> split_ip(string s);
     //TODO move to be a global variable
+    const std::map<string, string> GENERAL_IP {{"any", "*.*.*.*"}};
     const std::vector<string> DIR_DEF{"in", "out", "any"};
     const std::vector<string> ACTION_DEF{"allow", "deny", "any"};
     const std::vector<string> ACK_DEF{"yes", "no", "any"};
@@ -79,9 +80,8 @@ private:
     uint32_t src_port, dest_port;
     pcpp::ProtocolType protocol;
 
-
-    std::string ParseDirection(string p_dir);
-    std::string ParseAction(string p_action);
+    string ParseDirection(string p_dir);
+    string ParseAction(string p_action);
     std::pair<pcpp::IPv4Address, string> ParseIP(string p_ip_addr);
     uint32_t ParsePort(string p_port_num);
     string ParseAck(string p_ack);

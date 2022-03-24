@@ -51,23 +51,10 @@ bool RuleTable::ParsePacket(pcpp::Packet &p_packet , const string& dir) {
     }
     return false;
 }
-std::vector<string> split(string s, string delimiter) {
-    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-    string token;
-    std::vector<string> res;
 
-    while ((pos_end = s.find (delimiter, pos_start)) != string::npos) {
-        token = s.substr (pos_start, pos_end - pos_start);
-        pos_start = pos_end + delim_len;
-        res.push_back (token);
-    }
-
-    res.push_back (s.substr (pos_start));
-    return res;
-}
 bool RuleTable::compare_ip_addresses(const string &rule, const string &target) {
-    std::vector<string> split_src = split(rule, ".");
-    std::vector<string> split_target = split(rule, ".");
+    std::vector<string> split_src = Rule::split_ip(rule);
+    std::vector<string> split_target = Rule::split_ip(target);
     for(auto [r, t] = std::pair{split_src.begin(), split_target.begin()};
         r != split_src.end() && t!=split_target.end(); ++r, ++t){
         if(*r != "*" && *r != *t) return false;
