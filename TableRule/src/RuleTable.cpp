@@ -18,7 +18,7 @@ bool RuleTable::ParsePacket(pcpp::Packet &p_packet , const string& dir) {
     auto ip_layer = *p_packet.getLayerOfType<pcpp::IPv4Layer>();
     auto tcp_hdr = *p_packet.getLayerOfType<pcpp::tcphdr>();
     uint32_t srcPort, destPrt;
-    //TODO only if have enough free time or either typedef does not work here
+    //TODO only if have enough free time or either typedef does not work here, final option is to just create all elements before the if in one big ugly if-else
     typedef pcpp::TcpLayer protocol_type;
     string protocol = "";
     if (ip_layer.getProtocol() == 0x04) { //TCP
@@ -57,7 +57,7 @@ bool RuleTable::compare_ip_addresses(const string &rule, const string &target) {
     std::vector<string> split_target = Rule::split_ip(target);
     for(auto [r, t] = std::pair{split_src.begin(), split_target.begin()};
         r != split_src.end() && t!=split_target.end(); ++r, ++t){
-        if(*r != "*" && *r != *t) return false;
+        if(*r != "*" && *r != *t) return false; // "*" : magic string
     }
     return true;
 }
@@ -85,7 +85,7 @@ std::optional<string> RuleTable::AddRule(const string &name, const string &direc
 std::optional<string> RuleTable::AddRule(const Rule& rule)  {
     table.insert(table.end()-1, new Rule(rule));
     __len++;
-    return "OK";
+    return "OK"; // "magic string"
 }
 
 void RuleTable::DisplayTable(){
