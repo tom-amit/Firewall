@@ -34,6 +34,7 @@ bool RuleTable::ParsePacket(pcpp::Packet &p_packet , const string& dir) {
     destPrt = static_cast<uint32_t>(layer->getDstPort());
     for (auto& rule: table){
         //TODO add direction checking
+        //TODO: not retrieve with rule->get***() once and not twice for everything
         if((rule->getDirection() == dir || dir == "any") &&
         compare_ip_addresses(rule->getSrcIp().second, ip_layer.getSrcIPv4Address().toString())&&
         compare_ip_addresses(rule->getDestIp().second, ip_layer.getDstIPv4Address().toString()) &&
