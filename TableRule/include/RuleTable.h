@@ -25,7 +25,8 @@ private:
     std::optional<std::string> AddRule(const Rule& rule);
 
     std::vector<Rule*> table;
-    uint64_t __len;
+    uint64_t len;
+    std::vector<string> rule_names;
     uint16_t display_padding;
     bool compare_ip_addresses(const string& rule, const string& target);
 };

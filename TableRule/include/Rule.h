@@ -27,8 +27,8 @@ using std::to_string;
 
 class Rule {
 public:
-    static std::vector<string> split_ip(string s);
-    //TODO move to be a global variable
+    static std::vector<string> split_ip(const string& s);
+    //TODO move to be a global variable (somehow)
     const std::map<string, string> GENERAL_IP {{"any", "*.*.*.*"}};
     const std::vector<string> DIR_DEF{"in", "out", "any"};
     const std::vector<string> ACTION_DEF{"allow", "deny", "any"};
@@ -36,41 +36,43 @@ public:
     const std::map<string, long unsigned int> PROTOCOL_DEF{{"ANY", 0x111},{"TCP", 0x04}, {"UDP", 0x08}};
 
 
-    Rule(const string& name,const string& direction, const string& src_ip, const string& src_port, const string& dest_ip, const string& dest_port,const string& protocol, const string& ack, const string& action);
+    Rule(const string &name, const string &direction, const string& src_ip, const string &src_port,
+         const string& dest_ip, const string &dest_port, const string &protocol, const string &ack,
+         const string &action);
 
-    string getName() const;
+    [[nodiscard]] string getName() const;
 
     void setName(const string &p_name);
 
-    string getAction() const;
+    [[nodiscard]] string getAction() const;
 
     void setAction(const string &p_action);
 
-    string getDirection() const;
+    [[nodiscard]] string getDirection() const;
 
     void setDirection(const string &p_direction);
 
-    std::pair<pcpp::IPv4Address, string> getSrcIp() const;
+    [[nodiscard]] std::pair<pcpp::IPv4Address, string> getSrcIp() const;
 
     void setSrcIp(const string &p_src_ip);
 
-    std::pair<pcpp::IPv4Address, string> getDestIp() const;
+    [[nodiscard]] std::pair<pcpp::IPv4Address, string> getDestIp() const;
 
     void setDestIp(const string &p_dest_ip);
 
-    std::pair<uint32_t, string> getSrcPort() const;
+    [[nodiscard]] std::pair<uint32_t, string> getSrcPort() const;
 
     void setSrcPort(string p_src_port);
 
-    std::pair<uint32_t, string> getDestPort() const;
+    [[nodiscard]] std::pair<uint32_t, string> getDestPort() const;
 
     void setDestPort(string p_dest_port);
 
-    string getProtocol() const;
+    [[nodiscard]] string getProtocol() const;
 
     void setProtocol(string p_protocol);
 
-    std::pair<uint16_t , string> getAck() const;
+    [[nodiscard]] std::pair<uint16_t , string> getAck() const;
 
     void setAck(const string& p_ack);
 
@@ -80,7 +82,7 @@ private:
     uint32_t src_port, dest_port;
     pcpp::ProtocolType protocol;
 
-    string ParseDirection(string p_dir);
+    string ParseDirection(string dir);
     string ParseAction(string p_action);
     std::pair<pcpp::IPv4Address, string> ParseIP(string p_ip_addr);
     uint32_t ParsePort(string p_port_num);

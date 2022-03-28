@@ -8,7 +8,6 @@ Rule::Rule(const string &name, const string &direction, const string& src_ip, co
            const string& dest_ip, const string &dest_port, const string &protocol, const string &ack,
            const string &action)
 {
-    //TODO: add parsing for stuff like IP and ports, we don't want to represent them using strings obviously.
     this->name = name;
     this->direction = ParseDirection(direction);
     this->src_ip = ParseIP(src_ip);
@@ -94,29 +93,12 @@ void Rule::setAck(const string& p_ack) {
     Rule::ack = ParseAck(p_ack);
 }
 
-//TODO no critical, but a lot of these use the same pattern of string transform and find, maybe reduce to one implementation?
-
-std::string Rule::ParseDirection(string dir){
-    std::for_each(dir.begin(), dir.end(), [](char & c){
-        c = ::tolower(c);
+void strToFunc(string& str, int (*func)(int)){
+    std::for_each(str.begin(), str.end(), [&func](char & c){
+        c = func(c);
     });
-    if(std::find(DIR_DEF.begin(), DIR_DEF.end(), dir) != DIR_DEF.end()){
-        return dir;
-    }
-    std::cout << "PARSE DIR:" << dir << std::endl;
-    throw BadParse("Rule Direction", dir);
 }
-std::string Rule::ParseAction(string p_action){
-    std::for_each(p_action.begin(), p_action.end(), [](char & c){
-        c = ::tolower(c);
-    });
-    if(std::find(ACTION_DEF.begin(), ACTION_DEF.end(), p_action) != ACTION_DEF.end()){
-        return p_action;
-    }
-    throw BadParse("Rule Action", p_action);
-}
-
-std::vector<string> Rule::split_ip(string s) {
+std::vector<string> Rule::split_ip(const string& s) {
     string delimiter = ".";
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
     string token;
@@ -131,6 +113,22 @@ std::vector<string> Rule::split_ip(string s) {
     res.push_back (s.substr (pos_start));
     return res;
 }
+std::string Rule::ParseDirection(string dir){
+    strToFunc(dir, ::tolower);
+    if(std::find(DIR_DEF.begin(), DIR_DEF.end(), dir) != DIR_DEF.end()){
+        return dir;
+    }
+    std::cout << "PARSE DIR:" << dir << std::endl;
+    throw BadParse("Rule Direction", dir);
+}
+std::string Rule::ParseAction(string p_action){
+    strToFunc(p_action, ::tolower);
+    if(std::find(ACTION_DEF.begin(), ACTION_DEF.end(), p_action) != ACTION_DEF.end()){
+        return p_action;
+    }
+    throw BadParse("Rule Action", p_action);
+}
+
 std::pair<pcpp::IPv4Address,string> Rule::ParseIP(string p_ip_addr){
     std::vector<string> ip_split = split_ip(p_ip_addr);
     pcpp::IPv4Address temp(p_ip_addr);
@@ -138,9 +136,7 @@ std::pair<pcpp::IPv4Address,string> Rule::ParseIP(string p_ip_addr){
         return {temp, temp.toString()};
     }
     else{
-        std::for_each(p_ip_addr.begin(), p_ip_addr.end(), [](char & c){
-            c = ::tolower(c);
-        });
+        strToFunc(p_ip_addr, ::tolower);
         if(GENERAL_IP.find(p_ip_addr) != GENERAL_IP.end()){
             return {NULL, GENERAL_IP.at(p_ip_addr)};
         }
@@ -161,9 +157,7 @@ std::pair<pcpp::IPv4Address,string> Rule::ParseIP(string p_ip_addr){
     throw BadParse("Rule IP", p_ip_addr);
 }
 uint32_t Rule::ParsePort(string p_port_num){
-    std::for_each(p_port_num.begin(), p_port_num.end(), [](char & c){
-        c = ::tolower(c);
-    });
+    strToFunc(p_port_num, ::tolower);
     try{
         if(p_port_num == "any") return MAX_PORT+1;
         uint32_t tmp = std::stoi(p_port_num);
@@ -176,9 +170,7 @@ uint32_t Rule::ParsePort(string p_port_num){
 
 }
 string Rule::ParseAck(string p_ack){
-    std::for_each(p_ack.begin(), p_ack.end(), [](char & c){
-        c = ::tolower(c);
-    });
+    strToFunc(p_ack, ::tolower);
     if(std::find(ACK_DEF.begin(), ACK_DEF.end(), p_ack) != ACK_DEF.end()){
         return p_ack;
     }
@@ -186,9 +178,7 @@ string Rule::ParseAck(string p_ack){
 
 }
 pcpp::ProtocolType Rule::ParseProtocol(string p_protocol){
-    std::for_each(p_protocol.begin(), p_protocol.end(), [](char & c){
-        c = ::toupper(c);
-    });
+    strToFunc(p_protocol, ::toupper);
     if ( auto it{ PROTOCOL_DEF.find( p_protocol ) }; it != PROTOCOL_DEF.end() )
     {
         return PROTOCOL_DEF.at(p_protocol);
