@@ -94,12 +94,13 @@ void Rule::setAck(const string& p_ack) {
     Rule::ack = ParseAck(p_ack);
 }
 
-void strToFunc(string& str, int (*func)(int)){
-    std::for_each(str.begin(), str.end(), [&func](char & c){
+void Rule::strToFunc(string &str, int (*func)(int)) {
+    std::for_each(str.begin(), str.end(), [&func](char &c) {
         c = func(c);
     });
 }
-std::vector<string> Rule::split_ip(const string& s) {
+
+std::vector<string> Rule::split_ip(const string &s) {
     string delimiter = ".";
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
     string token;
@@ -122,9 +123,9 @@ std::string Rule::ParseDirection(string dir){
     std::cout << "PARSE DIR:" << dir << std::endl;
     throw BadParse("Rule Direction", dir);
 }
-std::string Rule::ParseAction(string p_action){
+std::string Rule::ParseAction(string p_action) {
     strToFunc(p_action, ::tolower);
-    if(std::find(ACTION_DEF.begin(), ACTION_DEF.end(), p_action) != ACTION_DEF.end()){
+    if (auto it{ACTION_DEF.find(p_action)}; it != ACTION_DEF.end()) {
         return p_action;
     }
     throw BadParse("Rule Action", p_action);

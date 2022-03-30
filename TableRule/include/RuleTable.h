@@ -18,7 +18,7 @@ using std::unique_ptr;
 class RuleTable {
 public:
     RuleTable();
-
+    const string SUCCESS{"OK"};
     std::optional<std::string> AddRule(const string &name, const string &direction, const string &src_ip,
                                        const string &dest_ip, const string &src_port, const string &dest_port,
                                        const string &protocol, const string &ack,
@@ -26,7 +26,7 @@ public:
 
     void DisplayTable();
 
-    bool ParsePacket(pcpp::Packet &p_packet, const string &dir = "any");
+    bool ParsePacket(pcpp::Packet &p_packet, string &dir = "any");
 
     std::optional<std::string> RemoveRule(const string &name);
 
@@ -37,7 +37,8 @@ private:
     uint64_t len;
     std::vector<string> rule_names;
     uint16_t display_padding;
-    bool compare_ip_addresses(const string& rule, const string& target);
+
+    static bool compare_ip_addresses(const string &rule, const string &target);
 };
 
 
