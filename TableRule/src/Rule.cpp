@@ -87,6 +87,7 @@ void Rule::setProtocol(string p_protocol) {
 }
 
 std::pair<uint16_t, string> Rule::getAck() const {
+    //TODO ugly line, we literally use ACK_DEF, so use it....
     return {(ack == "yes") ? 1 : ((ack == "no") ? 0 : -1) , ack};
 }
 
@@ -120,7 +121,7 @@ std::string Rule::ParseDirection(string dir){
     if(std::find(DIR_DEF.begin(), DIR_DEF.end(), dir) != DIR_DEF.end()){
         return dir;
     }
-    std::cout << "PARSE DIR:" << dir << std::endl;
+    //std::cout << "PARSE DIR:" << dir << std::endl;
     throw BadParse("Rule Direction", dir);
 }
 std::string Rule::ParseAction(string p_action) {
@@ -161,7 +162,7 @@ std::pair<pcpp::IPv4Address,string> Rule::ParseIP(string p_ip_addr){
 uint32_t Rule::ParsePort(string p_port_num){
     strToFunc(p_port_num, ::tolower);
     try{
-        if(p_port_num == "any") return MAX_PORT+1;
+        if (p_port_num == ANY) return MAX_PORT + 1;
         uint32_t tmp = std::stoi(p_port_num);
         if(tmp >= 0 && tmp <= MAX_PORT) return tmp;
         throw std::exception();
