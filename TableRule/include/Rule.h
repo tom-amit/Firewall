@@ -27,17 +27,21 @@ using std::to_string;
 
 class Rule {
 public:
-    static std::vector<string> split_ip(const string& s);
+    static std::vector<string> split_ip(const string &s);
+
     //TODO move to be a global variable (somehow)
-    const std::map<string, string> GENERAL_IP {{"any", "*.*.*.*"}};
+    const std::map<string, string> GENERAL_IP{{"any", "*.*.*.*"}};
     const std::vector<string> DIR_DEF{"in", "out", "any"};
     const std::vector<string> ACTION_DEF{"allow", "deny", "any"};
     const std::vector<string> ACK_DEF{"yes", "no", "any"};
-    const std::map<string, long unsigned int> PROTOCOL_DEF{{"ANY", 0x111},{"TCP", 0x04}, {"UDP", 0x08}};
+    const std::map<string, long unsigned int> PROTOCOL_DEF{{"ANY", 0x111},
+                                                           {"TCP", 0x04},
+                                                           {"UDP", 0x08}};
 
 
-    Rule(const string &name, const string &direction, const string& src_ip, const string &src_port,
-         const string& dest_ip, const string &dest_port, const string &protocol, const string &ack,
+    Rule(const string &name, const string &direction, const string &src_ip,
+         const string &dest_ip, const string &src_port, const string &dest_port, const string &protocol,
+         const string &ack,
          const string &action);
 
     [[nodiscard]] string getName() const;

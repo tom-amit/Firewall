@@ -3,160 +3,44 @@
 //
 
 #include "../include/Controller.h"
+#include <cstdio>
 
-
-
-namespace util {
-    template<typename ReturnType, typename... Args>
-    struct function_traits_defs {
-        static constexpr size_t arity = sizeof...(Args);
-
-        using result_type = ReturnType;
-
-        template<size_t i>
-        struct arg {
-            using type = typename std::tuple_element<i, std::tuple<Args...>>::type;
-        };
-    };
-
-    template<typename T>
-    struct function_traits_impl;
-
-    template<typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(Args...)>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(*)(Args...)>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ClassType, typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(ClassType::*)(Args...)>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ClassType, typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(ClassType::*)(Args...) const>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ClassType, typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(ClassType::*)(Args...) const &>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ClassType, typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(ClassType::*)(Args...) const &&>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ClassType, typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(ClassType::*)(Args...) volatile>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ClassType, typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(ClassType::*)(Args...) volatile &>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ClassType, typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(ClassType::*)(Args...) volatile &&>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ClassType, typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(ClassType::*)(Args...) const volatile>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ClassType, typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(ClassType::*)(Args...) const volatile &>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename ClassType, typename ReturnType, typename... Args>
-    struct function_traits_impl<ReturnType(ClassType::*)(Args...) const volatile &&>
-            : function_traits_defs<ReturnType, Args...> {
-    };
-
-    template<typename T, typename V = void>
-    struct function_traits
-            : function_traits_impl<T> {
-    };
-
-    template<typename T>
-    struct function_traits<T, decltype((void) &T::operator())>
-            : function_traits_impl<decltype(&T::operator())> {
-    };
-
-    template<size_t... Indices>
-    struct indices {
-        using next = indices<Indices..., sizeof...(Indices)>;
-    };
-    template<size_t N>
-    struct build_indices {
-        using type = typename build_indices<N - 1>::type::next;
-    };
-    template<>
-    struct build_indices<0> {
-        using type = indices<>;
-    };
-    template<size_t N>
-    using BuildIndices = typename build_indices<N>::type;
-
-    namespace details {
-        template<typename FuncType,
-                typename VecType,
-                size_t... I,
-                typename Traits = function_traits<FuncType>,
-                typename ReturnT = typename Traits::result_type>
-        ReturnT do_call(FuncType &func,
-                        VecType &args,
-                        indices<I...>) {
-            assert(args.size() >= Traits::arity);
-            return func(args[I]...);
-        }
-    }  // namespace details
-
-    template<typename FuncType,
-            typename VecType,
-            typename Traits = function_traits<FuncType>,
-            typename ReturnT = typename Traits::result_type>
-    ReturnT unpack_caller(FuncType &func,
-                          VecType &args) {
-        return details::do_call(func, args, BuildIndices<Traits::arity>());
-    }
-}
 Controller::Controller() {
     table = RuleTable();
+    cmd_map = {
+            {"add-rule",    {9, &Controller::add_rule}},
+            {"remove-rule", {1, &Controller::remove_rule}},
+            {"show-rules",  {0, &Controller::show_rules}},
+            {"start",       {0, &Controller::start}},
+            {"stop",        {0, &Controller::stop}}
+    };
 }
 
-void Controller::add_rule(std::vector<string> args){
-    std::cout << "Test!!!!!!!!!!!!! " << args.size() << std::endl;
-    int j = util::unpack_caller((table.AddRule), args);
-
+void Controller::add_rule(const std::vector<string> &args) {
+    table.AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
 }
-void Controller::remove_rule(std::vector<string> args){
 
+void Controller::remove_rule(const std::vector<string> &args) {
+    table.RemoveRule(args[0]);
 }
-void Controller::show_rules(std::vector<string> args){
 
+void Controller::show_rules(const std::vector<string> &args) {
+    table.DisplayTable();
 }
-void Controller::start(std::vector<string> args){
 
-}
-void Controller::stop(std::vector<string> args){
+void Controller::start(const std::vector<string> &args) {
 
 }
 
-void Controller::run(){
+void Controller::stop(const std::vector<string> &args) {
 
+}
+
+void Controller::run() {
+    table.AddRule("amit12345", "in", "234.222.*.3", "123", "192.169.33.1", "655399", "UDP", "yes", "allow");
+    table.AddRule("itay", "in", "234.222.11.3", "123", "192.169.33.1", "65535", "UDP", "yes", "allow");
     std::vector<std::string> args;
-    do
-    {
+    do {
         args.clear();
         std::cout << "Enter command: " << std::endl;
         std::string rawInput;
@@ -174,7 +58,7 @@ void Controller::run(){
         if ( auto it{ cmd_map.find( args[0] ) }; it != cmd_map.end())
         {
             if(args.size() - 1 == cmd_map.at(args[0]).first){
-                cmd_map.at(args[0]).second(std::vector<string>(args.begin()+1, args.end()));
+                (this->*(cmd_map.at(args[0]).second))(std::vector<string>(args.begin() + 1, args.end()));
             }
         }
         std::string selection = args[0], cmd;

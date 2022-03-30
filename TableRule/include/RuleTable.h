@@ -15,16 +15,21 @@ class RuleTable {
 public:
     RuleTable();
 
-    std::optional<std::string> AddRule(const string &name, const string &direction, const string &src_ip, const string &src_port,
-                                       const string &dest_ip, const string &dest_port, const string &protocol, const string &ack,
+    std::optional<std::string> AddRule(const string &name, const string &direction, const string &src_ip,
+                                       const string &dest_ip, const string &src_port, const string &dest_port,
+                                       const string &protocol, const string &ack,
                                        const string &action);
+
     void DisplayTable();
-    bool ParsePacket(pcpp::Packet& p_packet, const string& dir="any");
+
+    bool ParsePacket(pcpp::Packet &p_packet, const string &dir = "any");
+
+    std::optional<std::string> RemoveRule(const string &name);
 
 private:
-    std::optional<std::string> p_AddRule(const Rule& rule);
+    std::optional<std::string> p_AddRule(const Rule &rule);
 
-    std::vector<Rule*> table;
+    std::vector<Rule *> table;
     uint64_t len;
     std::vector<string> rule_names;
     uint16_t display_padding;

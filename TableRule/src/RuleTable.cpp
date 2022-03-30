@@ -56,23 +56,25 @@ bool RuleTable::ParsePacket(pcpp::Packet &p_packet , const string& dir) {
 bool RuleTable::compare_ip_addresses(const string &rule, const string &target) {
     std::vector<string> split_src = Rule::split_ip(rule);
     std::vector<string> split_target = Rule::split_ip(target);
-    for(auto [r, t] = std::pair{split_src.begin(), split_target.begin()};
-        r != split_src.end() && t!=split_target.end(); ++r, ++t){
-        if(*r != "*" && *r != *t) return false; // "*" : magic string
+    for (auto[r, t] = std::pair{split_src.begin(), split_target.begin()};
+         r != split_src.end() && t != split_target.end(); ++r, ++t) {
+        if (*r != "*" && *r != *t) return false; // "*" : magic string
     }
     return true;
 }
-std::optional<string> RuleTable::AddRule(const string &name, const string &direction, const string &src_ip, const string &src_port,
-                   const string &dest_ip, const string &dest_port, const string &protocol, const string &ack,
-                   const string &action) {
+
+std::optional<string> RuleTable::AddRule(const string &name, const string &direction, const string &src_ip,
+                                         const string &dest_ip, const string &src_port, const string &dest_port,
+                                         const string &protocol, const string &ack,
+                                         const string &action) {
     //TODO strings comparison is case insensitive, fix that later...
-    for(auto &it : table){
-        if(it->getName() == name){
-            std::cerr << "No duplicate names are allowed for the rules, RULE: (" << name << ")" <<  std::endl;
+    for (auto &it: table) {
+        if (it->getName() == name) {
+            std::cerr << "No duplicate names are allowed for the rules, RULE: (" << name << ")" << std::endl;
             return {};
         }
     }
-    try{
+    try {
         return p_AddRule(Rule(name, direction, src_ip, src_port, dest_ip, dest_port, protocol, ack, action));;
     }
     catch(BadParse& e){
@@ -89,24 +91,43 @@ std::optional<string> RuleTable::AddRule(const string &name, const string &direc
     }
 }
 
-std::optional<string> RuleTable::p_AddRule(const Rule& rule)  {
-    table.insert(table.end()-1, new Rule(rule));
+std::optional<string> RuleTable::p_AddRule(const Rule &rule) {
+    table.insert(table.end() - 1, new Rule(rule));
     len++;
     return "OK"; // "magic string"
 }
 
-void RuleTable::DisplayTable(){
-    std::cout.width(display_padding); std::cout << std::left << "Name";
-    std::cout.width(display_padding); std::cout << std::left << "Direction";
-    std::cout.width(display_padding); std::cout << std::left << "Source IP";
-    std::cout.width(display_padding); std::cout << std::left << "Source Port";
-    std::cout.width(display_padding); std::cout << std::left << "Dest IP";
-    std::cout.width(display_padding); std::cout << std::left << "Dest Port";
-    std::cout.width(display_padding); std::cout << std::left << "Protocol";
-    std::cout.width(display_padding); std::cout << std::left << "ACK";
-    std::cout.width(display_padding); std::cout << std::left << "Action";
+std::optional<std::string> RuleTable::RemoveRule(const string &name) {
+    for (auto[i, it] = std::pair{0, table.begin()}; it != table.end() - 1; ++i, it++) {
+        if ((*it)->getName() == name) {
+            table.erase(it);
+            return "OK";
+        }
+    }
+    return {};
+}
+
+void RuleTable::DisplayTable() {
+    std::cout.width(display_padding);
+    std::cout << std::left << "Name";
+    std::cout.width(display_padding);
+    std::cout << std::left << "Direction";
+    std::cout.width(display_padding);
+    std::cout << std::left << "Source IP";
+    std::cout.width(display_padding);
+    std::cout << std::left << "Dest IP";
+    std::cout.width(display_padding);
+    std::cout << std::left << "Source Port";
+    std::cout.width(display_padding);
+    std::cout << std::left << "Dest Port";
+    std::cout.width(display_padding);
+    std::cout << std::left << "Protocol";
+    std::cout.width(display_padding);
+    std::cout << std::left << "ACK";
+    std::cout.width(display_padding);
+    std::cout << std::left << "Action";
     std::cout << std::endl;
-    for(int i = 0;i<TABLE_LENGTH*display_padding;++i){
+    for (int i = 0; i < TABLE_LENGTH * display_padding; ++i) {
         std::cout << "=";
     }
     std::cout << std::endl;
