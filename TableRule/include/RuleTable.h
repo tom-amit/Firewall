@@ -22,7 +22,7 @@ public:
     bool ParsePacket(pcpp::Packet& p_packet, const string& dir="any");
 
 private:
-    std::optional<std::string> AddRule(const Rule& rule);
+    std::optional<std::string> p_AddRule(const Rule& rule);
 
     std::vector<Rule*> table;
     uint64_t len;

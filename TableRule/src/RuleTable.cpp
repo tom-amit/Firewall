@@ -73,11 +73,11 @@ std::optional<string> RuleTable::AddRule(const string &name, const string &direc
         }
     }
     try{
-        return AddRule(Rule(name, direction, src_ip, src_port,dest_ip, dest_port, protocol, ack, action));;
+        return p_AddRule(Rule(name, direction, src_ip, src_port, dest_ip, dest_port, protocol, ack, action));;
     }
     catch(BadParse& e){
         for(int i = 0;i<TABLE_LENGTH*display_padding;++i){
-            std::cout << ">";
+            std::cerr << ">";
         }
         std::cerr << std::endl;
         std::cerr << "Encountered parsing error (will not create rule):\n" << e.what() << std::endl;
@@ -89,7 +89,7 @@ std::optional<string> RuleTable::AddRule(const string &name, const string &direc
     }
 }
 
-std::optional<string> RuleTable::AddRule(const Rule& rule)  {
+std::optional<string> RuleTable::p_AddRule(const Rule& rule)  {
     table.insert(table.end()-1, new Rule(rule));
     len++;
     return "OK"; // "magic string"
