@@ -20,7 +20,7 @@ private:
     void StopLiveDevicesCapture();
 public:
     Firewall();
-
+    //TODO scan the entire project, and make sure no regular pointers are used, memory and efficiency is important here, so smart pointers are a must!
     RuleTable* table;
 
     void Run();
