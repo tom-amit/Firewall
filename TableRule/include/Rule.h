@@ -30,7 +30,7 @@ public:
     static void strToFunc(string &str, int (*func)(int));
 
     const static inline string ANY{"any"};
-    const static inline char IP_ASTERISK{'*'};
+    const static inline string IP_ASTERISK{"*"};
     const static inline std::map<string, string> GENERAL_IP{{"any", "*.*.*.*"}};
     const static inline std::vector<string> DIR_DEF{"in", "out", "any"};
     const static inline std::map<string, bool> ACTION_DEF{{"allow", true},

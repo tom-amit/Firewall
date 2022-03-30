@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <EthLayer.h>
 #include <TcpLayer.h>
+#include "../TableRule/include/RuleTable.h"
+
 /**
 * A struct for collecting packet statistics
 */
@@ -73,33 +75,10 @@ struct PacketStats
 };
 
 /**
-* a callback function for the blocking mode capture which is called each time a packet is captured
-*/
-static bool onPacketArrivesBlockingMode(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie)
-{
-    // extract the stats object form the cookie
-    PacketStats* stats = (PacketStats*)cookie;
-
-    // parsed the raw packet
-    pcpp::Packet parsedPacket(packet);
-
-    // collect stats from packet
-    stats->consumePacket(parsedPacket);
-
-    std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
-
-    sleep(3);
-
-    // return false means we don't want to stop capturing after this callback
-    return false;
-}
-
-/**
 * A callback function for the async capture which is called each time a packet is captured
 */
 static void onPacketArrives1(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie)
 {
-
     pcpp::Packet parsedPacket(packet);
     std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
 
@@ -121,7 +100,6 @@ static void onPacketArrives1(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev,
 }
 static void onPacketArrives2(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie)
 {
-
     pcpp::Packet parsedPacket(packet);
     std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
 
@@ -138,8 +116,7 @@ static void onPacketArrives2(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev,
             parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
             parsedPacket.computeCalculateFields();
 
-            if(parsedPacket.getLayerOfType<pcpp::TcpLayer>() == NULL || parsedPacket.getLayerOfType<pcpp::TcpLayer>()->getDstPort() != 7777)
-                otherDev->sendPacket(*parsedPacket.getRawPacket());
+            otherDev->sendPacket(*parsedPacket.getRawPacket());
         }
     }
 }
@@ -222,7 +199,7 @@ int main(int argc, char* argv[])
     dev1->stopCapture();
     dev2->stopCapture();
     // capture is finished, print results
-    std::cout << "Results:" << std::endl;
+    //std::cout << "Results:" << std::endl;
     //stats.printToConsole();
 
     return 0;

@@ -26,14 +26,14 @@ public:
 
     void DisplayTable();
 
-    bool ParsePacket(pcpp::Packet &p_packet, string &dir = "any");
+    bool ParsePacket(pcpp::Packet &p_packet, const string &dir = "any");
 
     std::optional<std::string> RemoveRule(const string &name);
-
+    std::vector<unique_ptr<Rule>> table;
 private:
     std::optional<std::string> p_AddRule(const Rule &rule);
 
-    std::vector<unique_ptr<Rule>> table;
+
     uint64_t len;
     std::vector<string> rule_names;
     uint16_t display_padding;

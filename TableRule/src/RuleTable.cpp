@@ -21,40 +21,36 @@ bool str_equals(const string &a, const string &b) {
     return true;
 }
 
-bool RuleTable::ParsePacket(pcpp::Packet &p_packet, string &dir) {
-    auto ip_layer = *p_packet.getLayerOfType<pcpp::IPv4Layer>();
-    auto tcp_hdr = *p_packet.getLayerOfType<pcpp::tcphdr>();
+bool RuleTable::ParsePacket(pcpp::Packet &p_packet, const string &dir) {
+    auto ip_layer = p_packet.getLayerOfType<pcpp::IPv4Layer>();
+    pcpp::tcphdr* tcp_hdr;
     uint32_t srcPort = MAX_PORT + 1, destPrt = MAX_PORT + 1;
-    string protocol;
-    for (const auto &it: Rule::PROTOCOL_DEF) {
-        if (it.second == ip_layer.getProtocol()) {
-            if (it.second == 0x04) { //TCP
-                auto layer = p_packet.getLayerOfType<pcpp::TcpLayer>();
-                srcPort = static_cast<uint32_t>(layer->getSrcPort());
-                destPrt = static_cast<uint32_t>(layer->getDstPort());
-            }
-            if (it.second == 0x08) {//UDP
-                auto layer = p_packet.getLayerOfType<pcpp::UdpLayer>();
-                srcPort = static_cast<uint32_t>(layer->getSrcPort());
-                destPrt = static_cast<uint32_t>(layer->getDstPort());
-            }
-            protocol = it.first;
-            break;
-        }
+    string protocol = "";
+    if(p_packet.getLayerOfType<pcpp::TcpLayer>() != NULL){//TCP
+        auto layer = p_packet.getLayerOfType<pcpp::TcpLayer>();
+        srcPort = static_cast<uint32_t>(layer->getSrcPort());
+        destPrt = static_cast<uint32_t>(layer->getDstPort());
+        tcp_hdr = layer->getTcpHeader();
+        protocol = "TCP";
     }
-    if (srcPort > MAX_PORT || destPrt > MAX_PORT)
-        throw std::invalid_argument("Invalid protocol or invalid src_port and dest_port");
+    else if (p_packet.getLayerOfType<pcpp::UdpLayer>() != NULL){//UDP
+        auto layer = p_packet.getLayerOfType<pcpp::UdpLayer>();
+        srcPort = static_cast<uint32_t>(layer->getSrcPort());
+        destPrt = static_cast<uint32_t>(layer->getDstPort());
+        protocol = "UDP";
+    }
+
     for (auto &rule: table) {
         string r_dir = rule->getDirection(), r_src_ip = rule->getSrcIp().second, r_dest_ip = rule->getDestIp().second,
                 r_protocol = rule->getProtocol(), r_action = rule->getAction();
         Rule::strToFunc(r_action, ::tolower);
         if ((str_equals(r_dir, dir) || str_equals(r_dir, Rule::ANY)) &&
-            compare_ip_addresses(r_src_ip, ip_layer.getSrcIPv4Address().toString()) &&
-            compare_ip_addresses(r_dest_ip, ip_layer.getDstIPv4Address().toString()) &&
+            compare_ip_addresses(r_src_ip, ip_layer->getSrcIPv4Address().toString()) &&
+            compare_ip_addresses(r_dest_ip, ip_layer->getDstIPv4Address().toString()) &&
             (rule->getSrcPort().first == srcPort || str_equals(rule->getSrcPort().second, Rule::ANY)) &&
             (rule->getDestPort().first == destPrt || str_equals(rule->getDestPort().second, Rule::ANY)) &&
             (str_equals(r_protocol, protocol) || str_equals(r_protocol, Rule::ANY)) &&
-            (rule->getAck().first == tcp_hdr.ackFlag || str_equals(rule->getAck().second, Rule::ANY))) {
+            (!str_equals(protocol, "TCP") || rule->getAck().first == tcp_hdr->ackFlag || str_equals(rule->getAck().second, Rule::ANY))) {
             if (auto it{Rule::ACTION_DEF.find(r_action)}; it != Rule::ACTION_DEF.end()) {
                 return Rule::ACTION_DEF.at(r_action);
             }
@@ -69,7 +65,7 @@ bool RuleTable::compare_ip_addresses(const string &rule, const string &target) {
     std::vector<string> split_target = Rule::split_ip(target);
     for (auto[r, t] = std::pair{split_src.begin(), split_target.begin()};
          r != split_src.end() && t != split_target.end(); ++r, ++t) {
-        if (*r != to_string(Rule::IP_ASTERISK) && *r != *t) return false;
+        if (*r != Rule::IP_ASTERISK && *r != *t) return false;
     }
     return true;
 }

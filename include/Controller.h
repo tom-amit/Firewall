@@ -7,6 +7,8 @@
 #include <map>
 #include <cassert>
 #include "../TableRule/include/RuleTable.h"
+#include "Firewall.h"
+
 #ifndef FIREWALL_CONTROLLER_H
 #define FIREWALL_CONTROLLER_H
 
@@ -17,7 +19,7 @@ class Controller {
 private:
     typedef void (Controller::*MFP)(const std::vector<string> &args);
 
-    RuleTable table;
+    Firewall firewall;
 
     void add_rule(const std::vector<string> &args);
 
