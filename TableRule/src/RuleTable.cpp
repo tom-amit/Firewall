@@ -3,13 +3,15 @@
 //
 #include "../include/RuleTable.h"
 
-RuleTable::RuleTable(): len(1), display_padding(13){
+RuleTable::RuleTable() : len(1), display_padding(20) {
     //TODO change pointers to smart pointer, i.e unique_ptr, shared_ptr
-    table =  std::vector<Rule*>{new Rule(string("default"), string("any"), string("any"),string("any"),
-                                         string("any"),string("any"),string("any"),string("any"),
-                                         string("deny"))};
+    table = std::vector<unique_ptr<Rule>>{};
+    table.emplace_back(new Rule(string("default"), string("any"), string("any"), string("any"),
+                                string("any"), string("any"), string("any"), string("any"),
+                                string("deny")));
 }
-bool RuleTable::ParsePacket(pcpp::Packet &p_packet , const string& dir) {
+
+bool RuleTable::ParsePacket(pcpp::Packet &p_packet, const string &dir) {
     //TODO maybe add support for internal/external for IPs?
     //TODO change string constants used here to a defined variable @Rule.h
     //TODO add check that protocol indeed exists inside PROTOCOL_DEF
@@ -75,7 +77,7 @@ std::optional<string> RuleTable::AddRule(const string &name, const string &direc
         }
     }
     try {
-        return p_AddRule(Rule(name, direction, src_ip, src_port, dest_ip, dest_port, protocol, ack, action));;
+        return p_AddRule(Rule(name, direction, src_ip, dest_ip, src_port, dest_port, protocol, ack, action));;
     }
     catch(BadParse& e){
         for(int i = 0;i<TABLE_LENGTH*display_padding;++i){
@@ -92,7 +94,7 @@ std::optional<string> RuleTable::AddRule(const string &name, const string &direc
 }
 
 std::optional<string> RuleTable::p_AddRule(const Rule &rule) {
-    table.insert(table.end() - 1, new Rule(rule));
+    table.emplace(table.end() - 1, new Rule(rule));
     len++;
     return "OK"; // "magic string"
 }
@@ -131,17 +133,26 @@ void RuleTable::DisplayTable() {
         std::cout << "=";
     }
     std::cout << std::endl;
-    for(auto& r : table){
+    for(auto& r : table) {
         std::cout << std::endl;
-        std::cout.width(display_padding); std::cout << std::left << r->getName();
-        std::cout.width(display_padding); std::cout << std::left << r->getDirection();
-        std::cout.width(display_padding); std::cout << std::left << r->getSrcIp().second;
-        std::cout.width(display_padding); std::cout << std::left << r->getSrcPort().second;
-        std::cout.width(display_padding); std::cout << std::left << r->getDestIp().second;
-        std::cout.width(display_padding); std::cout << std::left << r->getDestPort().second;
-        std::cout.width(display_padding); std::cout << std::left << r->getProtocol();
-        std::cout.width(display_padding); std::cout << std::left << r->getAck().second;
-        std::cout.width(display_padding); std::cout << std::left << r->getAction();
+        std::cout.width(display_padding);
+        std::cout << std::left << r->getName();
+        std::cout.width(display_padding);
+        std::cout << std::left << r->getDirection();
+        std::cout.width(display_padding);
+        std::cout << std::left << r->getSrcIp().second;
+        std::cout.width(display_padding);
+        std::cout << std::left << r->getDestIp().second;
+        std::cout.width(display_padding);
+        std::cout << std::left << r->getSrcPort().second;
+        std::cout.width(display_padding);
+        std::cout << std::left << r->getDestPort().second;
+        std::cout.width(display_padding);
+        std::cout << std::left << r->getProtocol();
+        std::cout.width(display_padding);
+        std::cout << std::left << r->getAck().second;
+        std::cout.width(display_padding);
+        std::cout << std::left << r->getAction();
     }
     std::cout << std::endl;
 }

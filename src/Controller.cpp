@@ -37,8 +37,8 @@ void Controller::stop(const std::vector<string> &args) {
 }
 
 void Controller::run() {
-    table.AddRule("amit12345", "in", "234.222.*.3", "123", "192.169.33.1", "655399", "UDP", "yes", "allow");
-    table.AddRule("itay", "in", "234.222.11.3", "123", "192.169.33.1", "65535", "UDP", "yes", "allow");
+    table.AddRule("amit12345", "in", "234.222.*.3", "123.123.123.123", "1", "6559", "UDP", "yes", "allow");
+    table.AddRule("itay", "in", "234.222.11.3", "2.*.*.1", "192", "65535", "UDP", "yes", "allow");
     std::vector<std::string> args;
     do {
         args.clear();
@@ -47,8 +47,7 @@ void Controller::run() {
         while (true) {
             std::cin >> rawInput;
             args.push_back(rawInput);
-            if (std::cin.peek() == '\n')
-            {
+            if (std::cin.peek() == '\n') {
                 break;
             }
         }

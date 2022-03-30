@@ -24,7 +24,6 @@ using std::string;
 using std::to_string;
 
 
-
 class Rule {
 public:
     static std::vector<string> split_ip(const string &s);
@@ -32,7 +31,7 @@ public:
     //TODO move to be a global variable (somehow)
     const std::map<string, string> GENERAL_IP{{"any", "*.*.*.*"}};
     const std::vector<string> DIR_DEF{"in", "out", "any"};
-    const std::vector<string> ACTION_DEF{"allow", "deny", "any"};
+    const std::vector<string> ACTION_DEF{"allow", "deny"};
     const std::vector<string> ACK_DEF{"yes", "no", "any"};
     const std::map<string, long unsigned int> PROTOCOL_DEF{{"ANY", 0x111},
                                                            {"TCP", 0x04},

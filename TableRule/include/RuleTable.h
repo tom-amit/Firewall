@@ -11,6 +11,10 @@
 #include "Packet.h"
 #include "TcpLayer.h"
 #include "UdpLayer.h"
+#include <memory>
+
+using std::unique_ptr;
+
 class RuleTable {
 public:
     RuleTable();
@@ -29,7 +33,7 @@ public:
 private:
     std::optional<std::string> p_AddRule(const Rule &rule);
 
-    std::vector<Rule *> table;
+    std::vector<unique_ptr<Rule>> table;
     uint64_t len;
     std::vector<string> rule_names;
     uint16_t display_padding;
