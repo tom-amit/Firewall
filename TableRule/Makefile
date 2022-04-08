@@ -1,7 +1,7 @@
 include /usr/local/etc/PcapPlusPlus.mk
 # All Target
 all:
-	#g++ -std=c++17 $(PCAPPP_BUILD_FLAGS) $(PCAPPP_INCLUDES) -c -o obj/main.o main.cpp
+	# g++ -std=c++17 $(PCAPPP_BUILD_FLAGS) $(PCAPPP_INCLUDES) -c -o obj/main.o main.cpp
 	g++ -std=c++17 $(PCAPPP_BUILD_FLAGS) $(PCAPPP_INCLUDES) -c -o obj/Rule.o src/Rule.cpp
 	g++ -std=c++17 $(PCAPPP_BUILD_FLAGS) $(PCAPPP_INCLUDES) -c -o obj/BadParse.o src/BadParse.cpp
 	g++ -std=c++17 $(PCAPPP_BUILD_FLAGS) $(PCAPPP_INCLUDES) -c -o obj/RuleTable.o src/RuleTable.cpp
