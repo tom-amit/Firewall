@@ -107,6 +107,7 @@ std::optional<std::string> RuleTable::RemoveRule(const string &name) {
     for (auto[i, it] = std::pair{0, table.begin()}; it != table.end() - 1; ++i, it++) {
         if ((*it)->getName() == name) {
             table.erase(it);
+            len--;
             return SUCCESS;
         }
     }
