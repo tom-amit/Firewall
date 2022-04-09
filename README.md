@@ -4,7 +4,7 @@ A network firewall implementation in C++17 using PcapPlusPlus.
 
 The project was initially compiled using Make but was converted to CMake for ease and GUI support.
 
-# <u>How To Build Pcap++ for CMake usage:</u>
+# <u>Building Dependencies for CMake usage:</u>
 
 ## Dependencies for Pcap++:
 
@@ -54,10 +54,15 @@ Now we've built Pcap++ for CMake usage.
 
 ## Getting Ultralight (OPTIONAL):
 
-Download the latest release of Ultralight from https://github.com/ultralight-ux/Ultralight/releases.
+The project downloads Ultralight on its own if specified, just add the flag:`-DGUI_ON=1`
 
-You can download an already built version or build from the source yourself, unfortunately the library does not come
-with an option to install to root, so you'll have to remember where you downloaded/built it.
+# <u>Building the firewall</u>
 
-When compiling the Firewall make sure you add the CMake flag:
-`-DUL_SDK_ROOT=/path/to/your/sdk/`
+```shell
+cd $FIREWALL_DOWNLOAD_PATH
+mkdir build && cd build
+cmake .. # OPTIONAL: -DGUI_ON=1
+make
+```
+
+The executable is located inside the bin/ folder.

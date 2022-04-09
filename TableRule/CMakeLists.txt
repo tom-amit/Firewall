@@ -17,7 +17,6 @@ if (NOT DEFINED PE_NAME)
             src/BadParse.cpp)
     set(PE_NAME "TableRule")
 endif ()
-message(STATUS "Lmao ${PE_NAME}")
 add_executable(${PE_NAME} main.cpp ${TABLERULE_SRC_FILES})
 
 target_link_libraries(${PE_NAME} PUBLIC PcapPlusPlus::PcapPP)

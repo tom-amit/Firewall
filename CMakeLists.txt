@@ -17,8 +17,10 @@ set(CMAKE_CXX_EXTENSIONS ON)
 # Project Debug Variables
 set(TABLE_RULE_ONLY 0)
 
-#TODO add gui variable to be available from command execution, if not defined then default is no gui
-set(GUI_ON 1)
+if (NOT DEFINED GUI_ON)
+    set(GUI_ON 0)
+endif ()
+
 set(PE_NAME "Firewall")
 
 #Table Rule Sources
@@ -31,19 +33,10 @@ if (TABLE_RULE_ONLY)
     add_subdirectory(TableRule)
 else ()
     if (GUI_ON)
-        #Path of Ultralight directory
-        if (NOT DEFINED UL_SDK_ROOT)
-            message(FATAL_ERROR "Ultralight was not found!")
-        endif ()
-        set(ULTRALIGHT_INCLUDE_DIR "${UL_SDK_ROOT}/include")
-        set(ULTRALIGHT_BINARY_DIR "${UL_SDK_ROOT}/bin")
-        set(ULTRALIGHT_INSPECTOR_DIR "${UL_SDK_ROOT}/inspector")
-        set(ULTRALIGHT_LIBRARY_DIR "${UL_SDK_ROOT}/bin")
-        SET(CMAKE_SKIP_BUILD_RPATH FALSE)
-        SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-        SET(CMAKE_INSTALL_RPATH $ORIGIN)
-
-        add_subdirectory("GUI")
+        include(cmake-ul/App.cmake)
+        set(GUI_SOURCE
+                src/UserInterface.cpp)
+        LINK_GUI(${GUI_SOURCE})
     else ()
         set(FIREWALL_SRC_FILES
                 src/Firewall.cpp
