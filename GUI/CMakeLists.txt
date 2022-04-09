@@ -2,6 +2,8 @@ include_directories("${ULTRALIGHT_INCLUDE_DIR}")
 link_directories("${ULTRALIGHT_LIBRARY_DIR}")
 link_libraries(UltralightCore AppCore Ultralight WebCore)
 
+message(STATUS "Include ${ULTRALIGHT_INCLUDE_DIR}")
+
 add_executable(${PE_NAME} main.cpp)
 
 # Copy all binaries to target directory

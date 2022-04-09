@@ -10,6 +10,8 @@ The project was initially compiled using Make but was converted to CMake for eas
 
 - libpcap
 - CMake > 3.12
+- Optional:
+  - Ultralight (for GUI)
 
 ### Install them:
 
@@ -49,3 +51,13 @@ sudo make install
 ```
 
 Now we've built Pcap++ for CMake usage.
+
+## Getting Ultralight (OPTIONAL):
+
+Download the latest release of Ultralight from https://github.com/ultralight-ux/Ultralight/releases.
+
+You can download an already built version or build from the source yourself, unfortunately the library does not come
+with an option to install to root, so you'll have to remember where you downloaded/built it.
+
+When compiling the Firewall make sure you add the CMake flag:
+`-DUL_SDK_ROOT=/path/to/your/sdk/`

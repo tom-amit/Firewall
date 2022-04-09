@@ -2,9 +2,11 @@ cmake_minimum_required(VERSION 3.12)
 
 project(Firewall)
 
+
 find_package(PcapPlusPlus CONFIG REQUIRED)
 message(STATUS "Using Pcap++ ${PcapPlusPlus_VERSION}")
 message(STATUS "Include dir: ${PcapPlusPlus_INCLUDE_DIR}")
+
 
 # Set C++17
 set(CMAKE_CXX_STANDARD 17)
@@ -14,9 +16,11 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 # Project Debug Variables
 set(TABLE_RULE_ONLY 0)
-set(GUI_ON 1)
 
+#TODO add gui variable to be available from command execution, if not defined then default is no gui
+set(GUI_ON 1)
 set(PE_NAME "Firewall")
+
 #Table Rule Sources
 set(TABLERULE_SRC_FILES
         ${PROJECT_SOURCE_DIR}/TableRule/src/RuleTable.cpp
@@ -27,15 +31,14 @@ if (TABLE_RULE_ONLY)
     add_subdirectory(TableRule)
 else ()
     if (GUI_ON)
-        message(STATUS "GUI FLAG ON")
-        set(SDK_ROOT "${CMAKE_BINARY_DIR}/SDK/")
-        set(PORT UltralightLinux)
-        set(IN_SOURCE_BUILD 0)
-        set(SDK_ROOT "${CMAKE_CURRENT_LIST_DIR}/Ultralight")
-        set(ULTRALIGHT_INCLUDE_DIR "${SDK_ROOT}/include")
-        set(ULTRALIGHT_BINARY_DIR "${SDK_ROOT}/bin")
-        set(ULTRALIGHT_INSPECTOR_DIR "${SDK_ROOT}/inspector")
-        set(ULTRALIGHT_LIBRARY_DIR "${SDK_ROOT}/bin")
+        #Path of Ultralight directory
+        if (NOT DEFINED UL_SDK_ROOT)
+            message(FATAL_ERROR "Ultralight was not found!")
+        endif ()
+        set(ULTRALIGHT_INCLUDE_DIR "${UL_SDK_ROOT}/include")
+        set(ULTRALIGHT_BINARY_DIR "${UL_SDK_ROOT}/bin")
+        set(ULTRALIGHT_INSPECTOR_DIR "${UL_SDK_ROOT}/inspector")
+        set(ULTRALIGHT_LIBRARY_DIR "${UL_SDK_ROOT}/bin")
         SET(CMAKE_SKIP_BUILD_RPATH FALSE)
         SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
         SET(CMAKE_INSTALL_RPATH $ORIGIN)

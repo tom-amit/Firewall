@@ -92,7 +92,7 @@ const char *htmlString() {
   <head>
     <style type="text/css">
     * { -webkit-user-select: none; }
-    body { 
+    body {
       overflow: hidden;
       margin: 0;
       padding: 0;
@@ -111,7 +111,7 @@ const char *htmlString() {
       height: 510px;
       width: 360px;
     }
-    p, li { 
+    p, li {
       font-size: 1em;
     }
     #leftPane {
@@ -148,10 +148,10 @@ const char *htmlString() {
     }
     li:before {
       content: '';
-      display:inline-block; 
-      height: 18; 
+      display:inline-block;
+      height: 18;
       width: 18;
-      margin-bottom: -5px; 
+      margin-bottom: -5px;
       margin-right: 1em;
       background-image: url("data:image/svg+xml;utf8,<svg xmlns=\
 'http://www.w3.org/2000/svg' width='18' height='18' viewBox='-2 -2 27 27'>\
