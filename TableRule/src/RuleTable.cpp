@@ -1,6 +1,7 @@
 //
 // Created by karkt on 3/19/2022.
 //
+
 //TODO make sure there are no memory leaks since we moved to unique_ptr!
 #include "../include/RuleTable.h"
 

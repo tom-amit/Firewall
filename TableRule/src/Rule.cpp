@@ -86,9 +86,8 @@ void Rule::setProtocol(string p_protocol) {
     Rule::protocol = ParseProtocol(std::move(p_protocol));
 }
 
-std::pair<uint16_t, string> Rule::getAck() const {
-    //TODO ugly line, we literally use ACK_DEF, so use it....
-    return {(ack == "yes") ? 1 : ((ack == "no") ? 0 : -1) , ack};
+std::pair<int16_t, string> Rule::getAck() const {
+    return {ACK_DEF.at(ack), ack};
 }
 
 void Rule::setAck(const string& p_ack) {
@@ -174,7 +173,7 @@ uint32_t Rule::ParsePort(string p_port_num){
 }
 string Rule::ParseAck(string p_ack){
     strToFunc(p_ack, ::tolower);
-    if(std::find(ACK_DEF.begin(), ACK_DEF.end(), p_ack) != ACK_DEF.end()){
+    if (ACK_DEF.find(p_ack) != ACK_DEF.end()) {
         return p_ack;
     }
     throw BadParse("Rule ACK", p_ack);

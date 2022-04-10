@@ -35,7 +35,9 @@ public:
     const static inline std::vector<string> DIR_DEF{"in", "out", "any"};
     const static inline std::map<string, bool> ACTION_DEF{{"allow", true},
                                                           {"deny",  false}};
-    const static inline std::vector<string> ACK_DEF{"yes", "no", "any"};
+    const static inline std::map<string, int16_t> ACK_DEF{{"yes", 1},
+                                                          {"no",  0},
+                                                          {"any", -1}};
     const static inline std::map<string, long unsigned int> PROTOCOL_DEF{{"ANY", 0x111},
                                                                          {"TCP", 0x04},
                                                                          {"UDP", 0x08}};
@@ -78,7 +80,7 @@ public:
 
     void setProtocol(string p_protocol);
 
-    [[nodiscard]] std::pair<uint16_t , string> getAck() const;
+    [[nodiscard]] std::pair<int16_t, string> getAck() const;
 
     void setAck(const string& p_ack);
 
