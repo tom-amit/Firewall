@@ -32,21 +32,20 @@ set(TABLERULE_SRC_FILES
 if (TABLE_RULE_ONLY)
     add_subdirectory(TableRule)
 else ()
+    set(FIREWALL_SRC_FILES
+            src/Firewall.cpp
+            src/Controller.cpp)
     if (GUI_ON)
         include(cmake-ul/App.cmake)
         set(GUI_SOURCE
-                src/UserInterface.cpp)
-        LINK_GUI(${GUI_SOURCE})
+                UserInterface.cpp)
+        LINK_GUI("${GUI_SOURCE};${FIREWALL_SRC_FILES};${TABLERULE_SRC_FILES}")
     else ()
-        set(FIREWALL_SRC_FILES
-                src/Firewall.cpp
-                src/Controller.cpp)
-
         add_executable(${PE_NAME} main.cpp ${FIREWALL_SRC_FILES} ${TABLERULE_SRC_FILES})
 
-        target_link_libraries(${PE_NAME} PUBLIC PcapPlusPlus::PcapPP)
-
-        set_target_properties(${PE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-                "${CMAKE_BINARY_DIR}/bin")
     endif ()
+    target_link_libraries(${PE_NAME} PUBLIC PcapPlusPlus::PcapPP)
+
+    set_target_properties(${PE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+            "${CMAKE_BINARY_DIR}/bin")
 endif ()

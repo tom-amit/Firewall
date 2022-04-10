@@ -21,6 +21,10 @@ private:
 
     Firewall firewall;
 
+    std::map<string, std::pair<u_int16_t, MFP>> cmd_map;
+public:
+    Controller();
+
     void add_rule(const std::vector<string> &args);
 
     void remove_rule(const std::vector<string> &args);
@@ -30,10 +34,6 @@ private:
     void start(const std::vector<string> &args);
 
     void stop(const std::vector<string> &args);
-
-    std::map<string, std::pair<u_int16_t, MFP>> cmd_map;
-public:
-    Controller();
 
     void run();
 };

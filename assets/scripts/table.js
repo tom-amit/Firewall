@@ -1,9 +1,29 @@
+angular.module('modalTest', ['ui.bootstrap', 'dialogs'])
+    .controller('dialogServiceTest', function ($scope, $rootScope, $timeout, $dialogs) {
+        $scope.launch = function () {
+            var dlg = null;
+            dlg = $dialogs.confirm('Please Confirm', 'Are you sure you want to deleted selected elements?');
+            dlg.result.then(function (btn) {
+                $(".mdl-data-dynamictable tbody").find('tr.is-selected').remove();
+                $(".mdl-data-dynamictable thead tr").removeClass("is-selected");
+                $(".mdl-data-dynamictable thead tr th label").removeClass("is-checked");
+                componentHandler.upgradeDom();
+                var _row = $(".mdl-data-dynamictable tbody").find('tr');
+                console.log("_row.length", _row.length);
+                if (_row.length < 1) {
+                    addNewRow();
+                }
+            }, function (btn) {
+            });
+        }; // end launch
+
+    }); // end run / module
+
 function addNewRow() {
 
     var _row = $(".mdl-data-dynamictable tbody").find('tr');
     var template = $('#basketItemTemplate').html();
     var _newRow = template.replace(/{{id}}/gi, 'checkbox-' + new Date().getTime());
-
     $(".mdl-data-dynamictable tbody tr:last").before(_newRow);
     componentHandler.upgradeAllRegistered();
 }
@@ -13,17 +33,10 @@ $(".add-row").on("click", function () {
     $(".mdl-dialog__addContent").remove();
     addNewRow();
 });
-var dialog = document.querySelector('dialog');
 $(".remove-row").on("click", function () {
     $(".mdl-dialog__addContent").remove();
-
-    if ($(".mdl-data-dynamictable tbody").find('tr.is-selected').length != 0) {
-        dialog.showModal();
-    }
-
-
 });
-$(document).on("click", ".mdl-checkbox", function () {
+$(document).on("click", ".checkbox", function () {
     var _tableRow = $(this).parents("tr:first");
     if ($(this).hasClass("is-checked") === false) {
         _tableRow.addClass("is-selected");
@@ -76,33 +89,28 @@ $(document).on("keydown", ".mdl-dialog__addContent", function (e) {
         default:
     }
 });
-var _temp = ""
+var _temp;
 $(document).on("click", ".save", function () {
     var _textfield = $(this).parents("td").find(".mdl-textfield");
     var _input = $(this).parents("td").find("input");
     if (_textfield.hasClass("is-invalid") === false && $.trim(_input.val()) !== "") {
         var _col = $(this).parents("td");
-        var value = _col.hasClass("TEST") ? "CUSTOM_OUTPUT " : ""; //TODO maybe add some custom output to beautify the GUI
-        _temp = _col
-        console.log(_col);
+        _temp = _col.parents("tr");
         $(_col).find("span")[1].innerHTML = _input.val();
-        $(_col).find(".mdl-dialog__addContent").remove()
+        $(_col).find(".mdl-dialog__addContent").remove();
+        if (parseInt(_col.attr("data-on"), 2) === 0) {
+            _col.parent("tr").attr("data-count", parseInt(_col.parent("tr").attr("data-count"), 10) + 1);
+            _col.attr("data-on", 1);
+        }
+        var n = 9
+        if (parseInt(_col.parent("tr").attr("data-count"), 10) === 9) {
+            var args = [];
+            for (let i = 0; i < n; ++i) {
+                console.log(i);
+                args.push($(_col.parents("tr")).find("span.mdl-data-table__label")[i].innerHTML);
+            }
+            console.log(args);
+            AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
+        }
     }
 });
-
-dialog.querySelector('.close').addEventListener('click', function () {
-    dialog.close();
-});
-dialog.querySelector('.remove').addEventListener('click', function () {
-    $(".mdl-data-dynamictable tbody").find('tr.is-selected').remove();
-    $(".mdl-data-dynamictable thead tr").removeClass("is-selected");
-    $(".mdl-data-dynamictable thead tr th label").removeClass("is-checked");
-    componentHandler.upgradeDom();
-    var _row = $(".mdl-data-dynamictable tbody").find('tr');
-    console.log("_row.length", _row.length);
-    if (_row.length < 1) {
-        addNewRow();
-    }
-    dialog.close();
-});
-

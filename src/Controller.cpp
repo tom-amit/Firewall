@@ -18,10 +18,12 @@ Controller::Controller() {
 
 void Controller::add_rule(const std::vector<string> &args) {
     firewall.table->AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+    show_rules({});
 }
 
 void Controller::remove_rule(const std::vector<string> &args) {
     firewall.table->RemoveRule(args[0]);
+    show_rules({});
 }
 
 void Controller::show_rules(const std::vector<string> &args) {

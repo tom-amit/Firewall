@@ -1,5 +1,4 @@
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
 set(SDK_ROOT "${CMAKE_BINARY_DIR}/SDK")
@@ -52,7 +51,7 @@ MACRO(LINK_GUI source_list)
 
     # Copy assets to assets path
     add_custom_command(TARGET ${APP_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "${ASSETS_PATH}")
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "../assets" "${ASSETS_PATH}")
 
     if (${ENABLE_INSPECTOR})
         # Copy inspector to assets directory
@@ -66,6 +65,4 @@ MACRO(LINK_GUI source_list)
 
     add_dependencies(${APP_NAME} UltralightSDK)
 
-    set_target_properties(${PE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-            "${CMAKE_BINARY_DIR}/bin")
 ENDMACRO()
