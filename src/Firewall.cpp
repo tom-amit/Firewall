@@ -11,9 +11,17 @@ struct Cookie {
     Cookie(pcpp::PcapLiveDevice* _dev, RuleTable* _table){ dev = _dev; table = _table;}
 };
 
+
+//TODO: remove magic MAC-IP addresses
 static void onPacketArrives1(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie)
 {
     pcpp::Packet parsedPacket(packet);
+
+    if(parsedPacket.getLayerOfType<pcpp::IPv4Layer>() != NULL && parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive < 2){
+        Firewall::SendTTLExpiredPacket(parsedPacket, dev);
+        return;
+    }
+
     Cookie* typedCookie = static_cast<Cookie*>(cookie);
     pcpp::PcapLiveDevice* otherDev = typedCookie->dev;
     std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
@@ -31,15 +39,20 @@ static void onPacketArrives1(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev,
     ethernet->setSourceMac(pcpp::MacAddress(otherDev->getMacAddress()));
     ethernet->setDestMac(pcpp::MacAddress("08:00:27:7e:ef:c8"));
 
-    if(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive > 1) {
-        parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
-        parsedPacket.computeCalculateFields();
-        otherDev->sendPacket(*parsedPacket.getRawPacket());
-    }
+    parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
+    parsedPacket.computeCalculateFields();
+    otherDev->sendPacket(*parsedPacket.getRawPacket());
 }
+//TODO: remove magic MAC-IP addresses
 static void onPacketArrives2(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie)
 {
     pcpp::Packet parsedPacket(packet);
+
+    if(parsedPacket.getLayerOfType<pcpp::IPv4Layer>() != NULL && parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive < 2){
+        Firewall::SendTTLExpiredPacket(parsedPacket, dev);
+        return;
+    }
+
     Cookie* typedCookie = static_cast<Cookie*>(cookie);
     pcpp::PcapLiveDevice* otherDev = typedCookie->dev;
     std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
@@ -55,11 +68,9 @@ static void onPacketArrives2(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev,
     ethernet->setSourceMac(pcpp::MacAddress(otherDev->getMacAddress()));
     ethernet->setDestMac(pcpp::MacAddress("08:00:27:f7:c7:e5"));
 
-    if(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive > 1) {
-        parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
-        parsedPacket.computeCalculateFields();
-        otherDev->sendPacket(*parsedPacket.getRawPacket());
-    }
+    parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
+    parsedPacket.computeCalculateFields();
+    otherDev->sendPacket(*parsedPacket.getRawPacket());
 }
 
 Firewall::Firewall() {
@@ -93,6 +104,36 @@ void Firewall::Run() {
 
 void Firewall::Stop() {
     StopLiveDevicesCapture();
+}
+
+//TODO: Use ARP Table to determine dest MAC
+pcpp::Packet Firewall::SendTTLExpiredPacket(pcpp::Packet expiredPacket, pcpp::PcapLiveDevice *dev) {
+    auto TTLExpired = pcpp::Packet();
+
+    // Create the Ethernet layer
+    auto expiredEthLayer = expiredPacket.getLayerOfType<pcpp::EthLayer>();
+    auto ethLayer = new pcpp::EthLayer(expiredEthLayer->getDestMac(), expiredEthLayer->getSourceMac(), pcpp::IPv4);
+    TTLExpired.addLayer(ethLayer);
+
+    // Create the IPv4 layer
+    auto expiredIPv4Layer = new pcpp::IPv4Layer(expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getSrcIPv4Address(), expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address());
+    auto ipv4Layer = new pcpp::IPv4Layer(dev->getIPv4Address(), expiredIPv4Layer->getSrcIPv4Address());
+    TTLExpired.addLayer(ipv4Layer);
+
+    // Create the ICMP layer
+    pcpp::Layer* expiredL4Layer = NULL;
+    if(expiredPacket.getLayerOfType<pcpp::UdpLayer>() != NULL)
+        expiredL4Layer = new pcpp::UdpLayer(expiredPacket.getLayerOfType<pcpp::UdpLayer>()->getSrcPort(), expiredPacket.getLayerOfType<pcpp::UdpLayer>()->getDstPort());
+    else if (expiredPacket.getLayerOfType<pcpp::TcpLayer>() != NULL)
+        expiredL4Layer = new pcpp::TcpLayer(expiredPacket.getLayerOfType<pcpp::TcpLayer>()->getSrcPort(), expiredPacket.getLayerOfType<pcpp::TcpLayer>()->getDstPort());
+
+    auto icmpLayer = new pcpp::IcmpLayer();
+    TTLExpired.addLayer(icmpLayer);
+    icmpLayer->setTimeExceededData(0, expiredIPv4Layer, expiredL4Layer);
+
+    TTLExpired.computeCalculateFields();
+
+    dev->sendPacket(*TTLExpired.getRawPacket());
 }
 
 

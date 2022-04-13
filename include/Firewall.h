@@ -9,6 +9,7 @@
 #include <PcapLiveDeviceList.h>
 #include <IPv4Layer.h>
 #include "../TableRule/include/RuleTable.h"
+#include <IcmpLayer.h>
 
 class Firewall {
 private:
@@ -25,6 +26,8 @@ public:
 
     void Run();
     void Stop();
+
+    static pcpp::Packet SendTTLExpiredPacket(pcpp::Packet expiredPacket, pcpp::PcapLiveDevice *dev);
 };
 
 
