@@ -27,14 +27,13 @@ bool RuleTable::ParsePacket(pcpp::Packet &p_packet, const string &dir) {
     pcpp::tcphdr* tcp_hdr;
     uint32_t srcPort = MAX_PORT + 1, destPrt = MAX_PORT + 1;
     string protocol = "";
-    if(p_packet.getLayerOfType<pcpp::TcpLayer>() != NULL){//TCP
+    if (p_packet.getLayerOfType<pcpp::TcpLayer>() != nullptr) {//TCP
         auto layer = p_packet.getLayerOfType<pcpp::TcpLayer>();
         srcPort = static_cast<uint32_t>(layer->getSrcPort());
         destPrt = static_cast<uint32_t>(layer->getDstPort());
         tcp_hdr = layer->getTcpHeader();
         protocol = "TCP";
-    }
-    else if (p_packet.getLayerOfType<pcpp::UdpLayer>() != NULL){//UDP
+    } else if (p_packet.getLayerOfType<pcpp::UdpLayer>() != nullptr) {//UDP
         auto layer = p_packet.getLayerOfType<pcpp::UdpLayer>();
         srcPort = static_cast<uint32_t>(layer->getSrcPort());
         destPrt = static_cast<uint32_t>(layer->getDstPort());
@@ -82,7 +81,7 @@ std::optional<string> RuleTable::AddRule(const string &name, const string &direc
         }
     }
     try {
-        return p_AddRule(Rule(name, direction, src_ip, dest_ip, src_port, dest_port, protocol, ack, action));;
+        return p_AddRule(Rule(name, direction, src_ip, dest_ip, src_port, dest_port, protocol, ack, action));
     }
     catch(BadParse& e){
         for(int i = 0;i<TABLE_LENGTH*display_padding;++i){

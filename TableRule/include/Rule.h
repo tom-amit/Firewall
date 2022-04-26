@@ -82,7 +82,7 @@ public:
 
     [[nodiscard]] std::pair<int16_t, string> getAck() const;
 
-    void setAck(const string& p_ack);
+    void setAck(const string &p_ack);
 
 private:
     string name, action, direction, ack;
@@ -90,12 +90,17 @@ private:
     uint32_t src_port, dest_port;
     pcpp::ProtocolType protocol;
 
-    string ParseDirection(string dir);
-    string ParseAction(string p_action);
-    std::pair<pcpp::IPv4Address, string> ParseIP(string p_ip_addr);
-    uint32_t ParsePort(string p_port_num);
-    string ParseAck(string p_ack);
-    pcpp::ProtocolType ParseProtocol(string p_protocol);
+    static string ParseDirection(string dir);
+
+    static string ParseAction(string p_action);
+
+    static std::pair<pcpp::IPv4Address, string> ParseIP(string p_ip_addr);
+
+    static uint32_t ParsePort(string p_port_num);
+
+    static string ParseAck(string p_ack);
+
+    static pcpp::ProtocolType ParseProtocol(string p_protocol);
 };
 
 

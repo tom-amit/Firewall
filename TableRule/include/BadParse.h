@@ -24,30 +24,32 @@ public:
      *  @param err_off Error offset
      */
     explicit
-    BadParse(const std::string& msg, int err_num, int err_off);
+    BadParse(std::string msg, int err_num, int err_off);
 
     explicit
-    BadParse(const std::string& failedAction,const std::string& where, int err_num = -1, int err_off = 0);
+    BadParse(const std::string &failedAction, const std::string &where, int err_num = -1, int err_off = 0);
+
     /** Destructor.
      *  Virtual to allow for subclassing.
      */
-    virtual ~BadParse() noexcept;
+    ~BadParse() noexcept override;
+
     /** Returns a pointer to the (constant) error description.
      *  @return A pointer to a const char*. The underlying memory
      *  is in possession of the Except object. Callers must
      *  not attempt to free the memory.
      */
-    virtual const char* what() const noexcept;
+    [[nodiscard]] const char *what() const noexcept override;
 
     /** Returns error number.
      *  @return #error_number
      */
-    virtual int getErrorNumber() const noexcept;
+    [[nodiscard]] virtual int getErrorNumber() const noexcept;
 
     /**Returns error offset.
      * @return #error_offset
      */
-    virtual int getErrorOffset() const noexcept;
+    [[nodiscard]] virtual int getErrorOffset() const noexcept;
 
 };
 

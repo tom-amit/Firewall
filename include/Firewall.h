@@ -13,21 +13,26 @@
 
 class Firewall {
 private:
-    pcpp::PcapLiveDevice *dev1, *dev2; //dev1 is 'internal' and dev2 is 'external'
+    pcpp::PcapLiveDevice *dev1{}, *dev2{}; //dev1 is 'internal' and dev2 is 'external'
 
     void SetLiveDevices();
-    void OpenLiveDevices();
+
+    void OpenLiveDevices() const;
+
     void StartLiveDevicesCapture();
+
     void StopLiveDevicesCapture();
+
 public:
     Firewall();
+
     //TODO scan the entire project, and make sure no regular pointers are used, memory and efficiency is important here, so smart pointers are a must!
-    RuleTable* table;
+    RuleTable *table;
 
     void Run();
     void Stop();
 
-    static pcpp::Packet SendTTLExpiredPacket(pcpp::Packet expiredPacket, pcpp::PcapLiveDevice *dev);
+    static pcpp::Packet SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::PcapLiveDevice *dev);
 };
 
 

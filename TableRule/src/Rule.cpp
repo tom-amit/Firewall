@@ -4,11 +4,12 @@
 
 #include "../include/Rule.h"
 
+#include <utility>
+
 Rule::Rule(const string &name, const string &direction, const string &src_ip,
            const string &dest_ip, const string &src_port, const string &dest_port, const string &protocol,
            const string &ack,
-           const string &action)
-{
+           const string &action) {
     this->name = name;
     this->direction = ParseDirection(direction);
     this->src_ip = ParseIP(src_ip);
@@ -16,7 +17,7 @@ Rule::Rule(const string &name, const string &direction, const string &src_ip,
     this->src_port = ParsePort(src_port);
     this->dest_port = ParsePort(dest_port);
     this->ack = ParseAck(ack);
-    this->protocol = ParseProtocol(protocol);;
+    this->protocol = ParseProtocol(protocol);
     this->action = ParseAction(action);
 }
 
@@ -64,7 +65,7 @@ std::pair<uint32_t, string> Rule::getSrcPort() const {
 }
 
 void Rule::setSrcPort(string p_src_port) {
-    src_port = ParsePort(p_src_port);
+    src_port = ParsePort(std::move(p_src_port));
 }
 
 std::pair<uint32_t, string> Rule::getDestPort() const {
@@ -72,7 +73,7 @@ std::pair<uint32_t, string> Rule::getDestPort() const {
 }
 
 void Rule::setDestPort(string p_dest_port) {
-    dest_port = ParsePort(p_dest_port);
+    dest_port = ParsePort(std::move(p_dest_port));
 }
 
 string Rule::getProtocol() const {
@@ -142,6 +143,7 @@ std::pair<pcpp::IPv4Address,string> Rule::ParseIP(string p_ip_addr){
         if(GENERAL_IP.find(p_ip_addr) != GENERAL_IP.end()){
             return {NULL, GENERAL_IP.at(p_ip_addr)};
         }
+        //TODO check if removing assignment will still work when adding characters below because Clang-Tidy complains.
         string replacement = "";
         for(auto& c: p_ip_addr){
             if(c == '*'){

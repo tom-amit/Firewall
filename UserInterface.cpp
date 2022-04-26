@@ -5,8 +5,6 @@
 #include "include/Controller.h"
 #include <iostream>
 #include <string>
-#include <locale>
-#include <codecvt>
 
 using namespace ultralight;
 
@@ -34,7 +32,7 @@ class GUI : public LoadListener, ViewListener {
     RefPtr<Overlay> overlay_;
     Controller control;
 public:
-    GUI(Ref<Window> win) {
+    explicit GUI(Ref<Window> win) {
         control = Controller();
 
         ///
@@ -55,7 +53,7 @@ public:
         overlay_->view()->LoadURL("file:///table.html");
     }
 
-    virtual ~GUI() {}
+    ~GUI() override = default;
 
     //TODO add support for RuleRemoval (note that we want to support multiple rule removal!)
     ///
@@ -89,10 +87,10 @@ public:
     ///
     /// We perform all our JavaScript initialization here.
     ///
-    virtual void OnDOMReady(ultralight::View *caller,
-                            uint64_t frame_id,
-                            bool is_main_frame,
-                            const String &url) override {
+    void OnDOMReady(ultralight::View *caller,
+                    uint64_t frame_id,
+                    bool is_main_frame,
+                    const String &url) override {
         ///
         /// Set our View's JSContext as the one to use in subsequent JSHelper calls
         ///

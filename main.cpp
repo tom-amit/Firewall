@@ -5,7 +5,7 @@
 #include "include/Controller.h"
 using std::string;
 
-int main(int argc, char *argv[]) {
+int main() {
     Controller c = Controller();
     c.run();
 }
