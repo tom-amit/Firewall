@@ -13,6 +13,8 @@
 #include "UdpLayer.h"
 #include <memory>
 #include <cmath>
+#include <bitset>
+
 using std::unique_ptr;
 using std::get;
 class RuleTable {
@@ -34,6 +36,8 @@ public:
                                         const string &protocol, const string &ack,
                                         const string &action);
     std::vector<unique_ptr<Rule>> table;
+    static bool compare_ip_addresses(const string &rule, const string &target);
+
 private:
     std::optional<std::string> p_AddRule(const Rule &rule);
 
@@ -42,7 +46,6 @@ private:
     std::vector<string> rule_names;
     uint16_t display_padding;
 
-    static bool compare_ip_addresses(const string &rule, const string &target);
 };
 
 

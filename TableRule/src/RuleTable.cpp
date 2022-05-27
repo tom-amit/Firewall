@@ -4,6 +4,7 @@
 
 //TODO make sure there are no memory leaks since we moved to unique_ptr!
 #include "../include/RuleTable.h"
+//TODO Add swap order of rules function (pretty simple for two rules)
 
 RuleTable::RuleTable() : len(1), display_padding(20) {
     table = std::vector<unique_ptr<Rule>>{};
@@ -61,6 +62,32 @@ bool RuleTable::ParsePacket(pcpp::Packet &p_packet, const string &dir) {
     return false;
 }
 
+string number_to_bin(const string num){
+    return std::bitset<8>(stoi(num)).to_string();
+}
+
+string ip_to_bin(const string &ip) {
+    std::vector<string> octets = Rule::split_ip(ip);
+    string bin_ip = "";
+    //iterate through octets and convert to binary with dots in between each octet
+    for (auto octet : octets) {
+        bin_ip += number_to_bin(octet);
+    }
+    return bin_ip;
+}
+string mask_ip(const string &ip, const string &mask) {
+    //given an IP and a mask, return the masked IP
+    string masked = "";
+    for (auto [i, j] = std::pair{ip.begin(), mask.begin()}; i != ip.end() && j != mask.end(); ++i, ++j) {
+        if (*j == '.') {
+            masked += '.';
+            continue;
+        }
+        if (*j == '1') masked += *i;
+        else masked += '0';
+    }
+    return masked;
+}
 
 bool RuleTable::compare_ip_addresses(const string &rule, const string &target) {
     //given a rule (contains IP and CIDR) and a target (IP), return true if the target is in the rule's CIDR
@@ -75,47 +102,27 @@ bool RuleTable::compare_ip_addresses(const string &rule, const string &target) {
         }
         return true;
     }
-    string ip = rule.substr(0, rule.find('/'));
-    string cidr = rule.substr(rule.find('/') + 1);
-    if (cidr.size() > 3)
+    string cidr = rule;
+    //check if target is in cidr range
+    string ip = cidr.substr(0, cidr.find('/'));
+    int mask = stoi(cidr.substr(cidr.find('/') + 1));
+    if (mask < 0 || mask > 32) return false;
+    if (mask == 0) return true;
+    if (mask == 32) {
+        if (ip == target) return true;
         return false;
-    if (cidr.size() == 3) {
-        if (cidr[0] == '0')
-            cidr = cidr.substr(1);
-        else
-            return false;
-
     }
-    if (cidr.size() == 2) {
-        if (cidr[0] == '0')
-            cidr = cidr.substr(1);
-        else
-            return false;
-    }
-    if (cidr.size() == 1) {
-        if (cidr[0] == '0')
-            cidr = cidr.substr(1);
-        else
-            return false;
-    }
-    if (cidr.size() == 0)
-        return false;
-    uint32_t mask = 0;
-    for (int i = 0; i < cidr.size(); i++) {
-        mask += (cidr[i] - '0') * pow(2, (cidr.size() - i - 1));
-    }
-    uint32_t ip_int = 0;
-    for (int i = 0; i < ip.size(); i++) {
-        ip_int += (ip[i] - '0') * pow(2, (ip.size() - i - 1));
-    }
-    uint32_t target_int = 0;
-    for (int i = 0; i < target.size(); i++) {
-        target_int += (target[i] - '0') * pow(2, (target.size() - i - 1));
-    }
-    return (ip_int & mask) == (target_int & mask);
-
+    //check if target is in cidr range
+    string mask_str = "";
+    for (int i = 0; i < mask; ++i) mask_str += "1";
+    for (int i = mask; i < 32; ++i) mask_str += "0";
+    string target_bin = ip_to_bin(target);
+    string ip_bin = ip_to_bin(ip);
+    string target_masked = mask_ip(target_bin, mask_str);
+    string ip_masked = mask_ip(ip_bin, mask_str);
+    if (target_masked == ip_masked) return true;
+    return false;
 }
-
 void RuleTable::DisplayTable() {
     std::cout.width(display_padding);
     std::cout << std::left << "Name";
