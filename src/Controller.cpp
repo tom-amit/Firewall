@@ -53,9 +53,7 @@ bool Controller::stop(const std::vector<string> &args) {
 }
 
 bool Controller::run() {
-    std::cout << firewall.table->compare_ip_addresses("192.168.0.0/15", "192.179.3.3") << std::endl;
-    return true;
-    firewall.table->AddRule("amit12345", "any", "any", "any", "any", "any", "any", "any", "allow");
+    //firewall.table->AddRule("amit12345", "any", "any", "any", "any", "any", "any", "any", "allow");
     //firewall.table->AddRule("itay", "in", "234.222.11.3", "2.*.*.1", "192", "65535", "UDP", "yes", "allow");
     std::vector<std::string> args;
     do {
