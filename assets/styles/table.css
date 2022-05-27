@@ -6,6 +6,9 @@
     margin: 30px;
 }
 
+.failed{
+    background-color: rgba(255, 0, 0, 0.2);
+}
 .checkbox-label {
     display: flex;
     flex-direction: row;

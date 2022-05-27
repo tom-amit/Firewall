@@ -89,7 +89,7 @@ $(document).on("keydown", ".mdl-dialog__addContent", function (e) {
         default:
     }
 });
-var _temp;
+var globalRuleSet = [];
 $(document).on("click", ".save", function () {
     var _textfield = $(this).parents("td").find(".mdl-textfield");
     var _input = $(this).parents("td").find("input");
@@ -102,7 +102,8 @@ $(document).on("click", ".save", function () {
             _col.parent("tr").attr("data-count", parseInt(_col.parent("tr").attr("data-count"), 10) + 1);
             _col.attr("data-on", 1);
         }
-        var n = 9
+        const _index = $(_temp).prevAll().length;
+        const n = 9;
         if (parseInt(_col.parent("tr").attr("data-count"), 10) === 9) {
             var args = [];
             for (let i = 0; i < n; ++i) {
@@ -110,7 +111,29 @@ $(document).on("click", ".save", function () {
                 args.push($(_col.parents("tr")).find("span.mdl-data-table__label")[i].innerHTML);
             }
             console.log(args);
-            AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
+            if (globalRuleSet.length === _index) {
+                var ret = AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
+                if (ret === false) {
+                    console.log("Rule addition failed!");
+                    $(_col.parents("tr")).addClass("failed");
+                }
+                else{
+                    $(_col.parents("tr")).removeClass("failed");
+                    console.log("Rule addition succeeded!");
+                }
+                globalRuleSet.push(args);
+            } else {
+                globalRuleSet[_index] = args;
+                var ret = EditRule(_index, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
+                if (ret === false) {
+                    console.log("Rule modification failed!");
+                    $(_col.parents("tr")).addClass("failed");
+                }
+                else{
+                    $(_col.parents("tr")).removeClass("failed");
+                    console.log("Rule modification succeeded!");
+                }
+            }
         }
     }
 });

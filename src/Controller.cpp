@@ -10,35 +10,49 @@ Controller::Controller() {
     cmd_map = {
             {"add-rule",    {9, &Controller::add_rule}},
             {"remove-rule", {1, &Controller::remove_rule}},
+            {"edit-rule",   {10, &Controller::edit_rule}},
             {"show-rules",  {0, &Controller::show_rules}},
             {"start",       {0, &Controller::start}},
             {"stop",        {0, &Controller::stop}}
     };
 }
 
-void Controller::add_rule(const std::vector<string> &args) {
-    firewall.table->AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+bool Controller::add_rule(const std::vector<string> &args) {
+    std::optional<string> ret = firewall.table->AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
     show_rules({});
+    return ret.has_value();
 }
 
-void Controller::remove_rule(const std::vector<string> &args) {
+bool Controller::remove_rule(const std::vector<string> &args) {
     firewall.table->RemoveRule(args[0]);
     show_rules({});
+    return false;
 }
 
-void Controller::show_rules(const std::vector<string> &args) {
+bool Controller::edit_rule(const std::vector<std::string> &args) {
+    uint16_t id = std::stoi(args[0]);
+    std::optional<string> ret = firewall.table->EditRule(id, args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
+    show_rules({});
+    return ret.has_value();
+
+}
+
+bool Controller::show_rules(const std::vector<string> &args) {
     firewall.table->DisplayTable();
+    return true;
 }
 
-void Controller::start(const std::vector<string> &args) {
+bool Controller::start(const std::vector<string> &args) {
     firewall.Run();
+    return true;
 }
 
-void Controller::stop(const std::vector<string> &args) {
+bool Controller::stop(const std::vector<string> &args) {
     firewall.Stop();
+    return true;
 }
 
-void Controller::run() {
+bool Controller::run() {
     firewall.table->AddRule("amit12345", "any", "any", "any", "any", "any", "any", "any", "allow");
     //firewall.table->AddRule("itay", "in", "234.222.11.3", "2.*.*.1", "192", "65535", "UDP", "yes", "allow");
     std::vector<std::string> args;
@@ -63,4 +77,5 @@ void Controller::run() {
             }
         }
     }while(true);
+    return true;
 }

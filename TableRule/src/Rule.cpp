@@ -5,7 +5,18 @@
 #include "../include/Rule.h"
 
 #include <utility>
-
+Rule::Rule(){
+    this->name = "";
+    this->direction = "";
+    this->src_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "");
+    this->dest_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "");
+    this->src_port = std::make_pair(0, 0);
+    this->dest_port = std::make_pair(0, 0);
+    this->ack="";
+    this->protocol = 0;
+    this->action = "";
+    this->isInvalid = true;
+}
 Rule::Rule(const string &name, const string &direction, const string &src_ip,
            const string &dest_ip, const string &src_port, const string &dest_port, const string &protocol,
            const string &ack,
@@ -19,6 +30,7 @@ Rule::Rule(const string &name, const string &direction, const string &src_ip,
     this->ack = ParseAck(ack);
     this->protocol = ParseProtocol(protocol);
     this->action = ParseAction(action);
+    this->isInvalid = false;
 }
 
 string Rule::getName() const {
@@ -45,14 +57,14 @@ void Rule::setDirection(const string &p_direction) {
     direction = ParseDirection(p_direction);
 }
 
-std::pair<pcpp::IPv4Address, string> Rule::getSrcIp() const {
+std::tuple<pcpp::IPv4Address, uint16_t, string> Rule::getSrcIp() const {
     return src_ip;
 }
 void Rule::setSrcIp(const string &p_src_ip) {
     src_ip = ParseIP(p_src_ip);
 }
 
-std::pair<pcpp::IPv4Address, string> Rule::getDestIp() const {
+std::tuple<pcpp::IPv4Address, uint16_t, string> Rule::getDestIp() const {
     return dest_ip;
 }
 
@@ -60,16 +72,34 @@ void Rule::setDestIp(const string &p_dest_ip) {
     dest_ip = ParseIP(p_dest_ip);
 }
 
-std::pair<uint32_t, string> Rule::getSrcPort() const {
-    return {src_port, src_port > MAX_PORT ? "any" : to_string(src_port)};
+std::tuple<uint32_t, uint32_t, string> Rule::getSrcPort() const {
+    string repr;
+    // if it's any, return the max port, if it's a range, return the range, else return the one of the ports
+    if (src_port.first == MAX_PORT+1 && src_port.second == MAX_PORT+1) {
+        repr = "any";
+    } else if (src_port.first == src_port.second) {
+        repr = to_string(src_port.first);
+    } else {
+        repr = to_string(src_port.first) + "-" + to_string(src_port.second);
+    }
+    return {src_port.first, src_port.second, repr};
 }
 
 void Rule::setSrcPort(string p_src_port) {
     src_port = ParsePort(std::move(p_src_port));
 }
 
-std::pair<uint32_t, string> Rule::getDestPort() const {
-    return {dest_port, dest_port > MAX_PORT ? "any" : to_string(dest_port)};
+std::tuple<uint32_t, uint32_t, string> Rule::getDestPort() const {
+    string repr;
+    // if it's any, return the max port, if it's a range, return the range, else return the one of the ports
+    if (dest_port.first == MAX_PORT+1 && dest_port.second == MAX_PORT+1) {
+        repr = "any";
+    } else if (dest_port.first == dest_port.second) {
+        repr = to_string(dest_port.first);
+    } else {
+        repr = to_string(dest_port.first) + "-" + to_string(dest_port.second);
+    }
+    return {dest_port.first, dest_port.second, repr};
 }
 
 void Rule::setDestPort(string p_dest_port) {
@@ -93,6 +123,11 @@ std::pair<int16_t, string> Rule::getAck() const {
 
 void Rule::setAck(const string& p_ack) {
     Rule::ack = ParseAck(p_ack);
+}
+
+
+bool Rule::isNotValid() const{
+    return isInvalid;
 }
 
 void Rule::strToFunc(string &str, int (*func)(int)) {
@@ -132,16 +167,35 @@ std::string Rule::ParseAction(string p_action) {
     throw BadParse("Rule Action", p_action);
 }
 
-std::pair<pcpp::IPv4Address,string> Rule::ParseIP(string p_ip_addr){
+std::tuple<pcpp::IPv4Address, uint16_t, string> Rule::ParseIP(string p_ip_addr){
+    uint16_t  final_cidr = IRRELEVANT_CIDR;
+    size_t pos = p_ip_addr.find("/");
+    if(pos != string::npos){
+        string cidr = p_ip_addr.substr(pos+1);
+        try{
+            final_cidr = std::stoi(cidr);
+            if (final_cidr > 32 || final_cidr < 0){
+                throw std::invalid_argument("");
+            }
+        }catch(std::invalid_argument &e){
+            throw BadParse("Rule CIDR in IP Rule", cidr);
+        }
+        p_ip_addr = p_ip_addr.substr(0,pos);
+    }
     std::vector<string> ip_split = split_ip(p_ip_addr);
+
     pcpp::IPv4Address temp(p_ip_addr);
     if(temp.toString() == p_ip_addr){
-        return {temp, temp.toString()};
+        if(final_cidr != IRRELEVANT_CIDR){
+            p_ip_addr += "/" + to_string(final_cidr);
+        }
+        return {temp, final_cidr, p_ip_addr};
     }
     else{
+        //TODO currently CIDR is ignored in general IPs or partly general but maybe should add support for it
         strToFunc(p_ip_addr, ::tolower);
         if(GENERAL_IP.find(p_ip_addr) != GENERAL_IP.end()){
-            return {NULL, GENERAL_IP.at(p_ip_addr)};
+            return {NULL, IRRELEVANT_CIDR, GENERAL_IP.at(p_ip_addr)};
         }
         //TODO check if removing assignment will still work when adding characters below because Clang-Tidy complains.
         string replacement = "";
@@ -155,17 +209,34 @@ std::pair<pcpp::IPv4Address,string> Rule::ParseIP(string p_ip_addr){
         }
         temp = pcpp::IPv4Address(replacement);
         if(temp.toString() == replacement){
-            return {NULL, p_ip_addr};
+            return {NULL, IRRELEVANT_CIDR, p_ip_addr};
         }
     }
     throw BadParse("Rule IP", p_ip_addr);
 }
-uint32_t Rule::ParsePort(string p_port_num){
+std::pair<uint32_t, uint32_t>  Rule::ParsePort(string p_port_num){
+    //check if port is a range
+    size_t pos = p_port_num.find('-');
+    if(pos != string::npos){
+        string port_start = p_port_num.substr(0, pos);
+        string port_end = p_port_num.substr(pos+1);
+        try{
+            uint32_t port_start_num = std::stoi(port_start);
+            uint32_t port_end_num = std::stoi(port_end);
+            if(port_start_num > port_end_num
+                || port_start_num < 0 || port_end_num > 65535){
+                throw std::invalid_argument("");
+            }
+            return {port_start_num, port_end_num};
+        }catch(std::invalid_argument &e){
+            throw BadParse("Rule Port Range", p_port_num);
+        }
+    }
     strToFunc(p_port_num, ::tolower);
     try{
-        if (p_port_num == ANY) return MAX_PORT + 1;
+        if (p_port_num == ANY) return {MAX_PORT+1, MAX_PORT+1};
         uint32_t tmp = std::stoi(p_port_num);
-        if(tmp >= 0 && tmp <= MAX_PORT) return tmp;
+        if(tmp >= 0 && tmp <= MAX_PORT) return {tmp, tmp};
         throw std::exception();
     }
     catch(...){
@@ -189,3 +260,8 @@ pcpp::ProtocolType Rule::ParseProtocol(string p_protocol){
     }
     throw BadParse("Rule Protocol", p_protocol);
 }
+
+void Rule::setNotValid(const bool p_notValid) {
+    isInvalid = p_notValid;
+}
+

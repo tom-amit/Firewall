@@ -17,7 +17,7 @@ using std::string;
 
 class Controller {
 private:
-    typedef void (Controller::*MFP)(const std::vector<string> &args);
+    typedef bool (Controller::*MFP)(const std::vector<string> &args);
 
     Firewall firewall;
 
@@ -25,17 +25,20 @@ private:
 public:
     Controller();
 
-    void add_rule(const std::vector<string> &args);
+    bool add_rule(const std::vector<string> &args);
 
-    void remove_rule(const std::vector<string> &args);
+    bool remove_rule(const std::vector<string> &args);
 
-    void show_rules(const std::vector<string> &args);
+    bool edit_rule(const std::vector<string> &args);
 
-    void start(const std::vector<string> &args);
+    bool show_rules(const std::vector<string> &args);
 
-    void stop(const std::vector<string> &args);
+    bool start(const std::vector<string> &args);
 
-    void run();
+    bool stop(const std::vector<string> &args);
+
+    bool run();
+
 };
 
 

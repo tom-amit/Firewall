@@ -7,6 +7,7 @@
 
 
 #define MAX_PORT 65535
+#define IRRELEVANT_CIDR 65535
 
 #include <vector>
 #include <algorithm>
@@ -25,6 +26,8 @@ using std::to_string;
 
 class Rule {
 public:
+    Rule(); // For invalid rules
+
     static std::vector<string> split_ip(const string &s);
 
     static void strToFunc(string &str, int (*func)(int));
@@ -60,19 +63,19 @@ public:
 
     void setDirection(const string &p_direction);
 
-    [[nodiscard]] std::pair<pcpp::IPv4Address, string> getSrcIp() const;
+    [[nodiscard]] std::tuple<pcpp::IPv4Address, uint16_t, string> getSrcIp() const;
 
     void setSrcIp(const string &p_src_ip);
 
-    [[nodiscard]] std::pair<pcpp::IPv4Address, string> getDestIp() const;
+    [[nodiscard]] std::tuple<pcpp::IPv4Address, uint16_t ,string> getDestIp() const;
 
     void setDestIp(const string &p_dest_ip);
 
-    [[nodiscard]] std::pair<uint32_t, string> getSrcPort() const;
+    [[nodiscard]] std::tuple<uint32_t, uint32_t, string> getSrcPort() const;
 
     void setSrcPort(string p_src_port);
 
-    [[nodiscard]] std::pair<uint32_t, string> getDestPort() const;
+    [[nodiscard]] std::tuple<uint32_t, uint32_t, string> getDestPort() const;
 
     void setDestPort(string p_dest_port);
 
@@ -84,19 +87,25 @@ public:
 
     void setAck(const string &p_ack);
 
+    [[nodiscard]] bool isNotValid() const;
+    void setNotValid(const bool p_notValid);
+
 private:
     string name, action, direction, ack;
-    std::pair<pcpp::IPv4Address, string> src_ip, dest_ip;
-    uint32_t src_port, dest_port;
+
+    //IP, CIDR, STR-IP
+    std::tuple<pcpp::IPv4Address, uint16_t, string> src_ip, dest_ip;
+    std::pair<uint32_t, uint32_t> src_port, dest_port;
     pcpp::ProtocolType protocol;
+    bool isInvalid;
 
     static string ParseDirection(string dir);
 
     static string ParseAction(string p_action);
 
-    static std::pair<pcpp::IPv4Address, string> ParseIP(string p_ip_addr);
+    static std::tuple<pcpp::IPv4Address, uint16_t, string> ParseIP(string p_ip_addr);
 
-    static uint32_t ParsePort(string p_port_num);
+    static std::pair<uint32_t, uint32_t>  ParsePort(string p_port_num);
 
     static string ParseAck(string p_ack);
 
