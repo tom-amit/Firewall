@@ -1,15 +1,20 @@
+//TODO angular needs to be downloaded locally, not remotely
 angular.module('modalTest', ['ui.bootstrap', 'dialogs'])
     .controller('dialogServiceTest', function ($scope, $rootScope, $timeout, $dialogs) {
         $scope.launch = function () {
             var dlg = null;
-            dlg = $dialogs.confirm('Please Confirm', 'Are you sure you want to deleted selected elements?');
+            dlg = $dialogs.confirm('Please Confirm', 'Are you sure you want to deleted selected rules?');
             dlg.result.then(function (btn) {
-                $(".mdl-data-dynamictable tbody").find('tr.is-selected').remove();
+                $(".mdl-data-dynamictable tbody").find('tr.is-selected').each(function () {
+                    var _index = $(this).prevAll().length;
+                    $(this).remove();
+                    RemoveRule(_index);
+                    console.log("Removed rule " + _index);
+                });
                 $(".mdl-data-dynamictable thead tr").removeClass("is-selected");
                 $(".mdl-data-dynamictable thead tr th label").removeClass("is-checked");
                 componentHandler.upgradeDom();
                 var _row = $(".mdl-data-dynamictable tbody").find('tr');
-                console.log("_row.length", _row.length);
                 if (_row.length < 1) {
                     addNewRow();
                 }

@@ -181,6 +181,7 @@ std::optional<string> RuleTable::AddRule(const string &name, const string &direc
     for (auto &it: table) {
         if (str_equals(it->getName(), name)) {
             std::cerr << "No duplicate names are allowed for the rules, RULE: (" << name << ")" << std::endl;
+            p_AddRule(Rule());
             return {};
         }
     }
@@ -208,15 +209,21 @@ std::optional<string> RuleTable::p_AddRule(const Rule &rule) {
     return SUCCESS;
 }
 
-std::optional<std::string> RuleTable::RemoveRule(const string &name) {
-    for (auto[i, it] = std::pair{0, table.begin()}; it != table.end() - 1; ++i, it++) {
-        if ((*it)->getName() == name) {
-            table.erase(it);
-            len--;
-            return SUCCESS;
+std::optional<std::string> RuleTable::RemoveRule(const string &index) {
+    try {
+        int i = std::stoi(index);
+        if (i < 0 || i >= len-1) {
+            std::cerr << "Index out of bounds" << std::endl;
+            return {};
         }
+        table.erase(table.begin() + i);
+        len--;
+        return SUCCESS;
     }
-    return {};
+    catch (std::invalid_argument &e) {
+        std::cerr << "Invalid index or not an index" << std::endl;
+        return {};
+    }
 }
 
 std::optional<std::string>
@@ -224,6 +231,20 @@ RuleTable::EditRule(const uint16_t id, const string &name, const string &directi
                     const string &dest_ip, const string &src_port, const string &dest_port, const string &protocol,
                     const string &ack, const string &action) {
     uint64_t i = 0;
+    for (auto it = table.begin(); it != table.end(); it++, ++i) {
+        if (i != id && (*it)->getName() == name) {
+            std::cerr << "No duplicate names are allowed for the rules, RULE: (" << name << ")" << std::endl;
+            uint64_t j = 0;
+            for (auto it = table.begin(); it != table.end(); it++, ++j) {
+                if(j == id) {
+                    (*it)->setNotValid(true);
+                    break;
+                }
+            }
+            return {};
+        }
+    }
+    i = 0;
     for (auto it = table.begin(); it != table.end() - 1; ++i, it++) {
         if (i == id) {
             try{
@@ -254,9 +275,7 @@ RuleTable::EditRule(const uint16_t id, const string &name, const string &directi
                 if (!action.empty()) {
                     (*it)->setAction(action);
                 }
-                if ((*it)->isNotValid()) {
-                    (*it)->setNotValid(false);
-                }
+                (*it)->setNotValid(false);
                 return SUCCESS;
             }
             catch (const std::exception &e) {

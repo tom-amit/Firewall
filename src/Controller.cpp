@@ -26,7 +26,7 @@ bool Controller::add_rule(const std::vector<string> &args) {
 bool Controller::remove_rule(const std::vector<string> &args) {
     firewall.table->RemoveRule(args[0]);
     show_rules({});
-    return false;
+    return true;
 }
 
 bool Controller::edit_rule(const std::vector<std::string> &args) {
