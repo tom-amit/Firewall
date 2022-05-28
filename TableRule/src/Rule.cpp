@@ -194,7 +194,8 @@ std::tuple<pcpp::IPv4Address, uint16_t, string> Rule::ParseIP(string p_ip_addr){
         return {temp, final_cidr, p_ip_addr};
     }
     else{
-        //TODO currently CIDR is ignored in general IPs or partly general but maybe should add support for it
+        //TODO currently CIDR is ignored in general IPs or partly general, but need to reject such IPs, CIDR and ASTERISK
+        // cannot happen simultaneously
         strToFunc(p_ip_addr, ::tolower);
         if(GENERAL_IP.find(p_ip_addr) != GENERAL_IP.end()){
             return {NULL, IRRELEVANT_CIDR, GENERAL_IP.at(p_ip_addr)};
