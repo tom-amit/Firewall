@@ -7,7 +7,7 @@
     <link href="styles/table.css" rel="stylesheet">
 </head>
 <body ng-controller="dialogServiceTest">
-<div class="mdl-grid" style="width:1100px;margin-top:100px;">
+<div class="mdl-grid" style="width:1300px;margin-top:100px;">
     <div class="mdl-data-tabledynamic mdl-shadow--2dp" id="Rules">
         <div class="mdl-data-tabledynamic__title">
             <h2 class="mdl-data-tabledynamic__title-text">Rules</h2>
@@ -33,6 +33,7 @@
                             <input type="checkbox" id="checkbox-all" class="mdl-checkbox__input">
                         </label>-->
                     </th>
+                    <th class="mdl-data-table__cell--non-numeric">Rule Index</th>
                     <th class="mdl-data-table__cell--non-numeric">Name</th>
                     <th class="mdl-data-table__cell--non-numeric">Direction</th>
                     <th class="mdl-data-table__cell--non-numeric">Source IP Address</th>
@@ -48,8 +49,8 @@
                 <tr class="checkbox-default">
                     <td>
                     </td>
-                    <td class="mdl-data-table__cell--non-numeric" style="text-align:left;"><span
-                            class="mdl-data-table__label" title="Name">default</span></td>
+                    <td class="mdl-data-table__cell--non-numeric" style="text-align: left"><span class="mdl-data-table__label" title="Rule Index">-1</span></td>
+                    <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label" title="Name">default</span></td>
                     <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label" title="Direction">any</span>
                     </td>
                     <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label" title="Source IP">any</span>
@@ -93,15 +94,16 @@
     </div>
 </script>
 <script id="basketItemTemplate" type="text/template">
-    <tr data-count=0>
+    <tr data-count=0 class="failed data-row">
         <td>
             <label class="checkbox-label" for="{{id}}">
                 <input type="checkbox" id="{{id}}" class="checkbox">
             </label>
         </td>
-        <td data-on=0 class="mdl-data-table__cell--non-numeric" style="text-align:left;"><span
-                class="mdl-data-table__label add-table-content"
-                title="Name">Add Name</span></td>
+        <td           class="mdl-data-table__cell--non-numeric" style="text-align: left"><span class="index mdl-data-table__label"
+                                                                      title="Rule Index">{{index_rule}}</span></td>
+        <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+                                                                      title="Name">Add Name</span></td>
         <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="Direction">Add Direction</span></td>
         <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
@@ -121,6 +123,7 @@
     </tr>
 </script>
 <script src="scripts/jquery-1.12.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script src="scripts/material.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
 <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.js" type="text/javascript"></script>

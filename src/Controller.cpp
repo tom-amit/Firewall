@@ -11,14 +11,29 @@ Controller::Controller() {
             {"add-rule",    {9, &Controller::add_rule}},
             {"remove-rule", {1, &Controller::remove_rule}},
             {"edit-rule",   {10, &Controller::edit_rule}},
+            {"swap-rule",   {2, &Controller::swap_rule_to}},
             {"show-rules",  {0, &Controller::show_rules}},
             {"start",       {0, &Controller::start}},
             {"stop",        {0, &Controller::stop}}
     };
 }
 
+bool Controller::swap_rule_to(const std::vector<string> &args) {
+    uint64_t id1 = std::stoull(args[0]);
+    uint64_t id2 = std::stoull(args[1]);
+    std::optional<string> ret = firewall.table->SwapRuleTo(id1, id2);
+    show_rules({});
+    return ret.has_value();
+}
+
 bool Controller::add_rule(const std::vector<string> &args) {
-    std::optional<string> ret = firewall.table->AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+    std::optional<string> ret;
+    if (args.empty()){
+        ret = firewall.table->AddEmptyRule();
+    }
+    else{
+        ret = firewall.table->AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+    }
     show_rules({});
     return ret.has_value();
 }

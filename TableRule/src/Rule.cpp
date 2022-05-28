@@ -6,15 +6,17 @@
 
 #include <utility>
 Rule::Rule(){
-    this->name = "";
-    this->direction = "";
-    this->src_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "");
-    this->dest_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "");
-    this->src_port = std::make_pair(0, 0);
-    this->dest_port = std::make_pair(0, 0);
-    this->ack="";
+    //TODO strings and values here are only for initial invalid rules, make sure a regular user cannot set them in a way
+    // that they will be accepted
+    this->name = "No Name";
+    this->direction = "none";
+    this->src_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "none");
+    this->dest_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "none");
+    this->src_port = std::make_pair(MAX_PORT+1, MAX_PORT+1);
+    this->dest_port = std::make_pair(MAX_PORT+1, MAX_PORT+1);
+    this->ack="none";
     this->protocol = 0;
-    this->action = "";
+    this->action = "none";
     this->isInvalid = true;
 }
 Rule::Rule(const string &name, const string &direction, const string &src_ip,

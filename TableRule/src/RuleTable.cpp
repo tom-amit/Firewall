@@ -5,8 +5,16 @@
 //TODO make sure there are no memory leaks since we moved to unique_ptr!
 #include "../include/RuleTable.h"
 //TODO Add swap order of rules function (pretty simple for two rules)
+template <typename t> void move(std::vector<t>& v, size_t oldIndex, size_t newIndex)
+{
+    if (oldIndex > newIndex)
+        std::rotate(v.rend() - oldIndex - 1, v.rend() - oldIndex, v.rend() - newIndex);
+    else
+        std::rotate(v.begin() + oldIndex, v.begin() + oldIndex + 1, v.begin() + newIndex + 1);
+}
 
-RuleTable::RuleTable() : len(1), display_padding(20) {
+
+RuleTable::RuleTable() : len(1), display_padding(22) {
     table = std::vector<unique_ptr<Rule>>{};
     table.emplace_back(new Rule(string("default"), string("any"), string("any"), string("any"),
                                 string("any"), string("any"), string("any"), string("any"),
@@ -125,6 +133,8 @@ bool RuleTable::compare_ip_addresses(const string &rule, const string &target) {
 }
 void RuleTable::DisplayTable() {
     std::cout.width(display_padding);
+    std::cout << std::left << "Index";
+    std::cout.width(display_padding);
     std::cout << std::left << "Name";
     std::cout.width(display_padding);
     std::cout << std::left << "Direction";
@@ -143,15 +153,18 @@ void RuleTable::DisplayTable() {
     std::cout.width(display_padding);
     std::cout << std::left << "Action";
     std::cout << std::endl;
-    for (int i = 0; i < TABLE_LENGTH * display_padding; ++i) {
+    for (int i = 0; i < round(TABLE_LENGTH * display_padding*1.1); ++i) {
         std::cout << "=";
     }
     std::cout << std::endl;
+    uint64_t i = 0;
     for(auto& r : table) {
         if (r->isNotValid()){
+            ++i;
             continue;
         }
-        std::cout << std::endl;
+        std::cout.width(display_padding);
+        std::cout << std::left << i;
         std::cout.width(display_padding);
         std::cout << std::left << r->getName();
         std::cout.width(display_padding);
@@ -170,8 +183,9 @@ void RuleTable::DisplayTable() {
         std::cout << std::left << r->getAck().second;
         std::cout.width(display_padding);
         std::cout << std::left << r->getAction();
+        std::cout << std::endl;
+        ++i;
     }
-    std::cout << std::endl;
 }
 
 std::optional<string> RuleTable::AddRule(const string &name, const string &direction, const string &src_ip,
@@ -207,6 +221,25 @@ std::optional<string> RuleTable::p_AddRule(const Rule &rule) {
     table.emplace(table.end() - 1, new Rule(rule));
     len++;
     return SUCCESS;
+}
+
+std::optional<string> RuleTable::AddEmptyRule(){
+    try{
+        p_AddRule(Rule());
+        return SUCCESS;
+    }
+    catch(const std::exception& e){
+        for(int i = 0;i<TABLE_LENGTH*display_padding;++i){
+            std::cerr << ">";
+        }
+        std::cerr << std::endl;
+        std::cerr << "Encountered parsing error (will not create rule):\n" << e.what() << std::endl;
+        for(int i = 0;i<TABLE_LENGTH*display_padding;++i){
+            std::cerr << "<";
+        }
+        std::cerr << std::endl;
+        return {};
+    }
 }
 
 std::optional<std::string> RuleTable::RemoveRule(const string &index) {
@@ -293,4 +326,14 @@ RuleTable::EditRule(const uint16_t id, const string &name, const string &directi
             }
         }
     }
+}
+
+std::optional<string> RuleTable::SwapRuleTo(uint64_t id1, uint64_t id2) {
+    // given 2 ids, swap the rules at those ids, table is built of unique pointers
+    if (id1 >= len-1 || id2 >= len-1) {
+        std::cerr << "Invalid index" << std::endl;
+        return {};
+    }
+    move(table, id1, id2);
+    return SUCCESS;
 }

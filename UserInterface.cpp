@@ -46,7 +46,7 @@ public:
         ///
         overlay_->view()->set_load_listener(this);
         overlay_->view()->set_view_listener(this);
-        std::cout << ("For testsss") << std::endl;
+        std::cout << ("For t1stsss") << std::endl;
         ///
         /// Load a string of HTML (we're using a C++11 Raw String Literal)
         ///
@@ -75,9 +75,15 @@ public:
             std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
             args_str.push_back(str);
         }
-        bool ret = control.add_rule(
-                {args_str[0], args_str[1], args_str[2], args_str[3], args_str[4], args_str[5], args_str[6], args_str[7],
-                 args_str[8]});
+        bool ret;
+        if (args.empty()){
+            ret = control.add_rule({});
+        }
+        else{
+            ret = control.add_rule(
+                    {args_str[0], args_str[1], args_str[2], args_str[3], args_str[4], args_str[5], args_str[6], args_str[7],
+                     args_str[8]});
+        }
         if (ret) {
             return JSValueMakeBoolean(thisObject.context(), true);
         } else {
@@ -108,6 +114,30 @@ public:
             return JSValueMakeBoolean(thisObject.context(), false);
         }
     }
+
+    JSValue SwapRuleTo(const JSObject &thisObject, const JSArgs &args) {
+        ///
+        /// Return our message to JavaScript as a JSValue.
+        ///
+
+        std::vector<string> args_str;
+
+        for (int i = 0; i < args.size(); ++i) {
+            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
+            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
+                                                         (size_t) JSStringGetLength(s));
+            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
+            args_str.push_back(str);
+        }
+        bool ret = control.swap_rule_to(
+                {args_str[0], args_str[1]});
+        if (ret) {
+            return JSValueMakeBoolean(thisObject.context(), true);
+        } else {
+            return JSValueMakeBoolean(thisObject.context(), false);
+        }
+    }
+
     JSValue RemoveRule(const JSObject &thisObject, const JSArgs &args) {
         ///
         /// Return our message to JavaScript as a JSValue.
@@ -169,6 +199,7 @@ public:
         global["AddRule"] = BindJSCallbackWithRetval(&GUI::AddRule);
         global["EditRule"] = BindJSCallbackWithRetval(&GUI::EditRule);
         global["RemoveRule"] = BindJSCallbackWithRetval(&GUI::RemoveRule);
+        global["SwapRuleTo"] = BindJSCallbackWithRetval(&GUI::SwapRuleTo);
     }
 
     static inline std::string ToUTF8(const String &str) {
@@ -252,7 +283,7 @@ int main() {
     ///
     /// Create our Window using default window flags.
     ///
-    auto window = Window::Create(app->main_monitor(), 1200, 800, false, kWindowFlags_Titled);
+    auto window = Window::Create(app->main_monitor(), 1400, 800, false, kWindowFlags_Titled);
 
     ///
     /// Set our window title.

@@ -39,6 +39,7 @@ public:
 
     bool run();
 
+    bool swap_rule_to(const std::vector<string> &args);
 };
 
 

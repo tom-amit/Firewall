@@ -1,4 +1,5 @@
 //TODO angular needs to be downloaded locally, not remotely
+var globalRuleSet = [];
 angular.module('modalTest', ['ui.bootstrap', 'dialogs'])
     .controller('dialogServiceTest', function ($scope, $rootScope, $timeout, $dialogs) {
         $scope.launch = function () {
@@ -9,6 +10,11 @@ angular.module('modalTest', ['ui.bootstrap', 'dialogs'])
                     var _index = $(this).prevAll().length;
                     $(this).remove();
                     RemoveRule(_index);
+                    console.log("Removed rule " + _index);
+                });
+                $(".mdl-data-dynamictable tbody").find('tr').each(function () {
+                    var _index = $(this).prevAll().length;
+                    $(this).find("span.index").text(_index);
                     console.log("Removed rule " + _index);
                 });
                 $(".mdl-data-dynamictable thead tr").removeClass("is-selected");
@@ -24,11 +30,23 @@ angular.module('modalTest', ['ui.bootstrap', 'dialogs'])
 
     }); // end run / module
 
+
+
 function addNewRow() {
 
     var _row = $(".mdl-data-dynamictable tbody").find('tr');
     var template = $('#basketItemTemplate').html();
-    var _newRow = template.replace(/{{id}}/gi, 'checkbox-' + new Date().getTime());
+    //take the template and put the index in it as the globalRuleSet length
+    var _newRow = template.replace(/{{index_rule}}/g, globalRuleSet.length);
+    var _newRow = _newRow.replace(/{{id}}/gi, 'checkbox-' + new Date().getTime());
+    var ret = AddRule()
+    //var ret = true;
+    if (ret === false) {
+        console.log("Empty rule addition failed!");
+        return;
+    }
+    console.log("Empty rule addition succeeded!");
+    globalRuleSet.push([]);
     $(".mdl-data-dynamictable tbody tr:last").before(_newRow);
     componentHandler.upgradeAllRegistered();
 }
@@ -94,7 +112,7 @@ $(document).on("keydown", ".mdl-dialog__addContent", function (e) {
         default:
     }
 });
-var globalRuleSet = [];
+const n = 9;
 $(document).on("click", ".save", function () {
     var _textfield = $(this).parents("td").find(".mdl-textfield");
     var _input = $(this).parents("td").find("input");
@@ -108,37 +126,42 @@ $(document).on("click", ".save", function () {
             _col.attr("data-on", 1);
         }
         const _index = $(_temp).prevAll().length;
-        const n = 9;
         if (parseInt(_col.parent("tr").attr("data-count"), 10) === 9) {
             var args = [];
-            for (let i = 0; i < n; ++i) {
+            for (let i = 1; i <= n; ++i) {
                 console.log(i);
                 args.push($(_col.parents("tr")).find("span.mdl-data-table__label")[i].innerHTML);
             }
-            console.log(args);
-            if (globalRuleSet.length === _index) {
-                var ret = AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
-                if (ret === false) {
-                    console.log("Rule addition failed!");
-                    $(_col.parents("tr")).addClass("failed");
-                }
-                else{
-                    $(_col.parents("tr")).removeClass("failed");
-                    console.log("Rule addition succeeded!");
-                }
-                globalRuleSet.push(args);
-            } else {
-                globalRuleSet[_index] = args;
-                var ret = EditRule(_index, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
-                if (ret === false) {
-                    console.log("Rule modification failed!");
-                    $(_col.parents("tr")).addClass("failed");
-                }
-                else{
-                    $(_col.parents("tr")).removeClass("failed");
-                    console.log("Rule modification succeeded!");
-                }
+            console.log("ARGS: " + args);
+            globalRuleSet[_index] = args;
+            var ret = EditRule(_index, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
+            if (ret === false) {
+                console.log("Rule modification failed!");
+                $(_col.parents("tr")).addClass("failed");
+            }
+            else{
+                $(_col.parents("tr")).removeClass("failed");
+                console.log("Rule modification succeeded!");
             }
         }
     }
+});
+
+$( "table>tbody" ).sortable({
+    items: "tr:not(:last)",
+    stop: function( event, ui ) {
+        let tr = ui.item[0];
+        var _index = $(tr).prevAll().length, oldIndex = $(tr).find("span.mdl-data-table__label")[0].innerHTML;
+        var args = [];
+        console.log("Moved " + oldIndex + " to " + _index);
+        for (let i = 1; i <= n; ++i) {
+            args.push($(tr).find("span.mdl-data-table__label")[i].innerHTML);
+        }
+        globalRuleSet[_index] = args;
+        SwapRuleTo(oldIndex, _index)
+        $(".mdl-data-dynamictable tbody").find('tr').each(function () {
+            var _idx = $(this).prevAll().length;
+            $(this).find("span.index").text(_idx);
+        });
+    },
 });

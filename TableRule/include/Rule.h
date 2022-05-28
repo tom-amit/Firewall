@@ -37,11 +37,14 @@ public:
     const static inline std::map<string, string> GENERAL_IP{{"any", "*.*.*.*"}};
     const static inline std::vector<string> DIR_DEF{"in", "out", "any"};
     const static inline std::map<string, bool> ACTION_DEF{{"allow", true},
-                                                          {"deny",  false}};
+                                                          {"deny",  false},
+                                                          {"none",  false}};
     const static inline std::map<string, int16_t> ACK_DEF{{"yes", 1},
                                                           {"no",  0},
-                                                          {"any", -1}};
-    const static inline std::map<string, long unsigned int> PROTOCOL_DEF{{"ANY", 0x111},
+                                                          {"any", -1},
+                                                          {"none", -100}};
+    const static inline std::map<string, long unsigned int> PROTOCOL_DEF{{"none", 0},
+                                                                         {"ANY", 0x111},
                                                                          {"TCP", 0x04},
                                                                          {"UDP", 0x08}};
 
