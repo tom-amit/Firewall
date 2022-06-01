@@ -12,12 +12,21 @@
         <div class="mdl-data-tabledynamic__title">
             <h2 class="mdl-data-tabledynamic__title-text">Rules</h2>
             <div class="mdl-data-tabledynamic__actions">
+                <!-- similar to ADD and REMOVE, create a "a" that calls saveJSON() and is called Save -->
+                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                   ng-click="saveJSON()">
+                    Save Rules
+                </a>
+                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                   ng-click="loadJSON()">
+                    Load Rules
+                </a>
                 <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect add-row">
-                    ADD
+                    ADD Rule
                 </a>
                 <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect remove-row"
                    ng-click="launch()">
-                    REMOVE
+                    REMOVE Rule
                 </a>
             </div>
 
@@ -93,8 +102,37 @@
         </div>
     </div>
 </script>
+<script id="basketItemTemplateReady" type="text/template">
+    <tr class="failed data-row">
+        <td>
+            <label class="checkbox-label" for="{{id}}">
+                <input type="checkbox" id="{{id}}" class="checkbox">
+            </label>
+        </td>
+        <td           class="mdl-data-table__cell--non-numeric" style="text-align: left"><span class="index mdl-data-table__label"
+                                                                                               title="Rule Index">{{index_rule}}</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+                                                            title="Name">{{Name}}</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+                                                            title="Direction">{{Direction}}</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+                                                            title="Source IP">{{Source IP}}</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+                                                            title="Dest IP">{{Destination IP}}</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+                                                            title="Source Port">{{Source Port}}</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+                                                            title="Dest Port">{{Destination Port}}</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+                                                            title="Protocol">{{Protocol}}</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+                                                            title="ACK">{{ACK}}</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+                                                            title="Action">{{ACTION}}</span></td>
+    </tr>
+</script>
 <script id="basketItemTemplate" type="text/template">
-    <tr data-count=0 class="failed data-row">
+    <tr class="failed data-row">
         <td>
             <label class="checkbox-label" for="{{id}}">
                 <input type="checkbox" id="{{id}}" class="checkbox">
@@ -102,23 +140,23 @@
         </td>
         <td           class="mdl-data-table__cell--non-numeric" style="text-align: left"><span class="index mdl-data-table__label"
                                                                       title="Rule Index">{{index_rule}}</span></td>
-        <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="Name">Add Name</span></td>
-        <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="Direction">Add Direction</span></td>
-        <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="Source IP">Add IP</span></td>
-        <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="Dest IP">Add IP</span></td>
-        <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="Source Port">Add Port</span></td>
-        <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="Dest Port">Add Port</span></td>
-        <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="Protocol">Add Protocol</span></td>
-        <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="ACK">Add ACK</span></td>
-        <td data-on=0 class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
+        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="Action">Add Action</span></td>
     </tr>
 </script>
