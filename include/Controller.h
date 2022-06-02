@@ -41,7 +41,9 @@ public:
 
     bool swap_rule_to(const std::vector<string> &args);
 
-    bool reset_firewall();
+    bool reset_firewall() const;
+
+    std::vector<uint64_t> get_hit_counts() const;
 };
 
 

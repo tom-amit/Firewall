@@ -18,7 +18,11 @@ Controller::Controller() {
     };
 }
 
-bool Controller::reset_firewall() {
+std::vector<uint64_t> Controller::get_hit_counts() const {
+    return firewall.table->get_hit_counts();
+}
+
+bool Controller::reset_firewall() const {
     firewall.table->clear_table();
     return true;
 }

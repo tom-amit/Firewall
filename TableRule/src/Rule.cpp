@@ -8,6 +8,7 @@
 Rule::Rule(){
     //TODO strings and values here are only for initial invalid rules, make sure a regular user cannot set them in a way
     // that they will be accepted
+    this->hit_count = 0;
     this->name = "No Name";
     this->direction = "none";
     this->src_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "none");
@@ -23,6 +24,7 @@ Rule::Rule(const string &name, const string &direction, const string &src_ip,
            const string &dest_ip, const string &src_port, const string &dest_port, const string &protocol,
            const string &ack,
            const string &action) {
+    this->hit_count = 0;
     this->name = name;
     this->direction = ParseDirection(direction);
     this->src_ip = ParseIP(src_ip);
@@ -33,6 +35,12 @@ Rule::Rule(const string &name, const string &direction, const string &src_ip,
     this->protocol = ParseProtocol(protocol);
     this->action = ParseAction(action);
     this->isInvalid = false;
+}
+void Rule::IncrementHitCount(){
+    this->hit_count++;
+}
+uint64_t Rule::getHitCount() const{
+    return hit_count;
 }
 
 string Rule::getName() const {

@@ -63,6 +63,7 @@ bool RuleTable::ParsePacket(pcpp::Packet &p_packet, const string &dir) {
             (str_equals(r_protocol, protocol) || str_equals(r_protocol, Rule::ANY)) &&
             (!str_equals(protocol, "TCP") || rule->getAck().first == tcp_hdr->ackFlag || str_equals(rule->getAck().second, Rule::ANY))) {
             if (auto it{Rule::ACTION_DEF.find(r_action)}; it != Rule::ACTION_DEF.end()) {
+                rule->IncrementHitCount();
                 return Rule::ACTION_DEF.at(r_action);
             }
         }
@@ -70,7 +71,7 @@ bool RuleTable::ParsePacket(pcpp::Packet &p_packet, const string &dir) {
     return false;
 }
 
-string number_to_bin(const string num){
+string number_to_bin(const string& num){
     return std::bitset<8>(stoi(num)).to_string();
 }
 
@@ -341,4 +342,13 @@ std::optional<string> RuleTable::SwapRuleTo(uint64_t id1, uint64_t id2) {
 void RuleTable::clear_table() {
     //clear the table of all rules except the last one
     table.erase(table.begin(), table.end() - 1);
+}
+
+std::vector<uint64_t> RuleTable::get_hit_counts() {
+    std::vector<uint64_t> ret = std::vector<uint64_t>();
+    //iterate over table and push back each hit count
+    for (auto & it : table) {
+        ret.push_back(it->getHitCount());
+    }
+    return ret;
 }

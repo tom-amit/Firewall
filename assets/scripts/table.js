@@ -4,6 +4,16 @@ const titles = ["Name", "Direction", "Source IP", "Destination IP", "Source Port
 const n = titles.length;
 var loader = document.createElement('input');
 loader.type = 'file';
+setInterval(function () {
+    if (isGUI){
+        let update = RetrieveHitCounts();
+        console.log("update:" + update);
+        let i = 0;
+        $("tbody").find("tr").each(function () {
+            $(this).find(".hit_count_class").text(update[i]);
+        });
+    }
+}, 1000);
 function createTemplate(){
     let dict = {};
     //iterate over titles and insert to arrTemplate with a null value

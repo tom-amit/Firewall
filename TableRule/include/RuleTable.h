@@ -40,6 +40,7 @@ public:
     std::vector<unique_ptr<Rule>> table;
     static bool compare_ip_addresses(const string &rule, const string &target);
     void clear_table();
+    std::vector<uint64_t> get_hit_counts();
 private:
     std::optional<std::string> p_AddRule(const Rule &rule);
 

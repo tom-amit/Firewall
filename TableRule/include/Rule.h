@@ -93,13 +93,18 @@ public:
     [[nodiscard]] bool isNotValid() const;
     void setNotValid(const bool p_notValid);
 
+    uint64_t getHitCount() const;
+
+    void IncrementHitCount();
 private:
     string name, action, direction, ack;
 
+    uint64_t hit_count;
     //IP, CIDR, STR-IP
     std::tuple<pcpp::IPv4Address, uint16_t, string> src_ip, dest_ip;
     std::pair<uint32_t, uint32_t> src_port, dest_port;
     pcpp::ProtocolType protocol;
+
     bool isInvalid;
 
     static string ParseDirection(string dir);

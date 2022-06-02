@@ -154,13 +154,36 @@ public:
         }
 
         std::ifstream infile(args_str[0]);
-        std::string line;
-        std::string content;
+        string line;
+        string content;
         while (std::getline(infile, line)) {
             content += line + "\n";
         }
         control.reset_firewall();
         return JSValueMakeString(thisObject.context(), JSStringCreateWithUTF8CString(content.c_str()));
+    }
+    JSValue RetrieveHitCounts(const JSObject &thisObject, const JSArgs &args) {
+        ///
+        /// Return our message to JavaScript as a JSValue.
+        ///
+
+        std::vector<string> args_str;
+
+        for (int i = 0; i < args.size(); ++i) {
+            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
+            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
+                                                         (size_t) JSStringGetLength(s));
+            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
+            args_str.push_back(str);
+        }
+        std::vector<uint64_t > ret = control.get_hit_counts();
+        //return ret as a JS array
+        JSValue array = JSObjectMakeArray(thisObject.context(), 0, nullptr, nullptr);
+        for (int i = 0; i < ret.size(); ++i) {
+            JSValue val = JSValueMakeNumber(thisObject.context(), ret[i]);
+            JSObjectSetPropertyAtIndex(thisObject.context(), array, i, val, nullptr);
+        }
+        return array;
     }
     JSValue SwapRuleTo(const JSObject &thisObject, const JSArgs &args) {
         ///
@@ -249,6 +272,7 @@ public:
         global["SwapRuleTo"] = BindJSCallbackWithRetval(&GUI::SwapRuleTo);
         global["SaveRules"] = BindJSCallbackWithRetval(&GUI::SaveRules);
         global["LoadRules"] = BindJSCallbackWithRetval(&GUI::LoadRules);
+        global["RetrieveHitCounts"] = BindJSCallbackWithRetval(&GUI::RetrieveHitCounts);
     }
 
     static inline std::string ToUTF8(const String &str) {

@@ -67,6 +67,7 @@
                     <th class="mdl-data-table__cell--non-numeric">Protocol</th>
                     <th class="mdl-data-table__cell--non-numeric">ACK</th>
                     <th class="mdl-data-table__cell--non-numeric">Action</th>
+                    <th class="mdl-data-table__cell--non-numeric">Hit Count</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -91,6 +92,8 @@
                                                                         title="ACK">any</span></td>
                     <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label"
                                                                         title="Action">any</span></td>
+                    <td class="mdl-data-table__cell--non-numeric" style="text-align: left"><span class="hit_count_class mdl-data-table__label" title="Hit Count">0</span></td>
+
                 </tr>
 
                 </tbody>
@@ -144,6 +147,8 @@
                                                             title="ACK">{{ACK}}</span></td>
         <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                             title="Action">{{ACTION}}</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="hit_count_class mdl-data-table__label add-table-content"
+                                                            title="Hit Count">0</span></td>
     </tr>
 </script>
 <script id="basketItemTemplate" type="text/template">
@@ -173,6 +178,8 @@
                                                                       title="ACK">Add ACK</span></td>
         <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                                       title="Action">Add Action</span></td>
+        <td class="mdl-data-table__cell--non-numeric"><span class="hit_count_class mdl-data-table__label add-table-content"
+                                                            title="Hit Count">0</span></td>
     </tr>
 </script>
 <script src="scripts/jquery-1.12.0.min.js"></script>
