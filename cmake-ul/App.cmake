@@ -48,10 +48,12 @@ MACRO(LINK_GUI source_list)
 
     # Set the assets path to "/assets"
     set(ASSETS_PATH "$<TARGET_FILE_DIR:${APP_NAME}>/assets")
-
+    set(RULES_PATH "$<TARGET_FILE_DIR:${APP_NAME}>/rules")
     # Copy assets to assets path
     add_custom_command(TARGET ${APP_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory "../assets" "${ASSETS_PATH}")
+    add_custom_command(TARGET ${APP_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${RULES_PATH})
+
 
     if (${ENABLE_INSPECTOR})
         # Copy inspector to assets directory

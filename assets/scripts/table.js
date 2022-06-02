@@ -44,6 +44,7 @@ angular.module('modalTest', ['ui.bootstrap', 'dialogs'])
         }; // end launch
 
         $scope.saveJSON = function () {
+
             var _json = JSON.stringify(globalRuleSet);
             var _blob = new Blob([_json], { type: "text/plain;charset=utf-8" });
             saveAs(_blob, "rules.json");
@@ -61,7 +62,7 @@ angular.module('modalTest', ['ui.bootstrap', 'dialogs'])
         };
     }); // end run / module
 
-$(loader).on('change', function (e) {
+loader.onchange = function (e) {
     var file = e.target.files[0];
     console.log("FILE: " + file);
     //read file as a JSON object
@@ -82,9 +83,10 @@ $(loader).on('change', function (e) {
             }
             addReadyRow(_arr);
         }
+        loader.value="";
     }
     reader.readAsText(file);
-});
+};
 function saveAs(blob, fileName) {
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
