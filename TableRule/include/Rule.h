@@ -37,7 +37,7 @@ public:
     const static inline std::map<string, string> GENERAL_IP{{"any", "*.*.*.*"}};
     const static inline std::vector<string> DIR_DEF{"in", "out", "any"};
     const static inline std::map<string, bool> ACTION_DEF{{"allow", true},
-                                                          {"deny",  false},
+                                                          {"drop",  false},
                                                           {"none",  false}};
     const static inline std::map<string, int16_t> ACK_DEF{{"yes", 1},
                                                           {"no",  0},
