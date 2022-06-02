@@ -18,6 +18,11 @@ Controller::Controller() {
     };
 }
 
+bool Controller::reset_firewall() {
+    firewall.table->clear_table();
+    return true;
+}
+
 bool Controller::swap_rule_to(const std::vector<string> &args) {
     uint64_t id1 = std::stoull(args[0]);
     uint64_t id2 = std::stoull(args[1]);

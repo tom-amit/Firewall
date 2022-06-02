@@ -39,7 +39,7 @@ public:
                                         const string &action);
     std::vector<unique_ptr<Rule>> table;
     static bool compare_ip_addresses(const string &rule, const string &target);
-
+    void clear_table();
 private:
     std::optional<std::string> p_AddRule(const Rule &rule);
 

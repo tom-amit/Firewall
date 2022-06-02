@@ -5,6 +5,8 @@
 #include "include/Controller.h"
 #include <iostream>
 #include <string>
+#include <fstream>
+
 
 using namespace ultralight;
 
@@ -46,7 +48,7 @@ public:
         ///
         overlay_->view()->set_load_listener(this);
         overlay_->view()->set_view_listener(this);
-        std::cout << ("For t1ssss") << std::endl;
+        std::cout << ("For 121sdssss") << std::endl;
         ///
         /// Load a string of HTML (we're using a C++11 Raw String Literal)
         ///
@@ -114,7 +116,52 @@ public:
             return JSValueMakeBoolean(thisObject.context(), false);
         }
     }
+    JSValue SaveRules(const JSObject &thisObject, const JSArgs &args) {
+        ///
+        /// Return our message to JavaScript as a JSValue.
+        ///
 
+        std::vector<string> args_str;
+
+        for (int i = 0; i < args.size(); ++i) {
+            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
+            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
+                                                         (size_t) JSStringGetLength(s));
+            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
+            args_str.push_back(str);
+        }
+        args_str[0] += ".json";
+        std::ofstream outfile;
+        outfile.open(args_str[0], std::ios_base::app & std::ofstream::trunc);
+        outfile << args_str[1] << std::endl; //
+        outfile.close();
+
+        return JSValueMakeBoolean(thisObject.context(), true);
+    }
+    JSValue LoadRules(const JSObject &thisObject, const JSArgs &args) {
+        ///
+        /// Return our message to JavaScript as a JSValue.
+        ///
+
+        std::vector<string> args_str;
+
+        for (int i = 0; i < args.size(); ++i) {
+            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
+            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
+                                                         (size_t) JSStringGetLength(s));
+            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
+            args_str.push_back(str);
+        }
+
+        std::ifstream infile(args_str[0]);
+        std::string line;
+        std::string content;
+        while (std::getline(infile, line)) {
+            content += line + "\n";
+        }
+        control.reset_firewall();
+        return JSValueMakeString(thisObject.context(), JSStringCreateWithUTF8CString(content.c_str()));
+    }
     JSValue SwapRuleTo(const JSObject &thisObject, const JSArgs &args) {
         ///
         /// Return our message to JavaScript as a JSValue.
@@ -200,6 +247,8 @@ public:
         global["EditRule"] = BindJSCallbackWithRetval(&GUI::EditRule);
         global["RemoveRule"] = BindJSCallbackWithRetval(&GUI::RemoveRule);
         global["SwapRuleTo"] = BindJSCallbackWithRetval(&GUI::SwapRuleTo);
+        global["SaveRules"] = BindJSCallbackWithRetval(&GUI::SaveRules);
+        global["LoadRules"] = BindJSCallbackWithRetval(&GUI::LoadRules);
     }
 
     static inline std::string ToUTF8(const String &str) {

@@ -1,5 +1,5 @@
 //TODO: angular needs to be downloaded locally, not remotely
-const isGUI = false;
+const isGUI = true;
 const titles = ["Name", "Direction", "Source IP", "Destination IP", "Source Port", "Destination Port", "Protocol", "ACK", "Action"];
 const n = titles.length;
 var loader = document.createElement('input');
@@ -44,56 +44,92 @@ angular.module('modalTest', ['ui.bootstrap', 'dialogs'])
         }; // end launch
 
         $scope.saveJSON = function () {
-
+            //read path from save-textfield
+            var src = "rules/"
+            var _path = $("#save-textfield").val();
+            if (_path.length <= 0) {
+                return
+            }
+            var _fullPath = src + _path;
             var _json = JSON.stringify(globalRuleSet);
-            var _blob = new Blob([_json], { type: "text/plain;charset=utf-8" });
-            saveAs(_blob, "rules.json");
+            let ret = true;
+            if (isGUI){
+                ret = SaveRules(_fullPath, _json);
+            }
+            else{
+                var _blob = new Blob([_json], { type: "text/plain;charset=utf-8" });
+                var a = document.createElement("a");
+                a.href = URL.createObjectURL(_blob);
+                a.download = _fullPath;
+                //a.click();
+            }
+            var x = document.createElement("div");
+            x.id = "snackbar";
+            //create text node
+            let t;
+            if (ret)
+                t = document.createTextNode("Saved to " + _fullPath);
+            else
+                t = document.createTextNode("Failed to save to " + _fullPath);
+            //append text node to div
+            x.appendChild(t);
+            //append to body
+            document.body.appendChild(x);
+            x.className = "show";
+            setTimeout(function () {
+                x.className= x.className.replace("show", "");
+                document.body.removeChild(x);}, 3000);
+                //remove x from body
         };
 
         $scope.loadJSON = function () {
-            console.log("LOAD");
             //open a modal, and if user clicks no, return
             var dlg = null;
             dlg = $dialogs.confirm('Please Confirm', 'Are you sure you want to load rules from a JSON file? Current table will be deleted.');
             //return if user clicks no
             dlg.result.then(function (btn) {
+
+                let ret = true;
+                if(isGUI){
+                    var src = "rules/"
+                    var _path = $("#load-textfield").val();
+                    console.log("VALUE: " + _path);
+                    if (_path.length <= 0) {
+                        return
+                    }
+                    var _fullPath = src + _path + ".json";
+                    ret = LoadRules(_fullPath);
+                    console.log("RET: " + ret);
+                    loadJSON(ret);
+                }
                 loader.click();
             });
         };
     }); // end run / module
+function loadJSON(e){
+     let _rules = JSON.parse(e);
+    //delete all rows except the last one
+    $("tbody").find("tr:not(:last)").each(function () {
+        $(this).remove();
+    });
+    globalRuleSet = [];
+    for (let i = 0; i < _rules.length; i++) {
+        // unpack _rules[i] into an array and send to addReaRow
+        var _arr = [];
+        for (let j = 0; j < n; j++) {
+            _arr.push(_rules[i][titles[j]]);
+        }
+        addReadyRow(_arr);
+    }
+    loader.value="";
+}
 
 loader.onchange = function (e) {
     var file = e.target.files[0];
     console.log("FILE: " + file);
     //read file as a JSON object
-    var reader = new FileReader();
-    reader.onload = function (e) {
-        let _rules = JSON.parse(e.target.result);
-        //delete all rows except the last one
-        $(".mdl-data-dynamictable tbody").find("tr:not(:last)").each(function () {
-            var _index = $(this).prevAll().length;
-            $(this).remove();
-        });
-        globalRuleSet = [];
-        for (let i = 0; i < _rules.length; i++) {
-            // unpack _rules[i] into an array and send to addReaRow
-            var _arr = [];
-            for (let j = 0; j < n; j++) {
-                _arr.push(_rules[i][titles[j]]);
-            }
-            addReadyRow(_arr);
-        }
-        loader.value="";
-    }
-    reader.readAsText(file);
+    loadJSON(e.target.result);
 };
-function saveAs(blob, fileName) {
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = fileName;
-    a.click();
-    URL.revokeObjectURL(a.href);
-}
 
 function addReadyRow(ruleArray) {
             var _row = $(".mdl-data-dynamictable tbody").find('tr');
@@ -122,7 +158,7 @@ function addReadyRow(ruleArray) {
             }
             var ret = true;
             if (isGUI){
-                ret = addRule(ruleArray[0], ruleArray[1], ruleArray[2], ruleArray[3], ruleArray[4], ruleArray[5], ruleArray[6], ruleArray[7], ruleArray[8]);
+                ret = AddRule(ruleArray[0], ruleArray[1], ruleArray[2], ruleArray[3], ruleArray[4], ruleArray[5], ruleArray[6], ruleArray[7], ruleArray[8]);
             }
             if (ret === false) {
                 console.log("Ready rule addition failed!");
@@ -130,7 +166,7 @@ function addReadyRow(ruleArray) {
             else{
                 console.log("Ready rule addition succeeded!");
             }
-            if (!check && !ret) {
+            if (!check && ret) {
                 //remove "failed" class from _newRow
                 _newRow = _newRow.replace(/failed/gi, "");
             }
@@ -241,10 +277,11 @@ $(document).on("click", ".save", function () {
         }
         if (!check) {
             let args = globalRuleSet[j];
-            console.log("ARGS: " + args);
+            //print the args to the console, but make it readable and not [Object object]
+            console.log("ARGS: " + JSON.stringify(args).replace(/\[|\]/g, "").replace(/\,/g, ", "));
             var ret = true
             if(isGUI){
-                EditRule(_index, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
+                ret = EditRule(_index,  args[titles[0]], args[titles[1]], args[titles[2]], args[titles[3]], args[titles[4]], args[titles[5]], args[titles[6]], args[titles[7]], args[titles[8]]);
             }
             if (ret === false) {
                 console.log("Rule modification failed!");

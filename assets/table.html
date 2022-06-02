@@ -8,18 +8,34 @@
 </head>
 <body ng-controller="dialogServiceTest">
 <div class="mdl-grid" style="width:1300px;margin-top:100px;">
+    <!-- create a div that is above the table -->
+    <div class="mdl-data-tabledynamic__title-button">
+        <div>
+            <!-- text field for saving the rules  with material design-->
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" id="save-textfield" ng-model="saveText">
+                <label class="mdl-textfield__label" for="save-textfield">Path...</label>
+            </div>
+            <a id="save-button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+               ng-click="saveJSON()">
+                Save Rules
+            </a>
+        </div>
+        <div style="padding-top: 10px">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" id="load-textfield" ng-model="loadText">
+                <label class="mdl-textfield__label" for="load-textfield">Path...</label>
+            </div>
+            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+               ng-click="loadJSON()">
+                Load Rules
+            </a>
+        </div>
+    </div>
     <div class="mdl-data-tabledynamic mdl-shadow--2dp" id="Rules">
         <div class="mdl-data-tabledynamic__title">
             <h2 class="mdl-data-tabledynamic__title-text">Rules</h2>
             <div class="mdl-data-tabledynamic__actions">
-                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                   ng-click="saveJSON()">
-                    Save Rules
-                </a>
-                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                   ng-click="loadJSON()">
-                    Load Rules
-                </a>
                 <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect add-row">
                     ADD Rule
                 </a>

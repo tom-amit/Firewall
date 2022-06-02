@@ -337,3 +337,8 @@ std::optional<string> RuleTable::SwapRuleTo(uint64_t id1, uint64_t id2) {
     move(table, id1, id2);
     return SUCCESS;
 }
+
+void RuleTable::clear_table() {
+    //clear the table of all rules except the last one
+    table.erase(table.begin(), table.end() - 1);
+}
