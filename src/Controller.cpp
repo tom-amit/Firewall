@@ -4,6 +4,21 @@
 
 #include "../include/Controller.h"
 #include <cstdio>
+#include <pcap/pcap.h>
+#include <sys/socket.h>
+#include <PcapFileDevice.h>
+//#include <pcap/bpf.h>
+#include "../include/NICS.h"
+#include <arpa/inet.h>
+#include <cerrno>
+#include <ifaddrs.h>
+#include <iostream>
+#include <net/if.h>
+#include <string>
+#include <string.h>
+#include <sysexits.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 Controller::Controller() {
     firewall = Firewall();

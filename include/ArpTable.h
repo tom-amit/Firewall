@@ -6,74 +6,31 @@
 #define FIREWALL_ARPTABLE_H
 
 #include <ArpLayer.h>
+#include <PcapLiveDeviceList.h>
+#include "NICS.h"
 
 struct ArpEntry {
-	pcpp::IPv4Address ip;
-	pcpp::MacAddress mac;
-	
-	ArpEntry(pcpp::IPv4Address _ip, pcpp::MacAddress _mac){ip = _ip; mac = _mac;}
+    pcpp::IPv4Address ip;
+    pcpp::MacAddress mac;
+    pcpp::PcapLiveDevice* device;
+
+    ArpEntry(pcpp::IPv4Address _ip, pcpp::MacAddress _mac, pcpp::PcapLiveDevice* _device){ip = _ip; mac = _mac;device = _device;}
 };
 
 class ArpTable {
 public:
-	std::vector<ArpEntry> table;
-	
-	ArpTable();
-	
-	pcpp::MacAddress Lookup(pcpp::IPv4Address ip);
+	static std::vector<ArpEntry> table;
+
+	static pcpp::MacAddress* Lookup(pcpp::IPv4Address ip);
+
+    static void AddEntry(ArpEntry entry);
+
+    static void RespondToArp(pcpp::Packet& packet, pcpp::PcapLiveDevice* dev);
 	
 private:
-	void AddEntry(ArpEntry entry);
-	ArpEntry GetEntry(pcpp::IPv4Address ip);
+	static ArpEntry* GetEntry(pcpp::IPv4Address ip);
 	
-	void RequestArp(pcpp::IPv4Address ip);
+	static void RequestArp(pcpp::IPv4Address ip);
 };
-
-ArpTable::ArpTable(){
-	
-}
-
-pcpp::MacAddress ArpTable::Lookup(pcpp::IPv4Address ip){
-	ArpEntry entry = GetEntry(ip);
-	if(entry != null){
-		return entry.mac;
-	}
-	else{
-		RequestArp(ip);
-		return null;
-	}
-}
-
-void ArpTable::AddEntry(ArpEntry entry){
-	for(ArpEntry ent : table){
-		if(ent.ip == entry.ip){
-			ent.mac = entry.mac;
-			return;
-		}
-	}
-	
-	table.push_back(entry);
-}
-
-ArpEntry ArpTable::GetEntry(pcpp::IPv4Address ip){
-	for(ArpEntry ent : table){
-		if(ent.ip == entry.ip){
-			return ent;
-		}
-	}
-	
-	return null;
-}
-
-void ArpTable::RequestArp(pcpp::IPv4Address ip, pcpp::PcapLiveDevice *dev){
-	auto arpRequestPacket = pcpp::Packet();
-	
-	auto arpLayer = new pcpp::ArpLayer(pcpp::ARP_REQUEST, dev->getMacAddress, pcpp::MacAddress("FF:FF:FF:FF:FF:FF"), dev->getIPv4Address(), ip);
-	arpRequestPacket.addLayer(arpLayer);
-	
-	arpRequestPacket.computeCalculateFields();
-	
-	dev->sendPacket(*arpRequestPacket.getRawPacket())
-}
 
 #endif //FIREWALL_ARPTABLE_H

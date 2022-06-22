@@ -34,7 +34,7 @@ if (TABLE_RULE_ONLY)
 else ()
     set(FIREWALL_SRC_FILES
             src/Firewall.cpp
-            src/Controller.cpp) #src/ArpTable.cpp include/ArpTable.h)
+            src/Controller.cpp src/NICS.cpp src/ArpTable.cpp)
     if (GUI_ON)
         include(cmake-ul/App.cmake)
         set(GUI_SOURCE

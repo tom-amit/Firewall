@@ -5,101 +5,130 @@
 #include "../include/Firewall.h"
 
 struct Cookie {
-    pcpp::PcapLiveDevice* dev;
+    std::vector<ARPAwaitingPacket>* arpAwaitingPackets;
     RuleTable* table;
 
-    Cookie(pcpp::PcapLiveDevice* _dev, RuleTable* _table){ dev = _dev; table = _table;}
+    Cookie(std::vector<ARPAwaitingPacket>* _arpAwaitingPackets, RuleTable* _table){ arpAwaitingPackets = _arpAwaitingPackets; table = _table;}
 };
 
-
-//TODO: remove magic MAC-IP addresses
-static void onPacketArrives1(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie)
+static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie)
 {
     pcpp::Packet parsedPacket(packet);
-
-    if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() != nullptr &&
-        parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive < 2) {
-        Firewall::SendTTLExpiredPacket(parsedPacket, dev);
-        return;
-    }
-
-    auto *typedCookie = static_cast<Cookie *>(cookie);
-    pcpp::PcapLiveDevice *otherDev = typedCookie->dev;
     std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
-    auto *ethernet = parsedPacket.getLayerOfType<pcpp::EthLayer>();
 
-    //TODO: delegate this to a different function without magic numbers
-    if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() == nullptr ||
-        parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address() != pcpp::IPv4Address("172.16.1.2"))
-        return;
-
-    if (!typedCookie->table->ParsePacket(parsedPacket, "out"))
-        return;
-
-    //std::cout << "allowed packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
-
-    ethernet->setSourceMac(pcpp::MacAddress(otherDev->getMacAddress()));
-    ethernet->setDestMac(pcpp::MacAddress("08:00:27:7e:ef:c8"));
-
-    parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
-    parsedPacket.computeCalculateFields();
-    otherDev->sendPacket(*parsedPacket.getRawPacket());
-}
-//TODO: remove magic MAC-IP addresses
-static void onPacketArrives2(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie) {
-    pcpp::Packet parsedPacket(packet);
-
-    if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() != nullptr &&
-        parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive < 2) {
-        Firewall::SendTTLExpiredPacket(parsedPacket, dev);
-        return;
+    //check if the packet is an arp packet
+    if (parsedPacket.getLayerOfType<pcpp::ArpLayer>() != nullptr) {
+        auto arpLayer = parsedPacket.getLayerOfType<pcpp::ArpLayer>();
+        if (arpLayer->getTargetMacAddress() != pcpp::MacAddress::Zero){
+            ArpTable::AddEntry(*(new ArpEntry(arpLayer->getSenderIpAddr(), arpLayer->getSenderMacAddress(), dev)));
+            std::cout << "added arp entry with the values:" << std::endl << arpLayer->getSenderIpAddr().toString() << std::endl << arpLayer->getSenderMacAddress().toString() << std::endl << std::endl;
+            auto *typedCookie = static_cast<Cookie *>(cookie);
+            auto *arpAwaitingPackets = typedCookie->arpAwaitingPackets;
+            auto it = arpAwaitingPackets->begin();
+            while (it != arpAwaitingPackets->end())
+            {
+                if (it->ip == arpLayer->getSenderIpAddr()) {
+                    it->parsedPacket.getLayerOfType<pcpp::EthLayer>()->setDestMac(arpLayer->getSenderMacAddress());
+                    it->parsedPacket.computeCalculateFields();
+                    std::cout << " ---------------- resending packet" << std::endl << it->parsedPacket.toString(true) << std::endl << std::endl;
+                    dev->sendPacket(*it->parsedPacket.getRawPacket());
+                    it = arpAwaitingPackets->erase(it);
+                }
+                else {
+                    ++it;
+                }
+            }
+            /*for (auto &awaitingPacket : *arpAwaitingPackets) {
+                if (awaitingPacket.ip == arpLayer->getSenderIpAddr()) {
+                    awaitingPacket.parsedPacket.getLayerOfType<pcpp::EthLayer>()->setDestMac(arpLayer->getSenderMacAddress());
+                    awaitingPacket.parsedPacket.computeCalculateFields();
+                    std::cout << " ---------------- resending packet" << std::endl << awaitingPacket.parsedPacket.toString(true) << std::endl << std::endl;
+                    dev->sendPacket(*awaitingPacket.parsedPacket.getRawPacket());
+                    //remove the packet from the awaiting packets
+                    arpAwaitingPackets->erase(awaitingPacket);
+                }
+            }*/
+        }
+        else{
+            ArpTable::RespondToArp(parsedPacket, dev);
+        }
     }
+    else {
+        if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() != nullptr &&
+            parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive < 2) {
+            Firewall::SendTTLExpiredPacket(parsedPacket, dev);
+            return;
+        }
 
-    auto *typedCookie = static_cast<Cookie *>(cookie);
-    pcpp::PcapLiveDevice *otherDev = typedCookie->dev;
-    std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
-    auto *ethernet = parsedPacket.getLayerOfType<pcpp::EthLayer>();
+        auto *typedCookie = static_cast<Cookie *>(cookie);
+        auto *ethernet = parsedPacket.getLayerOfType<pcpp::EthLayer>();
 
-    //TODO: delegate this to a different function without magic numbers
-    if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() == nullptr ||
-        parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address() != pcpp::IPv4Address("192.168.50.2"))
-        return;
+        if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() == nullptr)
+            return;
 
-    if (!typedCookie->table->ParsePacket(parsedPacket, "in"))
-        return;
+        auto targetDev = NICS::GetDeviceForIP(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address());
+        if (targetDev == nullptr)
+            return;
 
-    ethernet->setSourceMac(pcpp::MacAddress(otherDev->getMacAddress()));
-    ethernet->setDestMac(pcpp::MacAddress("08:00:27:f7:c7:e5"));
+        if (!typedCookie->table->ParsePacket(parsedPacket, "out"))
+            return;
 
-    parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
-    parsedPacket.computeCalculateFields();
-    otherDev->sendPacket(*parsedPacket.getRawPacket());
+        //std::cout << "allowed packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
+
+        parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
+        ethernet->setSourceMac(pcpp::MacAddress(targetDev->getMacAddress()));
+        pcpp::MacAddress *macAddress = ArpTable::Lookup(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address());
+        if (macAddress == nullptr) {
+            typedCookie->arpAwaitingPackets->insert(typedCookie->arpAwaitingPackets->end(),
+                                                    *(new ARPAwaitingPacket(parsedPacket,
+                                                                            parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address())));
+        } else {
+            ethernet->setDestMac(*macAddress);
+            parsedPacket.computeCalculateFields();
+            targetDev->sendPacket(*parsedPacket.getRawPacket());
+        }
+    }
 }
 
 Firewall::Firewall() {
     SetLiveDevices();
     table = new RuleTable();
+    arpAwaitingPackets = *(new std::vector<ARPAwaitingPacket>());
 }
 
 void Firewall::SetLiveDevices() {
-    dev1 = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByName("enp0s8");
-    dev2 = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByName("enp0s9");
+    auto devices = NICS::getDeviceList();
+    dev1 = devices[0];
+    dev2 = devices[1];
 }
 
-void Firewall::OpenLiveDevices() const {
-    dev1->open();
-    dev2->open();
+void Firewall::OpenLiveDevices() {
+    std::get<0>(dev1)->open();
+    std::get<0>(dev2)->open();
+
+    if(dev1filter != nullptr) {
+        std::get<0>(dev1)->clearFilter();
+        delete dev1filter;
+    }
+    if(dev2filter != nullptr) {
+        std::get<0>(dev2)->clearFilter();
+        delete dev2filter;
+    }
+    dev1filter = (new pcpp::MacAddressFilter(std::get<0>(dev1)->getMacAddress(), pcpp::DST));
+    dev2filter = (new pcpp::MacAddressFilter(std::get<0>(dev2)->getMacAddress(), pcpp::DST));
+
+    std::get<0>(dev1)->setFilter(*dev1filter);
+    std::get<0>(dev2)->setFilter(*dev2filter);;
 }
 
 void Firewall::StartLiveDevicesCapture() {
-    auto *cookie1 = (new Cookie(dev2, table));
-    auto *cookie2 = (new Cookie(dev1, table));
-    dev1->startCapture(onPacketArrives1, cookie1);
-    dev2->startCapture(onPacketArrives2, cookie2);
+    auto *cookie = (new Cookie(&arpAwaitingPackets, table));
+    std::get<0>(dev1)->startCapture(onPacketArrives, cookie);
+    std::get<0>(dev2)->startCapture(onPacketArrives, cookie);
 }
 void Firewall::StopLiveDevicesCapture() {
-    dev1->stopCapture();
-    dev2->stopCapture();
+    std::get<0>(dev1)->stopCapture();
+    std::get<0>(dev2)->stopCapture();
 }
 
 void Firewall::Run() {

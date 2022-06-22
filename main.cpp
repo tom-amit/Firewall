@@ -3,9 +3,12 @@
 //
 #include <iostream>
 #include "include/Controller.h"
+#include "include/NICS.h"
+
 using std::string;
 
 int main() {
+    NICS::GetData("ens37", "ens38");
     Controller c = Controller();
     c.run();
 }
