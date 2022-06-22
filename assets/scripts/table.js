@@ -3,6 +3,7 @@ const isGUI = true;
 const titles = ["Name", "Direction", "Source IP", "Destination IP", "Source Port", "Destination Port", "Protocol", "ACK", "Action"];
 const n = titles.length;
 var loader = document.createElement('input');
+var started = false;
 loader.type = 'file';
 setInterval(function () {
     if (isGUI){
@@ -11,6 +12,7 @@ setInterval(function () {
         let i = 0;
         $("tbody").find("tr").each(function () {
             $(this).find(".hit_count_class").text(update[i]);
+            i++;
         });
     }
 }, 1000);
@@ -114,6 +116,44 @@ angular.module('modalTest', ['ui.bootstrap', 'dialogs'])
                 }
                 loader.click();
             });
+        };
+        $scope.start = function () {
+            if (!started) {
+                var dlg = null;
+                dlg = $dialogs.confirm('Please Confirm', 'Are you sure you want to start the firewall?');
+                dlg.result.then(function (btn) {
+                    let ret = true;
+                    if (isGUI){
+                        ret = StartFirewall();
+                    }
+                    if(ret){
+                        started = true;
+                        $("#start-button").attr("disabled", true);
+                        $("#stop-button").attr("disabled", false);
+                        $("#status").css("color", "green");
+                        $("#status").text("Running");
+                    }
+                });
+            }
+        };
+        $scope.stop = function () {
+            if(started) {
+                var dlg = null;
+                dlg = $dialogs.confirm('Please Confirm', 'Are you sure you want to stop the firewall?');
+                dlg.result.then(function (btn) {
+                    let ret = true;
+                    if (isGUI) {
+                        ret = StopFirewall();
+                    }
+                    if (ret) {
+                        started = false;
+                        $("#start-button").attr("disabled", false);
+                        $("#stop-button").attr("disabled", true);
+                        $("#status").css("color", "red");
+                        $("#status").text("Stopped");
+                    }
+                });
+            }
         };
     }); // end run / module
 function loadJSON(e){

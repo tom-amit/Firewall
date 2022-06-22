@@ -230,6 +230,48 @@ public:
             return JSValueMakeBoolean(thisObject.context(), false);
         }
     }
+    JSValue StartFirewall(const JSObject &thisObject, const JSArgs &args) {
+        ///
+        /// Return our message to JavaScript as a JSValue.
+        ///
+
+        std::vector<string> args_str;
+
+        for (int i = 0; i < args.size(); ++i) {
+            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
+            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
+                                                         (size_t) JSStringGetLength(s));
+            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
+            args_str.push_back(str);
+        }
+        bool ret = control.start({});
+        if (ret) {
+            return JSValueMakeBoolean(thisObject.context(), true);
+        } else {
+            return JSValueMakeBoolean(thisObject.context(), false);
+        }
+    }
+    JSValue StopFirewall(const JSObject &thisObject, const JSArgs &args) {
+        ///
+        /// Return our message to JavaScript as a JSValue.
+        ///
+
+        std::vector<string> args_str;
+
+        for (int i = 0; i < args.size(); ++i) {
+            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
+            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
+                                                         (size_t) JSStringGetLength(s));
+            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
+            args_str.push_back(str);
+        }
+        bool ret = control.stop({});
+        if (ret) {
+            return JSValueMakeBoolean(thisObject.context(), true);
+        } else {
+            return JSValueMakeBoolean(thisObject.context(), false);
+        }
+    }
     ///
     /// Inherited from LoadListener, called when the page has finished parsing
     /// the document.
@@ -273,6 +315,8 @@ public:
         global["SaveRules"] = BindJSCallbackWithRetval(&GUI::SaveRules);
         global["LoadRules"] = BindJSCallbackWithRetval(&GUI::LoadRules);
         global["RetrieveHitCounts"] = BindJSCallbackWithRetval(&GUI::RetrieveHitCounts);
+        global["StartFirewall"] = BindJSCallbackWithRetval(&GUI::StartFirewall);
+        global["StopFirewall"] = BindJSCallbackWithRetval(&GUI::StopFirewall);
     }
 
     static inline std::string ToUTF8(const String &str) {
@@ -351,6 +395,7 @@ int main() {
     ///
     /// Create our main App instance.
     ///
+    NICS::GetData("ens37", "ens38");
     auto app = App::Create();
 
     ///
@@ -361,7 +406,7 @@ int main() {
     ///
     /// Set our window title.
     ///
-    window->SetTitle("TEST");
+    window->SetTitle("Firewall - Rule Table");
 
     ///
     /// Bind our App's main window.

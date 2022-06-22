@@ -5,6 +5,12 @@
     align-items: center;
     margin: 30px;
 }
+.vl {
+    border-left: 2px solid #00c2ff;
+    position: absolute;
+    margin-left: -3px;
+    top: 0;
+}
 
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
