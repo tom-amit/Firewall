@@ -395,7 +395,7 @@ int main() {
     ///
     /// Create our main App instance.
     ///
-    NICS::GetData("ens37", "ens38");
+    NICS::GetData("ens33", "ens36");
     auto app = App::Create();
 
     ///
