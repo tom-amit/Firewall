@@ -142,6 +142,10 @@ void Firewall::Stop() {
 
 //TODO: Use ARP Table to determine dest MAC
 pcpp::Packet Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::PcapLiveDevice *dev) {
+    std::cout << "src expired: " << expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getSrcIPv4Address().toString() << std::endl;
+    std::cout << "dst expired: " << expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address().toString() << std::endl;
+
+    std::cout << "current IP: " << dev->getIPv4Address().toString() << std::endl;
     auto TTLExpired = pcpp::Packet();
 
     // Create the Ethernet layer
@@ -170,6 +174,8 @@ pcpp::Packet Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, p
 
     TTLExpired.computeCalculateFields();
 
+    std::cout << "sending ttl expired packet:" << std::endl << TTLExpired.toString(true) << std::endl;
+    std::cout << "TTL of TTLExpired " << (int)(TTLExpired.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive) << std::endl;
     dev->sendPacket(*TTLExpired.getRawPacket());
 }
 
