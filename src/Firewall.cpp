@@ -157,6 +157,13 @@ pcpp::Packet Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, p
     auto expiredIPv4Layer = new pcpp::IPv4Layer(expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getSrcIPv4Address(),
                                                 expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address());
     auto ipv4Layer = new pcpp::IPv4Layer(dev->getIPv4Address(), expiredIPv4Layer->getSrcIPv4Address());
+
+	expiredIPv4Layer->getIPv4Header()->timeToLive = 0;
+	ipv4Layer->getIPv4Header()->timeToLive = 128;
+
+	//print both IP addresses
+	std::cout << "src ip: " << ipv4Layer->getSrcIPv4Address().toString() << std::endl;
+	std::cout << "dst ip: " << ipv4Layer->getDstIPv4Address().toString() << std::endl;
     TTLExpired.addLayer(ipv4Layer);
 
     // Create the ICMP layer
