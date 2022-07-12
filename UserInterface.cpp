@@ -36,6 +36,7 @@ class GUI : public LoadListener, ViewListener {
 public:
     explicit GUI(Ref<Window> win) {
         control = Controller();
+        control.start({});
 
         ///
         /// Create an Overlay using the same dimensions as our Window.
@@ -224,48 +225,6 @@ public:
         }
         bool ret = control.remove_rule(
                 {args_str[0]});
-        if (ret) {
-            return JSValueMakeBoolean(thisObject.context(), true);
-        } else {
-            return JSValueMakeBoolean(thisObject.context(), false);
-        }
-    }
-    JSValue StartFirewall(const JSObject &thisObject, const JSArgs &args) {
-        ///
-        /// Return our message to JavaScript as a JSValue.
-        ///
-
-        std::vector<string> args_str;
-
-        for (int i = 0; i < args.size(); ++i) {
-            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
-            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
-                                                         (size_t) JSStringGetLength(s));
-            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
-            args_str.push_back(str);
-        }
-        bool ret = control.start({});
-        if (ret) {
-            return JSValueMakeBoolean(thisObject.context(), true);
-        } else {
-            return JSValueMakeBoolean(thisObject.context(), false);
-        }
-    }
-    JSValue StopFirewall(const JSObject &thisObject, const JSArgs &args) {
-        ///
-        /// Return our message to JavaScript as a JSValue.
-        ///
-
-        std::vector<string> args_str;
-
-        for (int i = 0; i < args.size(); ++i) {
-            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
-            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
-                                                         (size_t) JSStringGetLength(s));
-            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
-            args_str.push_back(str);
-        }
-        bool ret = control.stop({});
         if (ret) {
             return JSValueMakeBoolean(thisObject.context(), true);
         } else {
