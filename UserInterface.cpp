@@ -56,7 +56,9 @@ public:
         overlay_->view()->LoadURL("file:///table.html");
     }
 
-    ~GUI() override = default;
+	~GUI() override {
+		control.stop({});
+	}
 
     //TODO add support for RuleRemoval (note that we want to support multiple rule removal!)
     ///
