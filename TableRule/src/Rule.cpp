@@ -245,7 +245,7 @@ std::pair<uint32_t, uint32_t>  Rule::ParsePort(string p_port_num){
     }
     strToFunc(p_port_num, ::tolower);
     try{
-        if (p_port_num == ANY) return {MAX_PORT+1, MAX_PORT+1};
+        if (p_port_num == ANY) return {0, MAX_PORT+1};
         uint32_t tmp = std::stoi(p_port_num);
         if(tmp >= 0 && tmp <= MAX_PORT) return {tmp, tmp};
         throw std::exception();
