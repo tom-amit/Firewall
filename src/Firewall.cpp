@@ -15,7 +15,8 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
 {
     pcpp::Packet parsedPacket(packet);
     std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
-
+    if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() != nullptr)
+        std::cout << "TTL of packet: "<< (int)(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive) << std::endl << std::endl;
     //check if the packet is an arp packet
     if (parsedPacket.getLayerOfType<pcpp::ArpLayer>() != nullptr) {
         auto arpLayer = parsedPacket.getLayerOfType<pcpp::ArpLayer>();
@@ -70,7 +71,7 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
         if (targetDev == nullptr)
             return;
 
-        if (!typedCookie->table->ParsePacket(parsedPacket, "out"))
+        if (!typedCookie->table->ParsePacket(parsedPacket, "in"))
             return;
 
         //std::cout << "allowed packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
@@ -86,6 +87,7 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
             ethernet->setDestMac(*macAddress);
             parsedPacket.computeCalculateFields();
             targetDev->sendPacket(*parsedPacket.getRawPacket());
+            std::cout << "temp packet:" << std::endl << parsedPacket.toString(true);
         }
     }
 }
@@ -150,7 +152,7 @@ pcpp::Packet Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, p
 
     // Create the Ethernet layer
     auto expiredEthLayer = expiredPacket.getLayerOfType<pcpp::EthLayer>();
-    auto ethLayer = new pcpp::EthLayer(expiredEthLayer->getSourceMac(), expiredEthLayer->getDestMac(), pcpp::IPv4);
+    auto ethLayer = new pcpp::EthLayer(expiredEthLayer->getDestMac(), expiredEthLayer->getSourceMac(), pcpp::IPv4);
     TTLExpired.addLayer(ethLayer);
 
     // Create the IPv4 layer
@@ -181,8 +183,8 @@ pcpp::Packet Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, p
 
     TTLExpired.computeCalculateFields();
 
-    std::cout << "sending ttl expired packet:" << std::endl << TTLExpired.toString(true) << std::endl;
-    std::cout << "TTL of TTLExpired " << (int)(TTLExpired.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive) << std::endl;
+    std::cout << "sending ttl expired packet:" << std::endl << TTLExpired.toString(true);
+    std::cout << "TTL of TTLExpired " << (int)(TTLExpired.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive) << std::endl << std::endl;
     dev->sendPacket(*TTLExpired.getRawPacket());
 }
 

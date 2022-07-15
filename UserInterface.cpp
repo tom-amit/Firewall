@@ -276,8 +276,6 @@ public:
         global["SaveRules"] = BindJSCallbackWithRetval(&GUI::SaveRules);
         global["LoadRules"] = BindJSCallbackWithRetval(&GUI::LoadRules);
         global["RetrieveHitCounts"] = BindJSCallbackWithRetval(&GUI::RetrieveHitCounts);
-        global["StartFirewall"] = BindJSCallbackWithRetval(&GUI::StartFirewall);
-        global["StopFirewall"] = BindJSCallbackWithRetval(&GUI::StopFirewall);
     }
 
     static inline std::string ToUTF8(const String &str) {
