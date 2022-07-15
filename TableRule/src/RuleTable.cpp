@@ -55,13 +55,15 @@ bool RuleTable::ParsePacket(pcpp::Packet &p_packet, const string &dir) {
         string r_dir = rule->getDirection(), r_src_ip = get<2>(rule->getSrcIp()), r_dest_ip = get<2>(rule->getDestIp()) ,
                 r_protocol = rule->getProtocol(), r_action = rule->getAction();
         Rule::strToFunc(r_action, ::tolower);
-        if ((str_equals(r_dir, dir) || str_equals(r_dir, Rule::ANY)) &&
-            compare_ip_addresses(r_src_ip, ip_layer->getSrcIPv4Address().toString()) &&
-            compare_ip_addresses(r_dest_ip, ip_layer->getDstIPv4Address().toString()) &&
-            (srcPort >= get<0>(rule->getSrcPort()) && srcPort <= get<1>(rule->getSrcPort())) &&
-            (destPrt >= get<0>(rule->getDestPort()) && destPrt <= get<1>(rule->getDestPort())) &&
-            (str_equals(r_protocol, protocol) || str_equals(r_protocol, Rule::ANY)) &&
-            (!str_equals(protocol, "TCP") || rule->getAck().first == tcp_hdr->ackFlag || str_equals(rule->getAck().second, Rule::ANY))) {
+		std::vector<bool> comparisons = {(str_equals(r_dir, dir) || str_equals(r_dir, Rule::ANY)),  compare_ip_addresses(r_src_ip, ip_layer->getSrcIPv4Address().toString()),
+		                                 compare_ip_addresses(r_dest_ip, ip_layer->getDstIPv4Address().toString()), (srcPort >= get<0>(rule->getSrcPort()) && srcPort <= get<1>(rule->getSrcPort())),
+		                                 (destPrt >= get<0>(rule->getDestPort()) && destPrt <= get<1>(rule->getDestPort())), (str_equals(r_protocol, protocol) || str_equals(r_protocol, Rule::ANY)),
+		                                 (!str_equals(protocol, "TCP") || rule->getAck().first == tcp_hdr->ackFlag || str_equals(rule->getAck().second, Rule::ANY)) };
+		std::vector<string> titles = {"dir", "src_ip", "dest_ip", "src_port", "dest_port", "protocol", "ack"};
+		for (unsigned int i = 0; i < comparisons.size(); ++i) {
+			std::cout << titles[i] << ": " << comparisons[i] << std::endl;
+		}
+        if (std::all_of(comparisons.begin(), comparisons.end(), [](bool b) { return b; })) {
             if (auto it{Rule::ACTION_DEF.find(r_action)}; it != Rule::ACTION_DEF.end()) {
                 rule->IncrementHitCount();
                 return Rule::ACTION_DEF.at(r_action);
