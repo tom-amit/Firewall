@@ -1,12 +1,14 @@
-<html lang="en" ng-app="modalTest">
+<html lang="en" ng-app="FW">
 
 <head>
     <meta content="initial-scale=1" name="viewport"/>
     <link href="styles/bootstrap.min.css" rel="stylesheet">
     <link href="styles/material.cyan-light_blue.min.css" rel="stylesheet">
+    <link href="styles/angular-material.css" rel="stylesheet">
+    <link href="styles/docs.css" rel="stylesheet">
     <link href="styles/table.css" rel="stylesheet">
 </head>
-<body ng-controller="dialogServiceTest">
+<body>
 <div class="mdl-grid" style="width:1300px;margin-top:100px;">
     <!-- create a div that is above the table -->
     <div class="mdl-data-tabledynamic__title-button">
@@ -35,10 +37,11 @@
     <div class="mdl-data-tabledynamic mdl-shadow--2dp" id="Rules">
         <div class="mdl-data-tabledynamic__title">
             <h2 class="mdl-data-tabledynamic__title-text">Rules</h2>
-            <div class="vl" style="height: 80px; left: 8%;"></div>
-            <p class="mdl-data-tabledynamic__title-text" style="padding-left: 40px">Status:</p>
-            <p class="mdl-data-tabledynamic__title-text" style="padding-left: 10px; color:red;" id="status">Stopped</p>
             <div class="mdl-data-tabledynamic__actions">
+                <a ng-controller="NICSModal" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect add-row"
+                    ng-click="select($event)" id="choose_nics">
+                    Change NICS
+                </a>
                 <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect add-row">
                     ADD Rule
                 </a>
@@ -46,6 +49,7 @@
                    ng-click="launch()">
                     REMOVE Rule
                 </a>
+
             </div>
 
         </div>
@@ -185,14 +189,15 @@
                                                             title="Hit Count">0</span></td>
     </tr>
 </script>
-<script src="scripts/jquery-1.12.0.min.js"></script>
-<script src="scripts/jquery-ui.min.js"></script>
-<script src="scripts/material.min.js"></script>
-<script src="scripts/angular.min.js"></script>
-<script src="scripts/ui-bootstrap-tpls-0.6.0.js" type="text/javascript"></script>
-<script src="scripts/dialogs.min.js"
-        type="text/javascript"></script>
-<script src="scripts/table.js"></script>
+<script src="scripts/deps/jquery-1.12.0.min.js"></script>
+<script src="scripts/deps/jquery-ui.min.js"></script>
+<script src="scripts/deps/angular.js"></script>
+<script src="scripts/deps/angular-animate.js"></script>
+<script src="scripts/deps/angular-aria.js" type="text/javascript"></script>
+<script src="scripts/deps/angular-material.min.js" type="text/javascript"></script>
+<script src="scripts/deps/angular-messages.js" type="text/javascript"></script>
+<script src="scripts/deps/svg-assets-cache.js" type="text/javascript"></script>
+<script src="scripts/angular_utils.js" type="text/javascript"></script>-->
 </body>
 
 </html>
