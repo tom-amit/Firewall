@@ -1,5 +1,7 @@
 let nic1  = undefined
 let nic2 = undefined
+
+isGUI = true;
 $(document).ready(function() {
     angular.element(document.getElementById('choose_nics')).scope().select();
 });
@@ -10,14 +12,24 @@ angular
         //use later for nics variables
         // $scope.status = "  ";
         //the template URL has ng-repeat for each nic
-        $scope.nics = [
-            {
-                name: "eth0"
-            },
-            {
-                name: "eth1"
+        $scope.nics = [];
+        if (isGUI) {
+            let temp = RequestNICS();
+            //iterate over temp and create a dictionary of nic objects with only name
+            for (let i = 0; i < temp.length; i++) {
+                $scope.nics.push({name: temp[i]});
             }
-        ];
+        }
+        else{
+            $scope.nics = [
+                {
+                    name: "eth0"
+                },
+                {
+                    name: "eth1"
+                }
+            ];
+        }
         $scope.select1 = undefined;
         $scope.select2 = undefined;
 

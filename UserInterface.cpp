@@ -6,10 +6,10 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-
-
+#include <unistd.h>
+#include <net/if.h>
 using namespace ultralight;
-
+//TODO in functions where parameters are not used, no need to parse them and their JSValue representation
 ///
 ///  Welcome to Sample 4!
 ///
@@ -49,7 +49,7 @@ public:
         ///
         overlay_->view()->set_load_listener(this);
         overlay_->view()->set_view_listener(this);
-        std::cout << ("For 121sdsssadsdass") << std::endl;
+        std::cout << ("For 121ssadsdass") << std::endl;
         ///
         /// Load a string of HTML (we're using a C++11 Raw String Literal)
         ///
@@ -233,6 +233,78 @@ public:
             return JSValueMakeBoolean(thisObject.context(), false);
         }
     }
+	static std::vector<string>  extract_network_interface_names()
+	{
+		/* DEFINITION
+		 *  #include <net/if.h>
+		 *  struct if_nameindex * if_nameindex() :  function that returns a pointer.
+		 *  The if_nameindex()  function returns an array of if_nameindex structs. There is one struct for each network interface
+		 *  The if_nameindex struct contains at least the following members:
+		 *      unsigned int if_index : which is the index of each network interface {1,2,..n}
+		 *      char * if_name : which is the name of the interface=the C style string= an array of characters terminated in the NULL character \0
+		 *
+		 *  The end of the array of struct is indicated by an entry with if_index=0 && if_name=NULL
+		 *  The if_nameindex() function returns an array of structs if successful, or NULL if some error occurred or not enough memory is available
+		 */
+		puts("Extracting network interface names...");
+		puts("Listing all available network interface names on this machine...");
+		puts("********************************");
+		std::vector<string> ret = {};
+		int counter_network_interfaces=0;
+
+		struct if_nameindex * interface_indexes;
+		struct if_nameindex * interface;
+
+		interface_indexes=if_nameindex();
+
+		if(interface_indexes==nullptr) //Some error occurred during the execution of if_nameindex() function or there is no enough memory available
+		{
+			perror("If_nameindex");
+			printf("Ooops...error while extracting the network interface names.\n");
+			exit(EXIT_FAILURE);
+		}
+
+		//Loop through the elements of the array of if_nameindex structs
+
+		for(interface=interface_indexes;interface->if_index!=0 && interface->if_name!=nullptr;interface++)
+		{
+			counter_network_interfaces++;
+			printf("There exists a network interface called \"%s\" with index %d. \n",interface->if_name, interface->if_index);
+			ret.emplace_back(interface->if_name);
+		}
+
+		puts("*******************************");
+		printf("In total, there is a number of %d network interfaces on this machine.\n",counter_network_interfaces);
+		return ret;
+
+
+	}
+	JSValue RequestNICS(const JSObject &thisObject, const JSArgs &args) {
+		///
+		/// Return our message to JavaScript as a JSValue.
+		///
+
+		std::vector<string> args_str;
+
+		for (int i = 0; i < args.size(); ++i) {
+			JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
+			ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
+				(size_t) JSStringGetLength(s));
+			std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
+			args_str.push_back(str);
+		}
+		std::vector<string> ret = extract_network_interface_names();
+
+
+
+		//return ret as a JS array
+		JSValue array = JSObjectMakeArray(thisObject.context(), 0, nullptr, nullptr);
+		for (int i = 0; i < ret.size(); ++i) {
+			JSValue val = JSValueMakeString(thisObject.context(), JSStringCreateWithUTF8CString(ret[i].c_str()));
+			JSObjectSetPropertyAtIndex(thisObject.context(), array, i, val, nullptr);
+		}
+		return array;
+	}
     ///
     /// Inherited from LoadListener, called when the page has finished parsing
     /// the document.
@@ -276,6 +348,7 @@ public:
         global["SaveRules"] = BindJSCallbackWithRetval(&GUI::SaveRules);
         global["LoadRules"] = BindJSCallbackWithRetval(&GUI::LoadRules);
         global["RetrieveHitCounts"] = BindJSCallbackWithRetval(&GUI::RetrieveHitCounts);
+		global["RequestNICS"] = BindJSCallbackWithRetval(&GUI::RequestNICS);
     }
 
     static inline std::string ToUTF8(const String &str) {
