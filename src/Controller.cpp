@@ -103,6 +103,12 @@ bool Controller::stop(const std::vector<string> &args) {
     return false;
 }
 
+bool Controller::changeNics(const std::vector<string> &args) {
+	bool ret = stop({});
+	NICS::GetData(args[0], args[1]);
+	return start({});
+}
+
 bool Controller::run() {
     //firewall->table->AddRule("amit12345", "any", "any", "any", "any", "any", "any", "any", "allow");
     //firewall->table->AddRule("itay", "in", "234.222.11.3", "2.*.*.1", "192", "65535", "UDP", "yes", "allow");

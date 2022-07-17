@@ -128,6 +128,12 @@ void Firewall::StartLiveDevicesCapture() {
     std::get<0>(dev1)->startCapture(onPacketArrives, cookie);
     std::get<0>(dev2)->startCapture(onPacketArrives, cookie);
 }
+void Firewall::CloseLiveDevices() {
+	std::get<0>(dev1)->close();
+	std::get<0>(dev2)->close();
+
+}
+
 void Firewall::StopLiveDevicesCapture() {
     std::get<0>(dev1)->stopCapture();
     std::get<0>(dev2)->stopCapture();
@@ -140,6 +146,7 @@ void Firewall::Run() {
 
 void Firewall::Stop() {
     StopLiveDevicesCapture();
+	CloseLiveDevices();
 }
 
 //TODO: Use ARP Table to determine dest MAC

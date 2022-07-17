@@ -33,6 +33,8 @@ private:
 
     void SetLiveDevices();
 
+	void CloseLiveDevices();
+
     void OpenLiveDevices();
 
     void StartLiveDevicesCapture();

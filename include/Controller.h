@@ -38,6 +38,8 @@ public:
 
     bool stop(const std::vector<string> &args);
 
+	bool changeNics(const std::vector<string> &args);
+
     bool run();
 
     bool swap_rule_to(const std::vector<string> &args);

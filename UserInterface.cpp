@@ -319,16 +319,13 @@ public:
 			std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
 			args_str.push_back(str);
 		}
-		bool ret;
-        std::cout << "STOPPING" << std::endl;
-		control.stop({});
-        NICS::GetData(args_str[0], args_str[1]);
-        std::cout << args_str[0] << ", " << args_str[1]<< std::endl;
-        ret = control.start({});
-        if (ret) {
-            return JSValueMakeBoolean(thisObject.context(), true);
-        }
-		return JSValueMakeBoolean(thisObject.context(), false);
+		bool ret = control.changeNics(
+			{args_str[0], args_str[1]});
+		if (ret) {
+			return JSValueMakeBoolean(thisObject.context(), true);
+		} else {
+			return JSValueMakeBoolean(thisObject.context(), false);
+		}
 	}
     ///
     /// Inherited from LoadListener, called when the page has finished parsing
