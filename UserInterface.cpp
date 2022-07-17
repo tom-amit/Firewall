@@ -42,14 +42,13 @@ public:
         /// Create an Overlay using the same dimensions as our Window.
         ///
         overlay_ = Overlay::Create(win, win->width(), win->height(), 0, 0);
-
         ///
         /// Register our GUI instance as a load listener so we can handle the
         /// View's OnDOMReady event below.
         ///
         overlay_->view()->set_load_listener(this);
         overlay_->view()->set_view_listener(this);
-        std::cout << ("For 121ssads") << std::endl;
+        std::cout << ("For asdsssads") << std::endl;
         ///
         /// Load a string of HTML (we're using a C++11 Raw String Literal)
         ///
@@ -348,7 +347,7 @@ public:
         global["SaveRules"] = BindJSCallbackWithRetval(&GUI::SaveRules);
         global["LoadRules"] = BindJSCallbackWithRetval(&GUI::LoadRules);
         global["RetrieveHitCounts"] = BindJSCallbackWithRetval(&GUI::RetrieveHitCounts);
-		global["RequestNICS"] = BindJSCallbackWithRetval(&GUI::RequestNICS);
+		global["RequestNICS"] = BindJSCallbackWithRetval(&GUI::RequestNICS);//
     }
 
     static inline std::string ToUTF8(const String &str) {

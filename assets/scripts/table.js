@@ -1,5 +1,5 @@
 //TODO: angular needs to be downloaded locally, not remotely
-const isGUI = false;
+const isGUI = true;
 const titles = ["Name", "Direction", "Source IP", "Destination IP", "Source Port", "Destination Port", "Protocol", "ACK", "Action"];
 const n = titles.length;
 var loader = document.createElement('input');

@@ -1,6 +1,6 @@
 let nic1  = undefined
 let nic2 = undefined
-
+let first = 1
 isGUI = true;
 $(document).ready(function() {
     angular.element(document.getElementById('choose_nics')).scope().select();
@@ -14,11 +14,16 @@ angular
         //the template URL has ng-repeat for each nic
         $scope.nics = [];
         if (isGUI) {
-            let temp = RequestNICS();
-            //iterate over temp and create a dictionary of nic objects with only name
-            for (let i = 0; i < temp.length; i++) {
-                $scope.nics.push({name: temp[i]});
-            }
+            setTimeout(function (){
+                let temp = RequestNICS();
+                console.log("update:" + temp);
+                //iterate over temp and create a dictionary of nic objects with only name
+                for (let i = 0; i < temp.length; i++) {
+                    $scope.nics.push({name: temp[i]});
+                }
+                console.log("after update: " + $scope.nics)
+                first = 0;
+            }, (first * 1000))
         }
         else{
             $scope.nics = [
