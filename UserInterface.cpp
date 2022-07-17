@@ -36,7 +36,7 @@ class GUI : public LoadListener, ViewListener {
 public:
     explicit GUI(Ref<Window> win) {
         control = Controller();
-        control.start({});
+        //control.start({});
 
         ///
         /// Create an Overlay using the same dimensions as our Window.
@@ -49,7 +49,7 @@ public:
         ///
         overlay_->view()->set_load_listener(this);
         overlay_->view()->set_view_listener(this);
-        std::cout << ("For 121ssadsdass") << std::endl;
+        std::cout << ("For 121ssads") << std::endl;
         ///
         /// Load a string of HTML (we're using a C++11 Raw String Literal)
         ///
