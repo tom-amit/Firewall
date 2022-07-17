@@ -20,6 +20,7 @@ private:
     typedef bool (Controller::*MFP)(const std::vector<string> &args);
 
     Firewall firewall;
+	bool firewallStopped;
 
     std::map<string, std::pair<u_int16_t, MFP>> cmd_map;
 public:

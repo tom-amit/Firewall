@@ -304,6 +304,32 @@ public:
 		}
 		return array;
 	}
+
+	JSValue RegisterNICS(const JSObject &thisObject, const JSArgs &args) {
+		///
+		/// Return our message to JavaScript as a JSValue.
+		///
+
+		std::vector<string> args_str;
+
+		for (int i = 0; i < args.size(); ++i) {
+			JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
+			ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
+				(size_t) JSStringGetLength(s));
+			std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
+			args_str.push_back(str);
+		}
+		bool ret;
+		ret = control.stop({});
+		if (ret){
+			NICS::GetData(args_str[0], args_str[1]);
+			ret = control.start({});
+			if (ret) {
+				return JSValueMakeBoolean(thisObject.context(), true);
+			}
+		}
+		return JSValueMakeBoolean(thisObject.context(), false);
+	}
     ///
     /// Inherited from LoadListener, called when the page has finished parsing
     /// the document.
@@ -347,7 +373,8 @@ public:
         global["SaveRules"] = BindJSCallbackWithRetval(&GUI::SaveRules);
         global["LoadRules"] = BindJSCallbackWithRetval(&GUI::LoadRules);
         global["RetrieveHitCounts"] = BindJSCallbackWithRetval(&GUI::RetrieveHitCounts);
-		global["RequestNICS"] = BindJSCallbackWithRetval(&GUI::RequestNICS);//
+		global["RequestNICS"] = BindJSCallbackWithRetval(&GUI::RequestNICS);
+		global["RegisterNICS"] = BindJSCallbackWithRetval(&GUI::RegisterNICS);
     }
 
     static inline std::string ToUTF8(const String &str) {
@@ -426,7 +453,7 @@ int main() {
     ///
     /// Create our main App instance.
     ///
-    NICS::GetData("ens33", "ens36");
+    //NICS::GetData("ens33", "ens36");
     auto app = App::Create();
 
     ///

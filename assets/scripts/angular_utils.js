@@ -16,12 +16,9 @@ angular
         if (isGUI) {
             setTimeout(function (){
                 let temp = RequestNICS();
-                console.log("update:" + temp);
-                //iterate over temp and create a dictionary of nic objects with only name
                 for (let i = 0; i < temp.length; i++) {
                     $scope.nics.push({name: temp[i]});
                 }
-                console.log("after update: " + $scope.nics)
                 first = 0;
             }, (first * 1000))
         }
@@ -65,6 +62,7 @@ angular
             }).then(function() {
                 $("#nic_1").text("First Network Card: " + nic1.name);
                 $("#nic_2").text("Second Network Card: " + nic2.name);
+                RegisterNICS(nic1.name, nic2.name);
             });
         }
     });

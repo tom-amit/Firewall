@@ -20,7 +20,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-Controller::Controller() {
+Controller::Controller():firewallStopped(true) {
     firewall = Firewall();
     cmd_map = {
             {"add-rule",    {9, &Controller::add_rule}},
@@ -82,13 +82,21 @@ bool Controller::show_rules(const std::vector<string> &args) {
 }
 
 bool Controller::start(const std::vector<string> &args) {
-    firewall.Run();
-    return true;
+	if (firewallStopped){
+		firewall.Run();
+		firewallStopped = false;
+		return true;
+	}
+    return false;
 }
 
 bool Controller::stop(const std::vector<string> &args) {
-    firewall.Stop();
-    return true;
+	if (!firewallStopped){
+		firewall.Stop();
+		firewallStopped = true;
+		return true;
+	}
+    return false;
 }
 
 bool Controller::run() {
