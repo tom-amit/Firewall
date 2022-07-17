@@ -105,6 +105,11 @@ void Firewall::SetLiveDevices() {
 }
 
 void Firewall::OpenLiveDevices() {
+    std::cout << "Devices:";
+    for (auto &device : NICS::getDeviceList()){
+        std::cout << " " << std::get<0>(device)->getName();
+    }
+    std::cout << std::endl;
     std::get<0>(dev1)->open();
     std::get<0>(dev2)->open();
 
