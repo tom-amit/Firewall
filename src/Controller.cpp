@@ -20,8 +20,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-Controller::Controller():firewallStopped(true) {
-    firewall = Firewall();
+Controller::Controller():firewallStopped(true), firewallInitialised(false){
     cmd_map = {
             {"add-rule",    {9, &Controller::add_rule}},
             {"remove-rule", {1, &Controller::remove_rule}},
@@ -34,18 +33,18 @@ Controller::Controller():firewallStopped(true) {
 }
 
 std::vector<uint64_t> Controller::get_hit_counts() const {
-    return firewall.table->get_hit_counts();
+    return firewall->table->get_hit_counts();
 }
 
 bool Controller::reset_firewall() const {
-    firewall.table->clear_table();
+    firewall->table->clear_table();
     return true;
 }
 
 bool Controller::swap_rule_to(const std::vector<string> &args) {
     uint64_t id1 = std::stoull(args[0]);
     uint64_t id2 = std::stoull(args[1]);
-    std::optional<string> ret = firewall.table->SwapRuleTo(id1, id2);
+    std::optional<string> ret = firewall->table->SwapRuleTo(id1, id2);
     show_rules({});
     return ret.has_value();
 }
@@ -53,38 +52,43 @@ bool Controller::swap_rule_to(const std::vector<string> &args) {
 bool Controller::add_rule(const std::vector<string> &args) {
     std::optional<string> ret;
     if (args.empty()){
-        ret = firewall.table->AddEmptyRule();
+        ret = firewall->table->AddEmptyRule();
     }
     else{
-        ret = firewall.table->AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+        ret = firewall->table->AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
     }
     show_rules({});
     return ret.has_value();
 }
 
 bool Controller::remove_rule(const std::vector<string> &args) {
-    firewall.table->RemoveRule(args[0]);
+    firewall->table->RemoveRule(args[0]);
     show_rules({});
     return true;
 }
 
 bool Controller::edit_rule(const std::vector<std::string> &args) {
     uint16_t id = std::stoi(args[0]);
-    std::optional<string> ret = firewall.table->EditRule(id, args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
+    std::optional<string> ret = firewall->table->EditRule(id, args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
     show_rules({});
     return ret.has_value();
 
 }
 
 bool Controller::show_rules(const std::vector<string> &args) {
-    firewall.table->DisplayTable();
+    firewall->table->DisplayTable();
     return true;
 }
 
 bool Controller::start(const std::vector<string> &args) {
 	if (firewallStopped){
-		firewall.Run();
+        if(!firewallInitialised){
+            firewall = new Firewall();
+            firewallInitialised = true;
+        }
+		firewall->Run();
 		firewallStopped = false;
+        std::cout << "FIRWALL RUNNING!" << std::endl;
 		return true;
 	}
     return false;
@@ -92,7 +96,7 @@ bool Controller::start(const std::vector<string> &args) {
 
 bool Controller::stop(const std::vector<string> &args) {
 	if (!firewallStopped){
-		firewall.Stop();
+		firewall->Stop();
 		firewallStopped = true;
 		return true;
 	}
@@ -100,8 +104,8 @@ bool Controller::stop(const std::vector<string> &args) {
 }
 
 bool Controller::run() {
-    //firewall.table->AddRule("amit12345", "any", "any", "any", "any", "any", "any", "any", "allow");
-    //firewall.table->AddRule("itay", "in", "234.222.11.3", "2.*.*.1", "192", "65535", "UDP", "yes", "allow");
+    //firewall->table->AddRule("amit12345", "any", "any", "any", "any", "any", "any", "any", "allow");
+    //firewall->table->AddRule("itay", "in", "234.222.11.3", "2.*.*.1", "192", "65535", "UDP", "yes", "allow");
     std::vector<std::string> args;
     do {
         args.clear();

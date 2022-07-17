@@ -48,7 +48,7 @@ public:
         ///
         overlay_->view()->set_load_listener(this);
         overlay_->view()->set_view_listener(this);
-        std::cout << ("For asdsssads") << std::endl;
+        std::cout << ("For asdssssads") << std::endl;
         ///
         /// Load a string of HTML (we're using a C++11 Raw String Literal)
         ///
@@ -320,14 +320,14 @@ public:
 			args_str.push_back(str);
 		}
 		bool ret;
-		ret = control.stop({});
-		if (ret){
-			NICS::GetData(args_str[0], args_str[1]);
-			ret = control.start({});
-			if (ret) {
-				return JSValueMakeBoolean(thisObject.context(), true);
-			}
-		}
+        std::cout << "STOPPING" << std::endl;
+		control.stop({});
+        NICS::GetData(args_str[0], args_str[1]);
+        std::cout << args_str[0] << ", " << args_str[1]<< std::endl;
+        ret = control.start({});
+        if (ret) {
+            return JSValueMakeBoolean(thisObject.context(), true);
+        }
 		return JSValueMakeBoolean(thisObject.context(), false);
 	}
     ///

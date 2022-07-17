@@ -19,8 +19,8 @@ class Controller {
 private:
     typedef bool (Controller::*MFP)(const std::vector<string> &args);
 
-    Firewall firewall;
-	bool firewallStopped;
+    Firewall* firewall = nullptr;
+	bool firewallStopped, firewallInitialised;
 
     std::map<string, std::pair<u_int16_t, MFP>> cmd_map;
 public:
@@ -42,9 +42,9 @@ public:
 
     bool swap_rule_to(const std::vector<string> &args);
 
-    bool reset_firewall() const;
+    [[nodiscard]] bool reset_firewall() const;
 
-    std::vector<uint64_t> get_hit_counts() const;
+    [[nodiscard]] std::vector<uint64_t> get_hit_counts() const;
 };
 
 
