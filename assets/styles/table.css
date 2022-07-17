@@ -12,6 +12,11 @@
     top: 0;
 }
 
+.nic_title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #00c2ff;
+}
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
     visibility: hidden; /* Hidden by default. Visible on click */

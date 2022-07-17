@@ -1,21 +1,21 @@
-<md-dialog aria-label="List dialog"> 
-      <md-dialog-content> 
-            <md-input-container> 
+<md-dialog aria-label="List dialog" ng-controller="NICSModal" style="width:40%">
+      <md-dialog-content>
+            <md-input-container style="margin-top: 18px; width:100%">
                   <label>Network Interface 1</label> 
-                  <md-select ng-model="NIC">
-                        <md-option ng-value="NIC" ng-repeat="NIC in NICS">{{NIC}}</md-option>
-                  </md-select> 
-            </md-input-container> 
-            <md-input-container> 
+                  <md-select ng-model="select1" ng-change="changeClose()"   >
+                        <md-option ng-value="n1" ng-repeat="n1 in nics">{{n1.name}}</md-option>
+                  </md-select>
+            </md-input-container>
+            <md-input-container style="width:100%">
                   <label>Network Interface 2</label> 
-                  <md-select ng-model="NIC">
-                        <md-option ng-value="NIC" ng-repeat="NIC in NICS">{{NIC}}</md-option>
+                  <md-select ng-model="select2" ng-change="changeClose()" >
+                        <md-option ng-value="n2" ng-repeat="n2 in nics">{{n2.name}}</md-option>
                   </md-select> 
             </md-input-container> 
       </md-dialog-content> 
       <md-dialog-actions> 
-            <md-button ng-click="closeDialog()" class="md-primary"> 
-                  Close 
+            <md-button ng-click="closeDialog()" class="md-primary" id="close">
+                  Close
             </md-button> 
       </md-dialog-actions> 
-</md-dialog>,
+</md-dialog>
