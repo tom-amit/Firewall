@@ -372,6 +372,7 @@ public:
         global["SwapRuleTo"] = BindJSCallbackWithRetval(&GUI::SwapRuleTo);
         global["SaveRules"] = BindJSCallbackWithRetval(&GUI::SaveRules);
         global["LoadRules"] = BindJSCallbackWithRetval(&GUI::LoadRules);
+        //TODO hit counts not working for last revision
         global["RetrieveHitCounts"] = BindJSCallbackWithRetval(&GUI::RetrieveHitCounts);
 		global["RequestNICS"] = BindJSCallbackWithRetval(&GUI::RequestNICS);
 		global["RegisterNICS"] = BindJSCallbackWithRetval(&GUI::RegisterNICS);
