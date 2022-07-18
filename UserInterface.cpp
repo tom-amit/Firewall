@@ -155,12 +155,17 @@ public:
             args_str.push_back(str);
         }
 
+		//if file does not exist, return "*$*"
         std::ifstream infile(args_str[0]);
-        string line;
+	    if (!infile.good()) {
+		    return JSValueMakeString(thisObject.context(), JSStringCreateWithUTF8CString(""));
+	    }
+	    string line;
         string content;
         while (std::getline(infile, line)) {
             content += line + "\n";
         }
+		infile.close();
         control.reset_firewall();
         return JSValueMakeString(thisObject.context(), JSStringCreateWithUTF8CString(content.c_str()));
     }

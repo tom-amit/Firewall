@@ -181,13 +181,29 @@ angular.module('mj-toaster').provider('Notification', function() {
 
 let nic1  = undefined
 let nic2 = undefined
+
 let first = 1
 $(document).ready(function() {
-   // angular.element(document.getElementById('choose_nics')).scope().select();
-
+   //angular.element(document.getElementById('choose_nics')).scope().select();
 });
 var mod = angular.module("FW", ["ngMaterial", "ngMessages", "material.svgAssetsCache", 'mj-toaster']);
-mod.controller('dataLoader', function($scope, Notification) {
+mod.controller("tableCtrl", function($scope, Notification) {
+    $scope.change = function(col_text, error){
+        if (error) {
+            Notification.error({
+                message:  col_text,
+                delay: 5000
+            });
+        }
+        else {
+            Notification.success({
+                message: 'Valid ' + col_text + '!',
+                delay: 5000
+            });
+        }
+    }
+});
+mod.controller('dataLoader', function($scope, $mdDialog, Notification) {
     $scope.saveJSON = function () {
         //read path from save-textfield
         var src = "rules/"
@@ -225,13 +241,19 @@ mod.controller('dataLoader', function($scope, Notification) {
         }
     };
 
-    $scope.loadJSON = function () {
-        //open a modal, and if user clicks no, return
-        var dlg = null;
-        dlg = $dialogs.confirm('Please Confirm', 'Are you sure you want to load rules from a JSON file? Current table will be deleted.');
-        //return if user clicks no
-        dlg.result.then(function (btn) {
+    $scope.loadJSON = function (ev) {
+        let content = "No path specified (confirming will do nothing)";
+        if($("#load-textfield").val().length > 0){
+            content = "Load rules/" + $("#load-textfield").val() + ".json?";
+        }
+        var confirm = $mdDialog.confirm()
+            .title('Are you sure you want to load rules from a JSON file? Current table will be deleted.')
+            .textContent(content)
+            .targetEvent(ev)
+            .ok('Load')
+            .cancel('Cancel');
 
+        $mdDialog.show(confirm).then(function() {
             let ret = true;
             if(isGUI){
                 var src = "rules/"
@@ -243,12 +265,19 @@ mod.controller('dataLoader', function($scope, Notification) {
                 var _fullPath = src + _path + ".json";
                 ret = LoadRules(_fullPath);
                 console.log("RET: " + ret);
+                if(ret === ""){
+                    Notification.error({
+                        message: 'Failed to load ' + _fullPath + ": file does not exist",
+                        delay: 5000
+                    });
+                }
                 loadJSON(ret);
             }
-            loader.click();
+        }, function() {
         });
     };
 });
+loader.click();
 mod.controller("NICSModal", function ($scope, $mdDialog) {
     //use later for nics vari   ables
     // $scope.status = "  ";
@@ -317,10 +346,22 @@ mod.controller("ruleModifications", function ($scope, $mdDialog) {
     }
     $scope.prompt_remove = function(ev) {
         // Appending dialog to document.body to cover sidenav in docs app
+        let tempIndices;
+        $(".mdl-data-dynamictable tbody").find('tr.is-selected').each(function () {
+            var _index = $(this).prevAll().length;
+           if (tempIndices === undefined) {
+               tempIndices = "Rules: " + 1;
+           }
+           else{
+                tempIndices += ", " +  _index;
+           }
+        });
+        if (tempIndices === undefined) {
+            tempIndices = "No rules selected";
+        }
         var confirm = $mdDialog.confirm()
-            .title('Are you sure?')
-            .textContent('Delete support task.')
-            .ariaLabel('Delete suppor task')
+            .title('Are you sure you want to delete selected rules?')
+            .textContent(tempIndices)
             .targetEvent(ev)
             .ok('Remove Rules')
             .cancel('Cancel');
