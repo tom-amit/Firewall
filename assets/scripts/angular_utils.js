@@ -184,7 +184,7 @@ let nic2 = undefined
 
 let first = 1
 $(document).ready(function() {
-   //angular.element(document.getElementById('choose_nics')).scope().select();
+   angular.element(document.getElementById('choose_nics')).scope().select();
 });
 var mod = angular.module("FW", ["ngMaterial", "ngMessages", "material.svgAssetsCache", 'mj-toaster']);
 mod.controller("tableCtrl", function($scope, Notification) {

@@ -147,8 +147,13 @@
                                                                                                title="Rule Index">{{index_rule}}</span></td>
         <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                             title="Name">{{Name}}</span></td>
-        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
-                                                            title="Direction">{{Direction}}</span></td>
+        <td class="failed mdl-data-table__cell--non-numeric"><select>
+            <option value="{{Direction}}" selected disabled hidden>{{Direction}}</option>
+            <option value="in">In</option>
+            <option value="out">Out</option>
+            <option value="any">Any</option>
+            </select>
+        </td>
         <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                             title="Source IP">{{Source IP}}</span></td>
         <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
@@ -157,12 +162,28 @@
                                                             title="Source Port">{{Source Port}}</span></td>
         <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                             title="Dest Port">{{Destination Port}}</span></td>
-        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
-                                                            title="Protocol">{{Protocol}}</span></td>
-        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
-                                                            title="ACK">{{ACK}}</span></td>
-        <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
-                                                            title="Action">{{ACTION}}</span></td>
+        <td class="failed mdl-data-table__cell--non-numeric"><select>
+            <option value="{{Protocol}}" selected disabled hidden>{{Protocol}}</option>
+            <option value="TCP">TCP</option>
+            <option value="UDP">UDP</option>
+            <option value="any">Any</option>
+
+        </select>
+        </td>
+        <td class="failed mdl-data-table__cell--non-numeric"><select>
+            <option value="{{ACK}}" selected disabled hidden>{{ACK}}</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="any">Any</option>
+
+        </select>
+        </td>
+        <td class="failed mdl-data-table__cell--non-numeric"><select>
+            <option value="{{ACTION}}" selected disabled hidden>{{ACTION}}</option>
+            <option value="allow">Allow</option>
+            <option value="drop">Drop</option>
+        </select>
+        </td>
         <td class="mdl-data-table__cell--non-numeric"><span class="hit_count_class mdl-data-table__label add-table-content"
                                                             title="Hit Count">0</span></td>
     </tr>
