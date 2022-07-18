@@ -62,6 +62,9 @@ function addReadyRow(ruleArray) {
         }
         console.log("ruleArray[" + i + "] = " + text);
 
+        if(checkValidity(text, i, globalRuleSet.length, false) === false){
+            $(_newRow).find("td").eq(i+1).addClass("failed");
+        }
         _newRow = _newRow.replace(new RegExp("{{" + titles[i] + "}}", "gi"), text);
     }
     globalRuleSet.push(createTemplate());
@@ -253,7 +256,7 @@ $( "table>tbody" ).sortable({
     },
 });
 
-function checkValidity(text, index, currentRow){
+function checkValidity(text, index, currentRow, notify = true) {
     //indices meaning:
 //0: rule name ( make sure no valid existing rule name is using the same name)
 //1: rule direction  (in or out)
@@ -267,16 +270,22 @@ function checkValidity(text, index, currentRow){
     switch (index){
         case 0:
             if (text === "") {
-                angular.element(document.getElementById('table_scope')).scope().change("Name is empty!", true);
+                if (notify) {
+                    angular.element(document.getElementById('table_scope')).scope().change("Name is empty!", true);
+                }
                 return false;
             }
             if(text === "default"){
-                angular.element(document.getElementById('table_scope')).scope().change("Name cannot be default!", true);
+                if (notify) {
+                    angular.element(document.getElementById('table_scope')).scope().change("Name cannot be default!", true);
+                }
                 return false;
             }
             for (var i = 0; i < globalRuleSet.length; i++) {
                 if (globalRuleSet[i][titles[0]] === text && i !== currentRow) {
-                    angular.element(document.getElementById('table_scope')).scope().change("Name already exists!", true);
+                    if(notify){
+                        angular.element(document.getElementById('table_scope')).scope().change("Name already exists!", true);
+                    }
                     return false;
                 }
             }
@@ -288,22 +297,22 @@ function checkValidity(text, index, currentRow){
             if(text.toLowerCase() === "any"){
                 return true;
             }
-            return validateIP(text, "Source");
+            return validateIP(text, "Source", notify);
         case 3:
             if(text.toLowerCase() === "any"){
                 return true;
             }
-            return validateIP(text, "Destination");
+            return validateIP(text, "Destination", notify);
         case 4:
             if(text.toLowerCase() === "any"){
                 return true;
             }
-            return validatePort(text, "Source");
+            return validatePort(text, "Source", notify);
         case 5:
             if(text.toLowerCase() === "any"){
                 return true;
             }
-            return validatePort(text, "Destination");
+            return validatePort(text, "Destination", notify);
         case 6:
             return text !== "";
         case 7:
@@ -314,31 +323,35 @@ function checkValidity(text, index, currentRow){
             return false;
     }
 }
-function validateCIDR(cidr){
-    angular.element(document.getElementById('table_scope')).scope().change("CIDR not in [0,32] range!", true);
+function validateCIDR(cidr, type, notify = true) {
+    if(notify)
+        angular.element(document.getElementById('table_scope')).scope().change("CIDR not in [0,32] range!", true);
     return cidr >= 0 && cidr <= 32;
 }
-function validateIP(text, meaning){
+function validateIP(text, meaning, notify = true) {
     //allow also CIDR notation while also checking if it is a valid ip address
     if (text.includes("/")) {
         var _temp = text.split("/");
         if (_temp.length !== 2) {
-            angular.element(document.getElementById('table_scope')).scope().change("Invalid CIDR usage", true);
+            if(notify)
+                angular.element(document.getElementById('table_scope')).scope().change("Invalid CIDR usage", true);
             return false;
         }
         else {
-            return validateIP(_temp[0], meaning) && validateCIDR(_temp[1]);
+            return validateIP(_temp[0], meaning, notify) && validateCIDR(_temp[1], notify);
         }
     }
     const split = text.split(".");
     if (split.length !== 4) {
-        angular.element(document.getElementById('table_scope')).scope().change(meaning + " IP must be of type x.x.x.x", true);
+        if(notify)
+            angular.element(document.getElementById('table_scope')).scope().change(meaning + " IP must be of type x.x.x.x", true);
         return false;
     }
     for (var i = 0; i < split.length; i++) {
         //check if split[i] is a number
         if (isNaN(split[i])) {
-            angular.element(document.getElementById('table_scope')).scope().change(meaning + " IP bytes must only include numbers", true);
+            if(notify)
+                angular.element(document.getElementById('table_scope')).scope().change(meaning + " IP bytes must only include numbers", true);
             return false;
         }
         if (split[i] < 0 || split[i] > 255) {
@@ -356,31 +369,34 @@ function validateIP(text, meaning){
                 temp = "Fourth";
             }
             temp +=  " byte of " + meaning + " IP must be of type 0-255";
-            angular.element(document.getElementById('table_scope')).scope().change(temp , true);
+            if(notify)
+                angular.element(document.getElementById('table_scope')).scope().change(temp , true);
             return false;
         }
     }
     return true;
 }
 
-function validatePort(text, meaning){
+function validatePort(text, meaning, notify = true) {
     //check if it's a range first
 
     if (text.includes("-") && text.length > 2) {
         var _temp = text.split("-");
         if (_temp.length !== 2) {
-            angular.element(document.getElementById('table_scope')).scope().change("Invalid " + meaning + " port range", true);
+            if(notify)
+                angular.element(document.getElementById('table_scope')).scope().change("Invalid " + meaning + " port range", true);
             return false;
         }
         else {
-            return validatePort(_temp[0], meaning) && validatePort(_temp[1]);
+            return validatePort(_temp[0], meaning, notify) && validatePort(_temp[1], meaning, notify);
         }
     }
     //check if it's a single port
     if(text >= 0 && text <= 65535 && !isNaN(text)){
         return true;
     }
-    angular.element(document.getElementById('table_scope')).scope().change("Ports should be in [0,65535]", true);
+    if(notify)
+        angular.element(document.getElementById('table_scope')).scope().change("Ports should be in [0,65535]", true);
     return false;
 
 }

@@ -244,7 +244,7 @@ mod.controller('dataLoader', function($scope, $mdDialog, Notification) {
     $scope.loadJSON = function (ev) {
         let content = "No path specified (confirming will do nothing)";
         if($("#load-textfield").val().length > 0){
-            content = "Load " + $("#load-textfield").val(); + "?";
+            content = "Load rules/" + $("#load-textfield").val() + ".json?";
         }
         var confirm = $mdDialog.confirm()
             .title('Are you sure you want to load rules from a JSON file? Current table will be deleted.')
