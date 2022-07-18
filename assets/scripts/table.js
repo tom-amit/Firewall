@@ -1,13 +1,8 @@
 //TODO: angular needs to be downloaded locally, not remotely
-const isGUI = true;
 const titles = ["Name", "Direction", "Source IP", "Destination IP", "Source Port", "Destination Port", "Protocol", "ACK", "Action"];
 const n = titles.length;
 var loader = document.createElement('input');
 loader.type = 'file';
-
-$(document).ready(function () {
-    $("#choose_nics").click();
-});
 
 setInterval(function () {
     if (isGUI){
@@ -29,7 +24,7 @@ function createTemplate(){
     return dict
 }
 var globalRuleSet = [];
-angular.module('modalTest', ['ui.bootstrap', 'dialogs'])
+angular.module('FW', ['ui.bootstrap', 'dialogs'])
     .controller('dialogServiceTest', function ($scope, $rootScope, $timeout, $dialogs) {
         $scope.launch = function () {
             var dlg = null;

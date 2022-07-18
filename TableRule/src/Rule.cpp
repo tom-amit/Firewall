@@ -210,6 +210,7 @@ std::tuple<pcpp::IPv4Address, uint16_t, string> Rule::ParseIP(string p_ip_addr){
         }
         //TODO check if removing assignment will still work when adding characters below because Clang-Tidy complains.
         string replacement = "";
+		//TODO remove support for asterrisks
         for(auto& c: p_ip_addr){
             if(c == '*'){
                 replacement+='0';

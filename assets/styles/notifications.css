@@ -1,0 +1,65 @@
+.mj-toaster {
+    position: fixed;
+    z-index: 9999;
+    width: 300px;
+    cursor: pointer;
+    -webkit-transition: all ease .5s;
+    -o-transition: all ease .5s;
+    transition: all ease .5s;
+    color: #fff;
+    background: #337ab7;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, .4)
+}
+
+.mj-toaster.killed {
+    -webkit-transition: opacity ease 1s;
+    -o-transition: opacity ease 1s;
+    transition: opacity ease 1s;
+    opacity: 0
+}
+
+.mj-toaster>h3 {
+    font-size: 14px;
+    font-weight: 700;
+    display: block;
+    margin: 10px 10px 0;
+    padding: 0 0 5px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, .3)
+}
+
+.mj-toaster a {
+    color: #fff
+}
+
+.mj-toaster a:hover {
+    text-decoration: underline
+}
+
+.mj-toaster>.message {
+    margin: 10px
+}
+
+.mj-toaster.warning {
+    color: #fff;
+    background: #f0ad4e
+}
+
+.mj-toaster.error {
+    color: #fff;
+    background: #d9534f
+}
+
+.mj-toaster.success {
+    color: #fff;
+    background: #5cb85c
+}
+
+.mj-toaster.info {
+    color: #fff;
+    background: #5bc0de
+}
+
+.mj-toaster:hover {
+    opacity: .7
+}

@@ -66,6 +66,9 @@
 .failed{
     background-color: rgba(255, 0, 0, 0.2);
 }
+.failed > span{
+    color: black !important;
+}
 .checkbox-label {
     display: flex;
     flex-direction: row;
