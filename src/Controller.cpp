@@ -33,6 +33,9 @@ Controller::Controller():firewallStopped(true), firewallInitialised(false){
 }
 
 std::vector<uint64_t> Controller::get_hit_counts() const {
+    if(!firewallInitialised){
+        return {};
+    }
     return firewall->table->get_hit_counts();
 }
 
