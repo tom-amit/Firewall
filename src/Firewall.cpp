@@ -8,12 +8,24 @@ struct Cookie {
     std::vector<ARPAwaitingPacket>* arpAwaitingPackets;
     RuleTable* table;
 
-    Cookie(std::vector<ARPAwaitingPacket>* _arpAwaitingPackets, RuleTable* _table){ arpAwaitingPackets = _arpAwaitingPackets; table = _table;}
+    Cookie(std::vector<ARPAwaitingPacket>* _arpAwaitingPackets, RuleTable* _table){ arpAwaitingPackets = _arpAwaitingPackets; table = _table; }
 };
 
-static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie)
+struct CookieWithDir {
+    Cookie* cookie;
+    std::string dir;
+
+    CookieWithDir(Cookie* _cookie, std::string _dir){ cookie = _cookie; dir = _dir; }
+};
+
+static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookieWithDir)
 {
+    auto *typedCookieWithDir = static_cast<CookieWithDir *>(cookieWithDir);
+    auto *typedCookie = typedCookieWithDir->cookie;
+    auto dir = typedCookieWithDir->dir;
+
     pcpp::Packet parsedPacket(packet);
+
     std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
     if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() != nullptr)
         std::cout << "TTL of packet: "<< (int)(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive) << std::endl << std::endl;
@@ -23,7 +35,6 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
         if (arpLayer->getTargetMacAddress() != pcpp::MacAddress::Zero){
             ArpTable::AddEntry(*(new ArpEntry(arpLayer->getSenderIpAddr(), arpLayer->getSenderMacAddress(), dev)));
             std::cout << "added arp entry with the values:" << std::endl << arpLayer->getSenderIpAddr().toString() << std::endl << arpLayer->getSenderMacAddress().toString() << std::endl << std::endl;
-            auto *typedCookie = static_cast<Cookie *>(cookie);
             auto *arpAwaitingPackets = typedCookie->arpAwaitingPackets;
             auto it = arpAwaitingPackets->begin();
             while (it != arpAwaitingPackets->end())
@@ -61,7 +72,6 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
             return;
         }
 
-        auto *typedCookie = static_cast<Cookie *>(cookie);
         auto *ethernet = parsedPacket.getLayerOfType<pcpp::EthLayer>();
 
         if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() == nullptr)
@@ -71,7 +81,7 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
         if (targetDev == nullptr)
             return;
 
-        if (!typedCookie->table->ParsePacket(parsedPacket, "in"))
+        if (!typedCookie->table->ParsePacket(parsedPacket, dir))
             return;
 
         //std::cout << "allowed packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
@@ -130,13 +140,14 @@ void Firewall::OpenLiveDevices() {
 
 void Firewall::StartLiveDevicesCapture() {
     auto *cookie = (new Cookie(&arpAwaitingPackets, table));
-    std::get<0>(dev1)->startCapture(onPacketArrives, cookie);
-    std::get<0>(dev2)->startCapture(onPacketArrives, cookie);
+    auto *cookieWithDir1 = (new CookieWithDir(cookie, 'out'));
+    auto *cookieWithDir2 = (new CookieWithDir(cookie, 'in'));
+    std::get<0>(dev1)->startCapture(onPacketArrives, cookieWithDir1);
+    std::get<0>(dev2)->startCapture(onPacketArrives, cookieWithDir2);
 }
 void Firewall::CloseLiveDevices() {
 	std::get<0>(dev1)->close();
 	std::get<0>(dev2)->close();
-
 }
 
 void Firewall::StopLiveDevicesCapture() {

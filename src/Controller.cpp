@@ -91,7 +91,7 @@ bool Controller::start(const std::vector<string> &args) {
         }
 		firewall->Run();
 		firewallStopped = false;
-        std::cout << "FIRWALL RUNNING!" << std::endl;
+        std::cout << "FIREWALL RUNNING!" << std::endl;
 		return true;
 	}
     return false;
