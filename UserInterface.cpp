@@ -79,7 +79,7 @@ public:
     JSValue AddRule(const JSObject &thisObject, const JSArgs &args) {
         std::vector<string> args_str;
 
-        for (int i = 0; i < args.size(); ++i) {
+        for (int i = 0; i < 9; ++i) {
             JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
             ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
                                                          (size_t) JSStringGetLength(s));
@@ -110,13 +110,9 @@ public:
 	 */
 
 	JSValue EditRule(const JSObject &thisObject, const JSArgs &args) {
-        ///
-        /// Return our message to JavaScript as a JSValue.
-        ///
-
         std::vector<string> args_str;
 
-        for (int i = 0; i < args.size(); ++i) {
+        for (int i = 0; i < 10; ++i) {
             JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
             ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
                                                          (size_t) JSStringGetLength(s));
@@ -140,13 +136,9 @@ public:
 	 */
 
 	JSValue SaveRules(const JSObject &thisObject, const JSArgs &args) {
-        ///
-        /// Return our message to JavaScript as a JSValue.
-        ///
-
         std::vector<string> args_str;
 
-        for (int i = 0; i < args.size(); ++i) {
+        for (int i = 0; i < 2; ++i) {
             JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
             ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
                                                          (size_t) JSStringGetLength(s));
@@ -169,22 +161,14 @@ public:
 	 * @return a JSValue representing the result of the function.
 	 */
     JSValue LoadRules(const JSObject &thisObject, const JSArgs &args) {
-        ///
-        /// Return our message to JavaScript as a JSValue.
-        ///
+        string args_str;
 
-        std::vector<string> args_str;
+        JSString s = JSValueToStringCopy(thisObject.context(), args[0], nullptr);
+        ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
+                                                     (size_t) JSStringGetLength(s));
+        args_str  = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
 
-        for (int i = 0; i < args.size(); ++i) {
-            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
-            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
-                                                         (size_t) JSStringGetLength(s));
-            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
-            args_str.push_back(str);
-        }
-
-		//if file does not exist, return "*$*"
-        std::ifstream infile(args_str[0]);
+        std::ifstream infile(args_str);
 	    if (!infile.good()) {
 		    return JSValueMakeString(thisObject.context(), JSStringCreateWithUTF8CString(""));
 	    }
@@ -204,21 +188,7 @@ public:
 	 * @return a JSValue representing the result of the function.
 	 */
     JSValue RetrieveHitCounts(const JSObject &thisObject, const JSArgs &args) {
-        ///
-        /// Return our message to JavaScript as a JSValue.
-        ///
-
-        std::vector<string> args_str;
-
-        for (int i = 0; i < args.size(); ++i) {
-            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
-            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
-                                                         (size_t) JSStringGetLength(s));
-            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
-            args_str.push_back(str);
-        }
         std::vector<uint64_t > ret = control.get_hit_counts();
-        //return ret as a JS array
         JSValue array = JSObjectMakeArray(thisObject.context(), 0, nullptr, nullptr);
         for (int i = 0; i < ret.size(); ++i) {
             JSValue val = JSValueMakeNumber(thisObject.context(), ret[i]);
@@ -227,13 +197,9 @@ public:
         return array;
     }
     JSValue SwapRuleTo(const JSObject &thisObject, const JSArgs &args) {
-        ///
-        /// Return our message to JavaScript as a JSValue.
-        ///
-
         std::vector<string> args_str;
 
-        for (int i = 0; i < args.size(); ++i) {
+        for (int i = 0; i < 2; ++i) {
             JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
             ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
                                                          (size_t) JSStringGetLength(s));
@@ -256,21 +222,14 @@ public:
 	 * @return a JSValue representing the result of the function.
 	 */
     JSValue RemoveRule(const JSObject &thisObject, const JSArgs &args) {
-        ///
-        /// Return our message to JavaScript as a JSValue.
-        ///
+        string args_str;
 
-        std::vector<string> args_str;
-
-        for (int i = 0; i < args.size(); ++i) {
-            JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
-            ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
-                                                         (size_t) JSStringGetLength(s));
-            std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
-            args_str.push_back(str);
-        }
+        JSString s = JSValueToStringCopy(thisObject.context(), args[0], nullptr);
+        ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
+                                                     (size_t) JSStringGetLength(s));
+        args_str  = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
         bool ret = control.remove_rule(
-                {args_str[0]});
+                {args_str});
         if (ret) {
             return JSValueMakeBoolean(thisObject.context(), true);
         } else {
@@ -333,24 +292,7 @@ public:
 	 * @return a JSValue representing the result of the function.
 	 */
 	JSValue RequestNICS(const JSObject &thisObject, const JSArgs &args) {
-		///
-		/// Return our message to JavaScript as a JSValue.
-		///
-
-		std::vector<string> args_str;
-
-		for (int i = 0; i < args.size(); ++i) {
-			JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
-			ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
-				(size_t) JSStringGetLength(s));
-			std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
-			args_str.push_back(str);
-		}
 		std::vector<string> ret = extract_network_interface_names();
-
-
-
-		//return ret as a JS array
 		JSValue array = JSObjectMakeArray(thisObject.context(), 0, nullptr, nullptr);
 		for (int i = 0; i < ret.size(); ++i) {
 			JSValue val = JSValueMakeString(thisObject.context(), JSStringCreateWithUTF8CString(ret[i].c_str()));
@@ -366,13 +308,9 @@ public:
 	 * @return a JSValue representing the result of the function.
 	 */
 	JSValue RegisterNICS(const JSObject &thisObject, const JSArgs &args) {
-		///
-		/// Return our message to JavaScript as a JSValue.
-		///
-
 		std::vector<string> args_str;
 
-		for (int i = 0; i < args.size(); ++i) {
+		for (int i = 0; i < 2; ++i) {
 			JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
 			ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
 				(size_t) JSStringGetLength(s));

@@ -4,7 +4,6 @@
 
 //TODO make sure there are no memory leaks since we moved to unique_ptr!
 #include "../include/RuleTable.h"
-//TODO Add swap order of rules function (pretty simple for two rules)
 template <typename t> void move(std::vector<t>& v, size_t oldIndex, size_t newIndex)
 {
     if (oldIndex > newIndex)
@@ -109,11 +108,11 @@ bool RuleTable::compare_ip_addresses(const string &rule, const string &target) {
         std::vector<string> split_target = Rule::split_ip(target);
         for (auto[r, t] = std::pair{split_src.begin(), split_target.begin()};
              r != split_src.end() && t != split_target.end(); ++r, ++t) {
-            if (*r != Rule::IP_ASTERISK && *r != *t) return false;
+            if (*r != *t) return false;
         }
         return true;
     }
-    string cidr = rule;
+    const string& cidr = rule;
     //check if target is in cidr range
     string ip = cidr.substr(0, cidr.find('/'));
     int mask = stoi(cidr.substr(cidr.find('/') + 1));

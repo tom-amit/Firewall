@@ -7,7 +7,7 @@
 
 
 #define MAX_PORT 65535
-#define IRRELEVANT_CIDR 65535
+#define IRRELEVANT_CIDR 33
 
 #include <vector>
 #include <algorithm>
@@ -33,8 +33,7 @@ public:
     static void strToFunc(string &str, int (*func)(int));
 
     const static inline string ANY{"any"};
-    const static inline string IP_ASTERISK{"*"};
-    const static inline std::map<string, string> GENERAL_IP{{"any", "*.*.*.*"}};
+    const static inline std::map<string, string> GENERAL_IP{{"any", "0.0.0.0"}};
     const static inline std::vector<string> DIR_DEF{"in", "out", "any"};
     const static inline std::map<string, bool> ACTION_DEF{{"allow", true},
                                                           {"drop",  false},
@@ -175,16 +174,44 @@ private:
 
     bool isInvalid;
 
+	/**
+	 * @brief Parse the direction and make sure it is valid
+	 * @param dir the direction to parse
+	 * @return the direction if it is valid, else throw BadParse
+	 */
     static string ParseDirection(string dir);
-
+	/**
+	 * @brief Parse the action and make sure it is valid
+	 * @param p_action the action to parse
+	 * @return the action if it is valid, else throw BadParse
+	 */
     static string ParseAction(string p_action);
-
+	/**
+	 * @brief Parse the ip address and  make sure it is valid
+	 * @param p_ip_addr the ip to parse
+	 * @return a tuple of three ip indicators (IP in pcap++ format, cidr, string of ip) if valid, else throw BadParse
+	 */
     static std::tuple<pcpp::IPv4Address, uint16_t, string> ParseIP(string p_ip_addr);
 
+	/**
+	 * @brief Parse the port (or port range)  and make sure it is valid
+	 * @param p_port_num the port (or port range) to parse
+	 * @return a pair of numbers which indicate the range of the valid ports if valid, else throw BadParse
+	 */
     static std::pair<uint32_t, uint32_t>  ParsePort(string p_port_num);
 
+	/**
+	 * @brief parse the ack bit and make sure it is valid
+	 * @param p_ack the ack bit to parse
+	 * @return the ack bit if it is valid, else throw BadParse
+	 */
     static string ParseAck(string p_ack);
 
+	/**
+	 * @brief parse the protocol and make sure it is valid
+	 * @param p_protocol the protocol to parse
+	 * @return the protocol type if it is valid, else throw BadParse
+	 */
     static pcpp::ProtocolType ParseProtocol(string p_protocol);
 };
 

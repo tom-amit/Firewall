@@ -140,8 +140,8 @@ void Firewall::OpenLiveDevices() {
 
 void Firewall::StartLiveDevicesCapture() {
     auto *cookie = (new Cookie(&arpAwaitingPackets, table));
-    auto *cookieWithDir1 = (new CookieWithDir(cookie, 'out'));
-    auto *cookieWithDir2 = (new CookieWithDir(cookie, 'in'));
+    auto *cookieWithDir1 = (new CookieWithDir(cookie, "out"));
+    auto *cookieWithDir2 = (new CookieWithDir(cookie, "in"));
     std::get<0>(dev1)->startCapture(onPacketArrives, cookieWithDir1);
     std::get<0>(dev2)->startCapture(onPacketArrives, cookieWithDir2);
 }
@@ -165,7 +165,6 @@ void Firewall::Stop() {
 	CloseLiveDevices();
 }
 
-//TODO: Use ARP Table to determine dest MAC
 void Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::PcapLiveDevice *dev) {
     std::cout << "src expired: " << expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getSrcIPv4Address().toString() << std::endl;
     std::cout << "dst expired: " << expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address().toString() << std::endl;

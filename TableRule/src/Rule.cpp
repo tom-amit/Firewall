@@ -6,10 +6,8 @@
 
 #include <utility>
 Rule::Rule(){
-    //TODO strings and values here are only for initial invalid rules, make sure a regular user cannot set them in a way
-    // that they will be accepted
     this->hit_count = 0;
-    this->name = "No Name";
+    this->name = "default"; //To avoid name clashes with this invalid rule
     this->direction = "none";
     this->src_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "none");
     this->dest_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "none");
@@ -179,7 +177,7 @@ std::string Rule::ParseAction(string p_action) {
 
 std::tuple<pcpp::IPv4Address, uint16_t, string> Rule::ParseIP(string p_ip_addr){
     uint16_t  final_cidr = IRRELEVANT_CIDR;
-    size_t pos = p_ip_addr.find("/");
+    size_t pos = p_ip_addr.find('/');
     if(pos != string::npos){
         string cidr = p_ip_addr.substr(pos+1);
         try{
@@ -192,8 +190,6 @@ std::tuple<pcpp::IPv4Address, uint16_t, string> Rule::ParseIP(string p_ip_addr){
         }
         p_ip_addr = p_ip_addr.substr(0,pos);
     }
-    std::vector<string> ip_split = split_ip(p_ip_addr);
-
     pcpp::IPv4Address temp(p_ip_addr);
     if(temp.toString() == p_ip_addr){
         if(final_cidr != IRRELEVANT_CIDR){
@@ -202,25 +198,12 @@ std::tuple<pcpp::IPv4Address, uint16_t, string> Rule::ParseIP(string p_ip_addr){
         return {temp, final_cidr, p_ip_addr};
     }
     else{
-        //TODO currently CIDR is ignored in general IPs or partly general, but need to reject such IPs, CIDR and ASTERISK
-        // cannot happen simultaneously
         strToFunc(p_ip_addr, ::tolower);
         if(GENERAL_IP.find(p_ip_addr) != GENERAL_IP.end()){
-            return {NULL, IRRELEVANT_CIDR, GENERAL_IP.at(p_ip_addr)};
+            return {NULL, 0, GENERAL_IP.at(p_ip_addr)};
         }
-        //TODO check if removing assignment will still work when adding characters below because Clang-Tidy complains.
-        string replacement = "";
-		//TODO remove support for asterrisks
-        for(auto& c: p_ip_addr){
-            if(c == '*'){
-                replacement+='0';
-            }
-            else{
-                replacement+=c;
-            }
-        }
-        temp = pcpp::IPv4Address(replacement);
-        if(temp.toString() == replacement){
+        temp = pcpp::IPv4Address(p_ip_addr);
+        if(temp.toString() == p_ip_addr){
             return {NULL, IRRELEVANT_CIDR, p_ip_addr};
         }
     }
