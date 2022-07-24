@@ -48,53 +48,121 @@ public:
                                                                          {"TCP", 0x04},
                                                                          {"UDP", 0x08}};
 
-
+	/**
+	 * @brief Construct a new Rule object
+	 * @param name Name of the rule
+	 * @param direction Direction of the rule
+	 * @param src_ip Source IP of the rule
+	 * @param dest_ip Destination IP of the rule
+	 * @param src_port Source port of the rule
+	 * @param dest_port Destination port of the rule
+	 * @param protocol Protocol of the rule
+	 * @param ack Whether the rule is for ACK packets
+	 * @param action Action of the rule, either allow or drop
+	 */
     Rule(const string &name, const string &direction, const string &src_ip,
          const string &dest_ip, const string &src_port, const string &dest_port, const string &protocol,
          const string &ack,
          const string &action);
 
+	/**
+	 * @return return the name of the rule
+	 */
     [[nodiscard]] string getName() const;
 
+	/**
+	 * @param p_name sets the name of the rule
+	 */
     void setName(const string &p_name);
 
+	/**
+	 * @return returns the action of the rule
+	 */
     [[nodiscard]] string getAction() const;
 
+	/**
+	 * @param p_action set the action of the rule
+	 */
     void setAction(const string &p_action);
-
+	/**
+	 * @return the direction of the rule
+	 */
     [[nodiscard]] string getDirection() const;
-
+	/**
+	 * @param p_direction set the direction of the rule
+	 */
     void setDirection(const string &p_direction);
-
+	/**
+	 * @return returns the source IP of the rule
+	 */
     [[nodiscard]] std::tuple<pcpp::IPv4Address, uint16_t, string> getSrcIp() const;
-
+	/**
+	 * @param p_src_ip set the source IP of the rule
+	 */
     void setSrcIp(const string &p_src_ip);
-
+	/**
+	 * @return returns the destination IP of the rule
+	 */
     [[nodiscard]] std::tuple<pcpp::IPv4Address, uint16_t ,string> getDestIp() const;
-
+	/**
+	 * @param p_dest_ip set the destination IP of the rule
+	 */
     void setDestIp(const string &p_dest_ip);
-
+	/**
+	 * @return returns the destination port of the rule
+	 */
     [[nodiscard]] std::tuple<uint32_t, uint32_t, string> getSrcPort() const;
-
+	/**
+	 * @param p_src_port set the source port  of the rule
+	 */
     void setSrcPort(string p_src_port);
-
+	/**
+	 * @return returns the destination port of the rule
+	 */
     [[nodiscard]] std::tuple<uint32_t, uint32_t, string> getDestPort() const;
-
+	/**
+	 * @param p_dest_port set the destination port of the rule
+	 */
     void setDestPort(string p_dest_port);
 
+	/**
+	 * @return the protocol type of the rule
+	 */
     [[nodiscard]] string getProtocol() const;
 
+	/**
+	 * @param p_protocol set the protocol type of the rule
+	 */
     void setProtocol(string p_protocol);
 
+	/**
+	 * @return get the ack flag of the rule
+	 */
     [[nodiscard]] std::pair<int16_t, string> getAck() const;
 
+	/**
+	 * @param p_ack set the ack flag of the rule
+	 */
     void setAck(const string &p_ack);
 
+	/**
+	 * @return True if the rule is invalid, else false.
+	 */
     [[nodiscard]] bool isNotValid() const;
-    void setNotValid(const bool p_notValid);
 
-    uint64_t getHitCount() const;
+	/**
+	 * @param p_notValid sets whether the rule is invalid or not
+	 */
+    void setNotValid(bool p_notValid);
 
+	/**
+	 * @return the hit count of the rule
+	 */
+    [[nodiscard]] uint64_t getHitCount() const;
+
+	/**
+	 * @brief Increment the hit count of the rule
+	 */
     void IncrementHitCount();
 private:
     string name, action, direction, ack;

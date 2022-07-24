@@ -52,10 +52,11 @@ sudo make install
 
 Now we've built Pcap++ for CMake usage.
 
-## Getting Ultralight (OPTIONAL):
+## Getting Ultralight (RECOMMENDED):
 
 The project downloads Ultralight on its own if specified, just add the flag:`-DGUI_ON=1`
 
+Ultralight is the utility that gives you a visual interface.
 # <u>Building the firewall</u>
 
 ```shell
@@ -66,3 +67,10 @@ make
 ```
 
 The executable is located inside the bin/ folder.
+
+# <u> Running the firewall</u>
+
+- The firewall was built using Linux, so you need to run it on Linux.
+- In order to run the firewall you need to have 2 network cards that are connected to different networks 
+on the routing computer (the computer hosting the firewall)
+- To actually test the firewall you obviously need 2 different computers connected to the 2 networks respectively.

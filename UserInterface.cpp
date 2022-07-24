@@ -48,28 +48,35 @@ public:
         ///
         overlay_->view()->set_load_listener(this);
         overlay_->view()->set_view_listener(this);
-        std::cout << ("`For ads1sads") << std::endl;
         ///
         /// Load a string of HTML (we're using a C++11 Raw String Literal)
         ///
         overlay_->view()->LoadURL("file:///table.html");
     }
 
+	/**
+	 Destructor for GUI
+	 */
 	~GUI() override {
+
 		control.stop({});
 	}
 
-    //TODO add support for RuleRemoval (note that we want to support multiple rule removal!)
     ///
     /// Our native JavaScript callback. This function will be called from
     /// JavaScript by calling GetMessage(). We bind the callback within
     /// the DOMReady callback defined below.
     ///
-    JSValue AddRule(const JSObject &thisObject, const JSArgs &args) {
-        ///
-        /// Return our message to JavaScript as a JSValue.
-        ///
 
+
+	/**
+	 * When a rule is added to the table, this function is called.
+	 * @param thisObject, a reference to the object that called the function.
+	 * @param args, the arguments passed to the function.
+	 * @return a JSValue representing the result of the function.
+	 */
+
+    JSValue AddRule(const JSObject &thisObject, const JSArgs &args) {
         std::vector<string> args_str;
 
         for (int i = 0; i < args.size(); ++i) {
@@ -95,7 +102,14 @@ public:
         }
     }
 
-    JSValue EditRule(const JSObject &thisObject, const JSArgs &args) {
+	/**
+	 * When a rule is edited in the table, this function is called.
+	 * @param thisObject, a reference to the object that called the function.
+	 * @param args, the arguments passed to the function.
+	 * @return a JSValue representing the result of the function.
+	 */
+
+	JSValue EditRule(const JSObject &thisObject, const JSArgs &args) {
         ///
         /// Return our message to JavaScript as a JSValue.
         ///
@@ -118,7 +132,14 @@ public:
             return JSValueMakeBoolean(thisObject.context(), false);
         }
     }
-    JSValue SaveRules(const JSObject &thisObject, const JSArgs &args) {
+	/**
+	 * When a the rule table is saved, this function is called.
+	 * @param thisObject, a reference to the object that called the function.
+	 * @param args, the arguments passed to the function.
+	 * @return a JSValue representing the result of the function.
+	 */
+
+	JSValue SaveRules(const JSObject &thisObject, const JSArgs &args) {
         ///
         /// Return our message to JavaScript as a JSValue.
         ///
@@ -140,6 +161,13 @@ public:
 
         return JSValueMakeBoolean(thisObject.context(), true);
     }
+
+	/**
+	 * When a the rule table is loaded, this function is called.
+	 * @param thisObject, a reference to the object that called the function.
+	 * @param args, the arguments passed to the function.
+	 * @return a JSValue representing the result of the function.
+	 */
     JSValue LoadRules(const JSObject &thisObject, const JSArgs &args) {
         ///
         /// Return our message to JavaScript as a JSValue.
@@ -169,6 +197,12 @@ public:
         control.reset_firewall();
         return JSValueMakeString(thisObject.context(), JSStringCreateWithUTF8CString(content.c_str()));
     }
+	/**
+	 * Retrieves the hit count for each rule.
+	 * @param thisObject, a reference to the object that called the function.
+	 * @param args, the arguments passed to the function.
+	 * @return a JSValue representing the result of the function.
+	 */
     JSValue RetrieveHitCounts(const JSObject &thisObject, const JSArgs &args) {
         ///
         /// Return our message to JavaScript as a JSValue.
@@ -215,6 +249,12 @@ public:
         }
     }
 
+	/**
+	 * When a rule/s is/are removed, this function is called.
+	 * @param thisObject, a reference to the object that called the function.
+	 * @param args, the arguments passed to the function.
+	 * @return a JSValue representing the result of the function.
+	 */
     JSValue RemoveRule(const JSObject &thisObject, const JSArgs &args) {
         ///
         /// Return our message to JavaScript as a JSValue.
@@ -237,6 +277,9 @@ public:
             return JSValueMakeBoolean(thisObject.context(), false);
         }
     }
+	/**
+	 Extracts all the network interfaces from the system.
+	 */
 	static std::vector<string>  extract_network_interface_names()
 	{
 		/* DEFINITION
@@ -283,6 +326,12 @@ public:
 
 
 	}
+	/**
+	 * When requesting the list of NICS, this function is called.
+	 * @param thisObject, a reference to the object that called the function.
+	 * @param args, the arguments passed to the function.
+	 * @return a JSValue representing the result of the function.
+	 */
 	JSValue RequestNICS(const JSObject &thisObject, const JSArgs &args) {
 		///
 		/// Return our message to JavaScript as a JSValue.
@@ -310,6 +359,12 @@ public:
 		return array;
 	}
 
+	/**
+	 * When registering the NICS selected, this function is called.
+	 * @param thisObject, a reference to the object that called the function.
+	 * @param args, the arguments passed to the function.
+	 * @return a JSValue representing the result of the function.
+	 */
 	JSValue RegisterNICS(const JSObject &thisObject, const JSArgs &args) {
 		///
 		/// Return our message to JavaScript as a JSValue.
@@ -324,8 +379,8 @@ public:
 			std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
 			args_str.push_back(str);
 		}
-		bool ret = control.changeNics(
-			{args_str[0], args_str[1]});
+		bool ret = control.changeNICS(
+				{args_str[0], args_str[1]});
 		if (ret) {
 			return JSValueMakeBoolean(thisObject.context(), true);
 		} else {
@@ -374,7 +429,6 @@ public:
         global["SwapRuleTo"] = BindJSCallbackWithRetval(&GUI::SwapRuleTo);
         global["SaveRules"] = BindJSCallbackWithRetval(&GUI::SaveRules);
         global["LoadRules"] = BindJSCallbackWithRetval(&GUI::LoadRules);
-        //TODO hit counts not working for last revision
         global["RetrieveHitCounts"] = BindJSCallbackWithRetval(&GUI::RetrieveHitCounts);
 		global["RequestNICS"] = BindJSCallbackWithRetval(&GUI::RequestNICS);
 		global["RegisterNICS"] = BindJSCallbackWithRetval(&GUI::RegisterNICS);
@@ -430,7 +484,6 @@ public:
                 return "";
         }
     }
-
     void OnAddConsoleMessage(View *caller,
                              MessageSource source,
                              MessageLevel level,

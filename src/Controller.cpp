@@ -106,7 +106,7 @@ bool Controller::stop(const std::vector<string> &args) {
     return false;
 }
 
-bool Controller::changeNics(const std::vector<string> &args) {
+bool Controller::changeNICS(const std::vector<string> &args) {
 	bool ret = stop({});
 	NICS::GetData(args[0], args[1]);
 	return start({});
