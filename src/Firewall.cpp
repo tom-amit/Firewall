@@ -155,7 +155,7 @@ void Firewall::Stop() {
 }
 
 //TODO: Use ARP Table to determine dest MAC
-pcpp::Packet Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::PcapLiveDevice *dev) {
+void Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::PcapLiveDevice *dev) {
     std::cout << "src expired: " << expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getSrcIPv4Address().toString() << std::endl;
     std::cout << "dst expired: " << expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address().toString() << std::endl;
 

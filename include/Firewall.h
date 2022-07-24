@@ -52,7 +52,7 @@ public:
     void Run();
     void Stop();
 
-    static pcpp::Packet SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::PcapLiveDevice *dev);
+    static void SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::PcapLiveDevice *dev);
 };
 
 
