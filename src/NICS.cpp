@@ -31,7 +31,7 @@ void NICS::GetData(const std::string& dev1, const std::string& dev2) {
             buffer12,
             INET_ADDRSTRLEN
     );
-    deviceList.push_back(std::make_tuple(ddev1, std::string(buffer12), std::string(buffer1)));
+    deviceList.emplace_back(ddev1, std::string(buffer12), std::string(buffer1));
 
     add = (ddev2->getAddresses()[1]);
     char buffer2[INET_ADDRSTRLEN] = {0, };
@@ -49,7 +49,7 @@ void NICS::GetData(const std::string& dev1, const std::string& dev2) {
             buffer22,
             INET_ADDRSTRLEN
     );
-    deviceList.push_back(std::make_tuple(ddev2, std::string(buffer22), std::string(buffer2)));
+    deviceList.emplace_back(ddev2, std::string(buffer22), std::string(buffer2));
 }
 
 pcpp::PcapLiveDevice *NICS::GetDeviceForIP(pcpp::IPv4Address ip) {

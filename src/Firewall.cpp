@@ -4,31 +4,31 @@
 
 #include "../include/Firewall.h"
 
+#include <utility>
+
 struct Cookie {
     std::vector<ARPAwaitingPacket>* arpAwaitingPackets;
-    RuleTable* table;
+    unique_ptr<RuleTable> table;
 
-    Cookie(std::vector<ARPAwaitingPacket>* _arpAwaitingPackets, RuleTable* _table){ arpAwaitingPackets = _arpAwaitingPackets; table = _table; }
+    Cookie(std::vector<ARPAwaitingPacket>* _arpAwaitingPackets, RuleTable* _table){ arpAwaitingPackets = _arpAwaitingPackets; table.reset(_table); }
 };
 
 struct CookieWithDir {
-    Cookie* cookie;
+    unique_ptr<Cookie> cookie;
     std::string dir;
 
-    CookieWithDir(Cookie* _cookie, std::string _dir){ cookie = _cookie; dir = _dir; }
+    CookieWithDir(Cookie* _cookie, std::string _dir){ cookie.reset(_cookie); dir = std::move(_dir); }
 };
 
 static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookieWithDir)
 {
-    auto *typedCookieWithDir = static_cast<CookieWithDir *>(cookieWithDir);
-    auto *typedCookie = typedCookieWithDir->cookie;
+    auto typedCookieWithDir = static_cast<CookieWithDir *>(cookieWithDir);
+    auto typedCookie = typedCookieWithDir->cookie.get();
     auto dir = typedCookieWithDir->dir;
 
     pcpp::Packet parsedPacket(packet);
 
-    std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
-    if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() != nullptr)
-        std::cout << "TTL of packet: "<< (int)(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive) << std::endl << std::endl;
+    //std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
     //check if the packet is an arp packet
     if (parsedPacket.getLayerOfType<pcpp::ArpLayer>() != nullptr) {
         auto arpLayer = parsedPacket.getLayerOfType<pcpp::ArpLayer>();
@@ -97,7 +97,7 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
             ethernet->setDestMac(*macAddress);
             parsedPacket.computeCalculateFields();
             targetDev->sendPacket(*parsedPacket.getRawPacket());
-            std::cout << "temp packet:" << std::endl << parsedPacket.toString(true);
+            //std::cout << "temp packet:" << std::endl << parsedPacket.toString(true);
         }
     }
 }
@@ -166,10 +166,6 @@ void Firewall::Stop() {
 }
 
 void Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::PcapLiveDevice *dev) {
-    std::cout << "src expired: " << expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getSrcIPv4Address().toString() << std::endl;
-    std::cout << "dst expired: " << expiredPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address().toString() << std::endl;
-
-    std::cout << "current IP: " << dev->getIPv4Address().toString() << std::endl;
     auto TTLExpired = pcpp::Packet();
 
     // Create the Ethernet layer
@@ -185,10 +181,7 @@ void Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::Pca
 	expiredIPv4Layer->getIPv4Header()->timeToLive = 0;
 	ipv4Layer->getIPv4Header()->timeToLive = 128;
 
-	//print both IP addresses
-	std::cout << "src ip: " << ipv4Layer->getSrcIPv4Address().toString() << std::endl;
-	std::cout << "dst ip: " << ipv4Layer->getDstIPv4Address().toString() << std::endl;
-    TTLExpired.addLayer(ipv4Layer);
+	TTLExpired.addLayer(ipv4Layer);
 
     // Create the ICMP layer
     pcpp::Layer *expiredL4Layer = nullptr;
@@ -205,8 +198,8 @@ void Firewall::SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::Pca
 
     TTLExpired.computeCalculateFields();
 
-    std::cout << "sending ttl expired packet:" << std::endl << TTLExpired.toString(true);
-    std::cout << "TTL of TTLExpired " << (int)(TTLExpired.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive) << std::endl << std::endl;
+    //std::cout << "sending ttl expired packet:" << std::endl << TTLExpired.toString(true);
+    //std::cout << "TTL of TTLExpired " << (int)(TTLExpired.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive) << std::endl << std::endl;
     dev->sendPacket(*TTLExpired.getRawPacket());
 }
 
