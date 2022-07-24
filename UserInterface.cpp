@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <net/if.h>
 using namespace ultralight;
-//TODO in functions where parameters are not used, no need to parse them and their JSValue representation
 ///
 ///  Welcome to Sample 4!
 ///
