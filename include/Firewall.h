@@ -17,12 +17,12 @@ struct ARPAwaitingPacket {
     pcpp::Packet parsedPacket;
     pcpp::IPv4Address ip;
 
-    ARPAwaitingPacket(pcpp::Packet _parsedPacket, pcpp::IPv4Address _ip) {
+    ARPAwaitingPacket(const pcpp::Packet& _parsedPacket, pcpp::IPv4Address _ip) {
         parsedPacket = _parsedPacket;
         ip = _ip;
     }
 
-    ARPAwaitingPacket() {}
+    ARPAwaitingPacket() = default;
 };
 
 class Firewall {
@@ -46,7 +46,6 @@ private:
 public:
     Firewall();
 
-    //TODO scan the entire project, and make sure no regular pointers are used, memory and efficiency is important here, so smart pointers are a must!
     shared_ptr<RuleTable> table;
 
     void Run();
