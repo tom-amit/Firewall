@@ -16,6 +16,7 @@
 #include <cmath>
 #include <bitset>
 using std::unique_ptr;
+using std::shared_ptr;
 using std::get;
 class RuleTable {
 public:

@@ -8,9 +8,9 @@
 
 struct Cookie {
     std::vector<ARPAwaitingPacket>* arpAwaitingPackets;
-    unique_ptr<RuleTable> table;
+    shared_ptr<RuleTable> table;
 
-    Cookie(std::vector<ARPAwaitingPacket>* _arpAwaitingPackets, RuleTable* _table){ arpAwaitingPackets = _arpAwaitingPackets; table.reset(_table); }
+	Cookie(std::vector<ARPAwaitingPacket>* _arpAwaitingPackets, shared_ptr<RuleTable> _table) : arpAwaitingPackets(_arpAwaitingPackets), table(std::move(_table)) {}
 };
 
 struct CookieWithDir {
@@ -104,7 +104,7 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
 
 Firewall::Firewall() {
     SetLiveDevices();
-    table = new RuleTable();
+    table.reset(new RuleTable());
     arpAwaitingPackets = *(new std::vector<ARPAwaitingPacket>());
 }
 

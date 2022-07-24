@@ -47,7 +47,7 @@ public:
     Firewall();
 
     //TODO scan the entire project, and make sure no regular pointers are used, memory and efficiency is important here, so smart pointers are a must!
-    RuleTable *table;
+    shared_ptr<RuleTable> table;
 
     void Run();
     void Stop();
