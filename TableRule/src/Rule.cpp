@@ -200,7 +200,7 @@ std::tuple<pcpp::IPv4Address, uint16_t, string> Rule::ParseIP(string p_ip_addr){
     else{
         strToFunc(p_ip_addr, ::tolower);
         if(GENERAL_IP.find(p_ip_addr) != GENERAL_IP.end()){
-            return {NULL, 0, GENERAL_IP.at(p_ip_addr)};
+            return {NULL, 0, GENERAL_IP.at(p_ip_addr) + "/0"};
         }
         temp = pcpp::IPv4Address(p_ip_addr);
         if(temp.toString() == p_ip_addr){

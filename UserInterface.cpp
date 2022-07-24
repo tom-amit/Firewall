@@ -8,6 +8,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <net/if.h>
+#include <math.h>
 using namespace ultralight;
 ///
 ///  Welcome to Sample 4!
@@ -78,7 +79,7 @@ public:
     JSValue AddRule(const JSObject &thisObject, const JSArgs &args) {
         std::vector<string> args_str;
 
-        for (int i = 0; i < 9; ++i) {
+        for (int i = 0; i < std::min((int)args.size(), 9); ++i) {
             JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
             ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
                                                          (size_t) JSStringGetLength(s));

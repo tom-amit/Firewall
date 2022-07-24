@@ -324,9 +324,10 @@ function checkValidity(text, index, currentRow, notify = true) {
     }
 }
 function validateCIDR(cidr, type, notify = true) {
-    if(notify)
+    let ret = (cidr >= 0 && cidr <= 32);
+    if(!ret && notify)
         angular.element(document.getElementById('table_scope')).scope().change("CIDR not in [0,32] range!", true);
-    return cidr >= 0 && cidr <= 32;
+    return ret;
 }
 function validateIP(text, meaning, notify = true) {
     //allow also CIDR notation while also checking if it is a valid ip address
