@@ -1,11 +1,10 @@
-//
-// Created by ubu1 on 30/03/2022.
-//
-
 #include "../include/Firewall.h"
 
 #include <utility>
 
+/**
+ * @brief contains needed information for the packet callback function
+ */
 struct Cookie {
     std::vector<ARPAwaitingPacket>* arpAwaitingPackets;
     shared_ptr<RuleTable> table;
@@ -13,6 +12,9 @@ struct Cookie {
 	Cookie(std::vector<ARPAwaitingPacket>* _arpAwaitingPackets, shared_ptr<RuleTable> _table) : arpAwaitingPackets(_arpAwaitingPackets), table(std::move(_table)) {}
 };
 
+/**
+ * @brief contains needed information for the packet callback function + what direction the device is in
+ */
 struct CookieWithDir {
     unique_ptr<Cookie> cookie;
     std::string dir;
@@ -20,6 +22,12 @@ struct CookieWithDir {
     CookieWithDir(Cookie* _cookie, std::string _dir){ cookie.reset(_cookie); dir = std::move(_dir); }
 };
 
+/**
+ * @brief Callback function for when a packet arrives, does the packet routing
+ * @param packet The packet that arrived
+ * @param dev The PcapLiveDevice that caught the packet
+ * @param cookieWithDir a parameter that is transferred to all calls of this function, contains needed shared information
+ */
 static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookieWithDir)
 {
     auto typedCookieWithDir = static_cast<CookieWithDir *>(cookieWithDir);
@@ -29,10 +37,11 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
     pcpp::Packet parsedPacket(packet);
 
     //std::cout << "packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
-    //check if the packet is an arp packet
+
     if (parsedPacket.getLayerOfType<pcpp::ArpLayer>() != nullptr) {
         auto arpLayer = parsedPacket.getLayerOfType<pcpp::ArpLayer>();
         if (arpLayer->getTargetMacAddress() != pcpp::MacAddress::Zero){
+            // for ARP responses, add entry to ARP table, and release related arp awaiting packets
             ArpTable::AddEntry(*(new ArpEntry(arpLayer->getSenderIpAddr(), arpLayer->getSenderMacAddress(), dev)));
             std::cout << "added arp entry with the values:" << std::endl << arpLayer->getSenderIpAddr().toString() << std::endl << arpLayer->getSenderMacAddress().toString() << std::endl << std::endl;
             auto *arpAwaitingPackets = typedCookie->arpAwaitingPackets;
@@ -50,50 +59,48 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
                     ++it;
                 }
             }
-            /*for (auto &awaitingPacket : *arpAwaitingPackets) {
-                if (awaitingPacket.ip == arpLayer->getSenderIpAddr()) {
-                    awaitingPacket.parsedPacket.getLayerOfType<pcpp::EthLayer>()->setDestMac(arpLayer->getSenderMacAddress());
-                    awaitingPacket.parsedPacket.computeCalculateFields();
-                    std::cout << " ---------------- resending packet" << std::endl << awaitingPacket.parsedPacket.toString(true) << std::endl << std::endl;
-                    dev->sendPacket(*awaitingPacket.parsedPacket.getRawPacket());
-                    //remove the packet from the awaiting packets
-                    arpAwaitingPackets->erase(awaitingPacket);
-                }
-            }*/
         }
         else{
+            // for ARP Requests, respond appropriately
             ArpTable::RespondToArp(parsedPacket, dev);
         }
     }
     else {
-        if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() != nullptr &&
-            parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive < 2) {
+        /// check for the existence of an ipv4 layer
+        if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() == nullptr)
+            return;
+
+        /// check for expired TTL
+        if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive < 2) {
             Firewall::SendTTLExpiredPacket(parsedPacket, dev);
             return;
         }
 
         auto *ethernet = parsedPacket.getLayerOfType<pcpp::EthLayer>();
 
-        if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() == nullptr)
-            return;
-
+        /// get the device for the destination ip
         auto targetDev = NICS::GetDeviceForIP(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address());
         if (targetDev == nullptr)
             return;
 
+        /// check that the packet passes the RuleTable
         if (!typedCookie->table->ParsePacket(parsedPacket, dir))
             return;
 
         //std::cout << "allowed packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
 
+        /// update TTL
         parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
+
         ethernet->setSourceMac(pcpp::MacAddress(targetDev->getMacAddress()));
         pcpp::MacAddress *macAddress = ArpTable::Lookup(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address());
         if (macAddress == nullptr) {
+            /// if MAC is not in ARP table, add to awaiting packets and sends ARP request
             typedCookie->arpAwaitingPackets->insert(typedCookie->arpAwaitingPackets->end(),
                                                     *(new ARPAwaitingPacket(parsedPacket,
                                                                             parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address())));
         } else {
+            /// send packet
             ethernet->setDestMac(*macAddress);
             parsedPacket.computeCalculateFields();
             targetDev->sendPacket(*parsedPacket.getRawPacket());

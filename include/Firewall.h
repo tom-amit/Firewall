@@ -1,7 +1,3 @@
-//
-// Created by ubu1 on 30/03/2022.
-//
-
 #ifndef FIREWALL_FIREWALL_H
 #define FIREWALL_FIREWALL_H
 
@@ -13,6 +9,9 @@
 #include "NICS.h"
 #include "ArpTable.h"
 
+/**
+ * @brief a packet and an ip of arp entry missing
+ */
 struct ARPAwaitingPacket {
     pcpp::Packet parsedPacket;
     pcpp::IPv4Address ip;
@@ -51,6 +50,11 @@ public:
     void Run();
     void Stop();
 
+    /**
+     * @brief Sends the appropriate TTL Eexpired packet for a packet
+     * @param expiredPacket the expired packet
+     * @param dev the device which caught the packet
+     */
     static void SendTTLExpiredPacket(const pcpp::Packet &expiredPacket, pcpp::PcapLiveDevice *dev);
 };
 
