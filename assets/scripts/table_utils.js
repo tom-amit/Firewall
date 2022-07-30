@@ -3,13 +3,13 @@ const n = titles.length;
 var loader = document.createElement('input');
 loader.type = 'file';
 var globalRuleSet = [];
-const isGUI=true;
+const isGUI=false;
 
 
 setInterval(function () {
     if (isGUI){
         let update = RetrieveHitCounts();
-        console.log("update:" + update);
+        //console.log("update:" + update);
         let i = 0;
         $("tbody").find("tr").each(function () {
             $(this).find(".hit_count_class").text(update[i]);
@@ -51,10 +51,13 @@ loader.onchange = function (e) {
 };
 
 function addReadyRow(ruleArray) {
-    var _row = $(".mdl-data-dynamictable tbody").find('tr');
-    var template = $('#basketItemTemplateReady').html();
-    var _newRow = template.replace(/{{index_rule}}/g, globalRuleSet.length);
-    var _newRow = _newRow.replace(/{{id}}/gi, 'checkbox-' + new Date().getTime());
+    const _row = $(".mdl-data-dynamictable tbody").find('tr');
+    const template = $('#basketItemTemplateReady').html();
+    let _newRow = template.replace(/{{index_rule}}/g, 1);
+    _newRow = _newRow.replace(/{{id}}/gi, 'checkbox-' + new Date().getTime());
+    $(".mdl-data-dynamictable tbody").find('tr').each(function () {
+        $(this).find("span.index").text(parseInt($(this).find("span.index").text()) + 1);
+    });
     for (let i = 0; i < n; i++) {
         text = ruleArray[i];
         if (text === null) {
@@ -99,8 +102,12 @@ function addNewRow() {
 
     var _row = $(".mdl-data-dynamictable tbody").find('tr');
     var template = $('#basketItemTemplate').html();
-    var _newRow = template.replace(/{{index_rule}}/g, globalRuleSet.length);
-    var _newRow = _newRow.replace(/{{id}}/gi, 'checkbox-' + new Date().getTime());
+    var _newRow = template.replace(/{{index_rule}}/g, 1);
+    // all previous rows should have their index increased by 1
+    _newRow = _newRow.replace(/{{id}}/gi, 'checkbox-' + new Date().getTime());
+    $(".mdl-data-dynamictable tbody").find('tr').each(function () {
+        $(this).find("span.index").text(parseInt($(this).find("span.index").text()) + 1);
+    });
     var ret = true;
     if (isGUI){
         ret = AddRule();
@@ -194,6 +201,8 @@ function ruleModify(_input, _col){
     console.log("TEST: " + globalRuleSet);
     //check if globalRuleSet[j] does not contain nulls
     $(_col).find(".mdl-dialog__addContent").remove();
+
+    //we use prevAll and not nextAll since firewall indexing is a vector, hence highest priority is index 0 and so on.
     const _index = $(_temp).prevAll().length;
     var check = false;
     for (var key in globalRuleSet[j]) {
@@ -250,7 +259,7 @@ $( "table>tbody" ).sortable({
             SwapRuleTo(oldIndex, _index)
         }
         $(".mdl-data-dynamictable tbody").find('tr').each(function () {
-            var _idx = $(this).prevAll().length;
+            var _idx = $(this).nextAll().length;
             $(this).find("span.index").text(_idx);
         });
     },

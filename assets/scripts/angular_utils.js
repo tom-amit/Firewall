@@ -348,7 +348,7 @@ mod.controller("ruleModifications", function ($scope, $mdDialog) {
         // Appending dialog to document.body to cover sidenav in docs app
         let tempIndices;
         $(".mdl-data-dynamictable tbody").find('tr.is-selected').each(function () {
-            var _index = $(this).prevAll().length;
+            var _index = $(this).nextAll().length;
            if (tempIndices === undefined) {
                tempIndices = "Rules: " + 1;
            }
@@ -368,7 +368,7 @@ mod.controller("ruleModifications", function ($scope, $mdDialog) {
 
         $mdDialog.show(confirm).then(function() {
             $(".mdl-data-dynamictable tbody").find('tr.is-selected').each(function () {
-                var _index = $(this).prevAll().length;
+                var _index = $(this).nextAll().length;
                 $(this).remove();
                 if (isGUI){
                     RemoveRule(_index);
@@ -377,7 +377,7 @@ mod.controller("ruleModifications", function ($scope, $mdDialog) {
                 console.log("Removed rule " + _index);
             });
             $(".mdl-data-dynamictable tbody").find('tr').each(function () {
-                var _index = $(this).prevAll().length;
+                var _index = $(this).nextAll().length;
                 $(this).find("span.index").text(_index);
             });
             $(".mdl-data-dynamictable thead tr").removeClass("is-selected");
