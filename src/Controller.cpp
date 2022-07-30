@@ -15,7 +15,7 @@
 #include <iostream>
 #include <net/if.h>
 #include <string>
-#include <string.h>
+#include <cstring>
 #include <sysexits.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -25,11 +25,21 @@ Controller::Controller():firewallStopped(true), firewallInitialised(false){
             {"add-rule",    {9, &Controller::add_rule}},
             {"remove-rule", {1, &Controller::remove_rule}},
             {"edit-rule",   {10, &Controller::edit_rule}},
-            {"swap-rule",   {2, &Controller::swap_rule_to}},
+            {"swap-rules",   {2, &Controller::swap_rule_to}},
+            {"select-nics", {2, &Controller::changeNICS}},
             {"show-rules",  {0, &Controller::show_rules}},
             {"start",       {0, &Controller::start}},
-            {"stop",        {0, &Controller::stop}}
+            {"stop",        {0, &Controller::stop}},
+            {"help",        {0, &Controller::help}}
     };
+}
+
+bool Controller::help(const std::vector<string> &args) {
+	std::cout << "Available commands:" << std::endl;
+	for (auto &cmd : cmd_map) {
+		std::cout << "  " << cmd.first << std::endl;
+	}
+	return true;
 }
 
 std::vector<uint64_t> Controller::get_hit_counts() const {
@@ -86,6 +96,10 @@ bool Controller::show_rules(const std::vector<string> &args) {
 bool Controller::start(const std::vector<string> &args) {
 	if (firewallStopped){
         if(!firewallInitialised){
+			if(NICS::getDeviceList().empty()){
+				std::cout << "No devices selected for firewall" << std::endl;
+				return false;
+			}
             firewall = new Firewall();
             firewallInitialised = true;
         }

@@ -15,6 +15,18 @@ void NICS::GetData(const std::string& dev1, const std::string& dev2) {
     auto ddev1 = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByName(dev1);
     auto ddev2 = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByName(dev2);
 
+	if (ddev1 == nullptr || ddev2 == nullptr) {
+		string msg;
+		if(ddev1 == nullptr)
+			msg = "First device not found";
+		if(ddev2 == nullptr)
+			msg = "Second device not found";
+		if (ddev1 == nullptr && ddev2 == nullptr)
+			msg = "Both devices not found";
+		std::cout << msg  << std::endl;
+		return;
+	}
+
     auto add = (ddev1->getAddresses()[1]);
     char buffer1[INET_ADDRSTRLEN] = {0, };
     inet_ntop(

@@ -94,6 +94,8 @@ public:
 	 * @return vector of hit counts
 	 */
     [[nodiscard]] std::vector<uint64_t> get_hit_counts() const;
+
+	bool help(const std::vector<string> &args);
 };
 
 
