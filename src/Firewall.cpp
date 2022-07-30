@@ -13,16 +13,6 @@ struct Cookie {
 };
 
 /**
- * @brief contains needed information for the packet callback function + what direction the device is in
- */
-struct CookieWithDir {
-    unique_ptr<Cookie> cookie;
-    std::string dir;
-
-    CookieWithDir(Cookie* _cookie, std::string _dir){ cookie.reset(_cookie); dir = std::move(_dir); }
-};
-
-/**
  * @brief Callback function for when a packet arrives, does the packet routing
  * @param packet The packet that arrived
  * @param dev The PcapLiveDevice that caught the packet
