@@ -8,7 +8,6 @@
 using std::string;
 
 int main() {
-    NICS::GetData("ens33", "ens36");
     Controller c = Controller();
     c.run();
 }

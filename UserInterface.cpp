@@ -162,7 +162,7 @@ public:
 	 */
     JSValue LoadRules(const JSObject &thisObject, const JSArgs &args) {
         string args_str;
-
+		//
         JSString s = JSValueToStringCopy(thisObject.context(), args[0], nullptr);
         ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
                                                      (size_t) JSStringGetLength(s));

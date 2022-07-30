@@ -32,14 +32,14 @@ bool str_equals(const string &a, const string &b) {
 
 bool RuleTable::ParsePacket(pcpp::Packet &p_packet, const string &dir) {
 	auto ip_layer = p_packet.getLayerOfType<pcpp::IPv4Layer>();
-	unique_ptr<pcpp::tcphdr> tcp_hdr;
+	pcpp::tcphdr* tcp_hdr;
 	uint32_t srcPort = MAX_PORT + 1, destPrt = MAX_PORT + 1;
 	string protocol;
 	if (p_packet.getLayerOfType<pcpp::TcpLayer>() != nullptr) {//TCP
 		auto layer = p_packet.getLayerOfType<pcpp::TcpLayer>();
 		srcPort = static_cast<uint32_t>(layer->getSrcPort());
 		destPrt = static_cast<uint32_t>(layer->getDstPort());
-		tcp_hdr.reset(layer->getTcpHeader());
+		tcp_hdr = layer->getTcpHeader();
 		protocol = "TCP";
 	} else if (p_packet.getLayerOfType<pcpp::UdpLayer>() != nullptr) {//UDP
 		auto layer = p_packet.getLayerOfType<pcpp::UdpLayer>();

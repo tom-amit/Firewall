@@ -3,7 +3,7 @@ const n = titles.length;
 var loader = document.createElement('input');
 loader.type = 'file';
 var globalRuleSet = [];
-const isGUI=false;
+const isGUI=true;
 
 
 setInterval(function () {

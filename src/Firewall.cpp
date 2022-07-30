@@ -99,6 +99,8 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
             typedCookie->arpAwaitingPackets->insert(typedCookie->arpAwaitingPackets->end(),
                                                     *(new ARPAwaitingPacket(parsedPacket,
                                                                             parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address())));
+			//print packet to see what is being sent
+			return;
         } else {
             /// send packet
             ethernet->setDestMac(*macAddress);

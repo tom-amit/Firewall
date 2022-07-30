@@ -267,11 +267,13 @@ mod.controller('dataLoader', function($scope, $mdDialog, Notification) {
                 console.log("RET: " + ret);
                 if(ret === ""){
                     Notification.error({
-                        message: 'Failed to load ' + _fullPath + ": file does not exist",
+                        message: 'Failed to load ' + _fullPath + ": file does not exist or empty",
                         delay: 5000
                     });
                 }
-                loadJSON(ret);
+                else{
+                    loadJSON(ret);
+                }
             }
         }, function() {
         });
