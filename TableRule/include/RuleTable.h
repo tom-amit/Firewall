@@ -31,7 +31,6 @@ public:
 	/**
 	 * @brief add a new rule to the table
 	 * @param name the name of the rule
-	 * @param direction the direction of the rule
 	 * @param src_ip the source ip of the rule
 	 * @param dest_ip the destination ip of the rule
 	 * @param src_port the source port of the rule
@@ -41,7 +40,7 @@ public:
 	 * @param action the action of the rule
 	 * @return an optional string
 	 */
-	std::optional<std::string> AddRule(const string &name, const string &direction, const string &src_ip,
+	std::optional<std::string> AddRule(const string &name, const string &src_ip,
                                        const string &dest_ip, const string &src_port, const string &dest_port,
                                        const string &protocol, const string &ack,
                                        const string &action);
@@ -54,10 +53,9 @@ public:
 	/**
 	 * @brief compares a packet to each rule in the table until if finds a match
 	 * @param p_packet the packet to compare
-	 * @param dir the direction of the packet
 	 * @return True if the packet should be allowed, false otherwise.
 	 */
-    bool ParsePacket(pcpp::Packet &p_packet, const string &dir = "any");
+    bool ParsePacket(pcpp::Packet &p_packet);
 	/**
 	 * @brief adds an empty rule to the table (automatically invalid)
 	 * @return optional string
@@ -80,7 +78,6 @@ public:
 	 * @brief edit a rule in the table
 	 * @param id the index of the rule to edit
 	 * @param name the name of the rule
-	 * @param direction the direction of the rule
 	 * @param src_ip the source ip of the rule
 	 * @param dest_ip the destination ip of the rule
 	 * @param src_port the source port of the rule
@@ -90,7 +87,7 @@ public:
 	 * @param action the action of the rule
 	 * @return optional string
 	 */
-    std::optional<std::string> EditRule(uint16_t id, const string &name, const string &direction, const string &src_ip,
+    std::optional<std::string> EditRule(uint16_t id, const string &name, const string &src_ip,
                                         const string &dest_ip, const string &src_port, const string &dest_port,
                                         const string &protocol, const string &ack,
                                         const string &action);

@@ -79,7 +79,7 @@ public:
     JSValue AddRule(const JSObject &thisObject, const JSArgs &args) {
         std::vector<string> args_str;
 
-        for (int i = 0; i < std::min((int)args.size(), 9); ++i) {
+        for (int i = 0; i < std::min((int)args.size(), 8); ++i) {
             JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
             ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
                                                          (size_t) JSStringGetLength(s));
@@ -112,7 +112,7 @@ public:
 	JSValue EditRule(const JSObject &thisObject, const JSArgs &args) {
         std::vector<string> args_str;
 
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 9; ++i) {
             JSString s = JSValueToStringCopy(thisObject.context(), args[i], nullptr);
             ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
                                                          (size_t) JSStringGetLength(s));
@@ -340,7 +340,7 @@ public:
         ///
         Ref<JSContext> context = caller->LockJSContext();
         SetJSContext(context.get());
-
+	    //
         ///
         /// Get the global object (this would be the "window" object in JS)
         ///

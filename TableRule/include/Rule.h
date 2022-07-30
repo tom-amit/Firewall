@@ -34,7 +34,6 @@ public:
 
     const static inline string ANY{"any"};
     const static inline std::map<string, string> GENERAL_IP{{"any", "0.0.0.0"}};
-    const static inline std::vector<string> DIR_DEF{"in", "out", "any"};
     const static inline std::map<string, bool> ACTION_DEF{{"allow", true},
                                                           {"drop",  false},
                                                           {"none",  false}};
@@ -50,7 +49,6 @@ public:
 	/**
 	 * @brief Construct a new Rule object
 	 * @param name Name of the rule
-	 * @param direction Direction of the rule
 	 * @param src_ip Source IP of the rule
 	 * @param dest_ip Destination IP of the rule
 	 * @param src_port Source port of the rule
@@ -59,7 +57,7 @@ public:
 	 * @param ack Whether the rule is for ACK packets
 	 * @param action Action of the rule, either allow or drop
 	 */
-    Rule(const string &name, const string &direction, const string &src_ip,
+    Rule(const string &name, const string &src_ip,
          const string &dest_ip, const string &src_port, const string &dest_port, const string &protocol,
          const string &ack,
          const string &action);
@@ -83,14 +81,6 @@ public:
 	 * @param p_action set the action of the rule
 	 */
     void setAction(const string &p_action);
-	/**
-	 * @return the direction of the rule
-	 */
-    [[nodiscard]] string getDirection() const;
-	/**
-	 * @param p_direction set the direction of the rule
-	 */
-    void setDirection(const string &p_direction);
 	/**
 	 * @return returns the source IP of the rule
 	 */
@@ -164,7 +154,7 @@ public:
 	 */
     void IncrementHitCount();
 private:
-    string name, action, direction, ack;
+    string name, action, ack;
 
     uint64_t hit_count;
     //IP, CIDR, STR-IP
@@ -174,12 +164,6 @@ private:
 
     bool isInvalid;
 
-	/**
-	 * @brief Parse the direction and make sure it is valid
-	 * @param dir the direction to parse
-	 * @return the direction if it is valid, else throw BadParse
-	 */
-    static string ParseDirection(string dir);
 	/**
 	 * @brief Parse the action and make sure it is valid
 	 * @param p_action the action to parse

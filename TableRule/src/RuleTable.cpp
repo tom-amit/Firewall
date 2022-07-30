@@ -30,7 +30,7 @@ bool str_equals(const string &a, const string &b) {
 	return true;
 }
 
-bool RuleTable::ParsePacket(pcpp::Packet &p_packet, const string &dir) {
+bool RuleTable::ParsePacket(pcpp::Packet &p_packet) {
 	auto ip_layer = p_packet.getLayerOfType<pcpp::IPv4Layer>();
 	pcpp::tcphdr* tcp_hdr;
 	uint32_t srcPort = MAX_PORT + 1, destPrt = MAX_PORT + 1;
@@ -51,17 +51,13 @@ bool RuleTable::ParsePacket(pcpp::Packet &p_packet, const string &dir) {
 	for (auto &rule: table) {
 		if (rule->isNotValid())
 			continue;
-		string r_dir = rule->getDirection(), r_src_ip = get<2>(rule->getSrcIp()), r_dest_ip = get<2>(rule->getDestIp()) ,
+		string  r_src_ip = get<2>(rule->getSrcIp()), r_dest_ip = get<2>(rule->getDestIp()) ,
 				r_protocol = rule->getProtocol(), r_action = rule->getAction();
 		Rule::strToFunc(r_action, ::tolower);
-		std::vector<bool> comparisons = {(str_equals(r_dir, dir) || str_equals(r_dir, Rule::ANY)),  compare_ip_addresses(r_src_ip, ip_layer->getSrcIPv4Address().toString()),
+		std::vector<bool> comparisons = {compare_ip_addresses(r_src_ip, ip_layer->getSrcIPv4Address().toString()),
 		                                 compare_ip_addresses(r_dest_ip, ip_layer->getDstIPv4Address().toString()), (srcPort >= get<0>(rule->getSrcPort()) && srcPort <= get<1>(rule->getSrcPort())),
 		                                 (destPrt >= get<0>(rule->getDestPort()) && destPrt <= get<1>(rule->getDestPort())), (str_equals(r_protocol, protocol) || str_equals(r_protocol, Rule::ANY)),
 		                                 (!str_equals(protocol, "TCP") || rule->getAck().first == tcp_hdr->ackFlag || str_equals(rule->getAck().second, Rule::ANY)) };
-		/*std::vector<string> titles = {"dir", "src_ip", "dest_ip", "src_port", "dest_port", "protocol", "ack"};
-		for (unsigned int i = 0; i < comparisons.size(); ++i) {
-			std::cout << titles[i] << ": " << comparisons[i] << std::endl;
-		}*/
 		if (std::all_of(comparisons.begin(), comparisons.end(), [](bool b) { return b; })) {
 			if (auto it{Rule::ACTION_DEF.find(r_action)}; it != Rule::ACTION_DEF.end()) {
 				rule->IncrementHitCount();
@@ -139,8 +135,6 @@ void RuleTable::DisplayTable() {
 	std::cout.width(display_padding);
 	std::cout << std::left << "Name";
 	std::cout.width(display_padding);
-	std::cout << std::left << "Direction";
-	std::cout.width(display_padding);
 	std::cout << std::left << "Source IP";
 	std::cout.width(display_padding);
 	std::cout << std::left << "Dest IP";
@@ -170,8 +164,6 @@ void RuleTable::DisplayTable() {
 		std::cout.width(display_padding);
 		std::cout << std::left << r->getName();
 		std::cout.width(display_padding);
-		std::cout << std::left << r->getDirection();
-		std::cout.width(display_padding);
 		std::cout << std::left << get<2>(r->getSrcIp());
 		std::cout.width(display_padding);
 		std::cout << std::left << get<2>(r->getDestIp());
@@ -190,7 +182,7 @@ void RuleTable::DisplayTable() {
 	}
 }
 
-std::optional<string> RuleTable::AddRule(const string &name, const string &direction, const string &src_ip,
+std::optional<string> RuleTable::AddRule(const string &name, const string &src_ip,
                                          const string &dest_ip, const string &src_port, const string &dest_port,
                                          const string &protocol, const string &ack,
                                          const string &action) {
@@ -202,7 +194,7 @@ std::optional<string> RuleTable::AddRule(const string &name, const string &direc
 		}
 	}
 	try {
-		return p_AddRule(Rule(name, direction, src_ip, dest_ip, src_port, dest_port, protocol, ack, action));
+		return p_AddRule(Rule(name, src_ip, dest_ip, src_port, dest_port, protocol, ack, action));
 	}
 	catch(BadParse& e){
 		for(int i = 0;i<TABLE_LENGTH*display_padding;++i){
@@ -262,7 +254,7 @@ std::optional<std::string> RuleTable::RemoveRule(const string &index) {
 }
 
 std::optional<std::string>
-RuleTable::EditRule(const uint16_t id, const string &name, const string &direction, const string &src_ip,
+RuleTable::EditRule(const uint16_t id, const string &name, const string &src_ip,
                     const string &dest_ip, const string &src_port, const string &dest_port, const string &protocol,
                     const string &ack, const string &action) {
 	uint64_t i = 0;
@@ -285,9 +277,6 @@ RuleTable::EditRule(const uint16_t id, const string &name, const string &directi
 			try{
 				if (!name.empty()) {
 					(*it)->setName(name);
-				}
-				if (!direction.empty()) {
-					(*it)->setDirection(direction);
 				}
 				if (!src_ip.empty()) {
 					(*it)->setSrcIp(src_ip);

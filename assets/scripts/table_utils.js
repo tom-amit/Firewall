@@ -1,9 +1,9 @@
-const titles = ["Name", "Direction", "Source IP", "Destination IP", "Source Port", "Destination Port", "Protocol", "ACK", "Action"];
+const titles = ["Name", "Sourdce IP", "Destination IP", "Source Port", "Destination Port", "Protocol", "ACK", "Action"];
 const n = titles.length;
 var loader = document.createElement('input');
 loader.type = 'file';
 var globalRuleSet = [];
-const isGUI=true;
+const isGUI=false;
 
 
 setInterval(function () {
@@ -83,7 +83,7 @@ function addReadyRow(ruleArray) {
     }
     var ret = true;
     if (isGUI){
-        ret = AddRule(ruleArray[0], ruleArray[1], ruleArray[2], ruleArray[3], ruleArray[4], ruleArray[5], ruleArray[6], ruleArray[7], ruleArray[8]);
+        ret = AddRule(ruleArray[0], ruleArray[1], ruleArray[2], ruleArray[3], ruleArray[4], ruleArray[5], ruleArray[6], ruleArray[7]);
     }
     if (ret === false) {
         console.log("Ready rule addition failed!");
@@ -217,7 +217,7 @@ function ruleModify(_input, _col){
         console.log("ARGS: " + JSON.stringify(args).replace(/\[|\]/g, "").replace(/\,/g, ", "));
         ret = true
         if(isGUI){
-            ret = EditRule(_index,  args[titles[0]], args[titles[1]], args[titles[2]], args[titles[3]], args[titles[4]], args[titles[5]], args[titles[6]], args[titles[7]], args[titles[8]]);
+            ret = EditRule(_index,  args[titles[0]], args[titles[1]], args[titles[2]], args[titles[3]], args[titles[4]], args[titles[5]], args[titles[6]], args[titles[7]]);
         }
         if (ret === false) {
             console.log("Rule modification failed!");
@@ -249,7 +249,7 @@ $( "table>tbody" ).sortable({
     items: "tr:not(:last)",
     stop: function( event, ui ) {
         let tr = ui.item[0];
-        var _index = $(tr).prevAll().length, oldIndex = $(tr).find("span.mdl-data-table__label")[0].innerHTML;
+        var _index = $(tr).prevAll().length, oldIndex = globalRuleSet.length-($(tr).find("span.mdl-data-table__label")[0].innerHTML);
         console.log("Moved " + oldIndex + " to " + _index);
         //move globalRuleSet[oldIndex] to _index
         let temp = globalRuleSet[oldIndex];
@@ -266,16 +266,6 @@ $( "table>tbody" ).sortable({
 });
 
 function checkValidity(text, index, currentRow, notify = true) {
-    //indices meaning:
-//0: rule name ( make sure no valid existing rule name is using the same name)
-//1: rule direction  (in or out)
-    //2: make sure this is a valid ip address
-    // 3: make sure this is a valid ip address
-    // 4: make sure this is a valid port
-    // 5: make sure this is a valid port
-    // 6: make sure this is a valid protocol type (TCP or UDP)
-    // 7: make sure this is a valid ack bit (yes or no)
-    // 8: make sure this is a valid action (allow or drop)
     switch (index){
         case 0:
             if (text === "") {
@@ -300,33 +290,30 @@ function checkValidity(text, index, currentRow, notify = true) {
             }
             return true;
         case 1:
-            return text !== "";
-
-        case 2:
             if(text.toLowerCase() === "any"){
                 return true;
             }
             return validateIP(text, "Source", notify);
-        case 3:
+        case 2:
             if(text.toLowerCase() === "any"){
                 return true;
             }
             return validateIP(text, "Destination", notify);
-        case 4:
+        case 3:
             if(text.toLowerCase() === "any"){
                 return true;
             }
             return validatePort(text, "Source", notify);
-        case 5:
+        case 4:
             if(text.toLowerCase() === "any"){
                 return true;
             }
             return validatePort(text, "Destination", notify);
+        case 5:
+            return text !== "";
         case 6:
             return text !== "";
         case 7:
-            return text !== "";
-        case 8:
             return text !== "";
         default:
             return false;

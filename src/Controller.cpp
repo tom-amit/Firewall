@@ -22,9 +22,9 @@
 
 Controller::Controller():firewallStopped(true), firewallInitialised(false){
     cmd_map = {
-            {"add-rule",    {9, &Controller::add_rule}},
+            {"add-rule",    {8, &Controller::add_rule}},
             {"remove-rule", {1, &Controller::remove_rule}},
-            {"edit-rule",   {10, &Controller::edit_rule}},
+            {"edit-rule",   {9, &Controller::edit_rule}},
             {"swap-rules",   {2, &Controller::swap_rule_to}},
             {"select-nics", {2, &Controller::changeNICS}},
             {"show-rules",  {0, &Controller::show_rules}},

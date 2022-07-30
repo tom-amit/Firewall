@@ -75,7 +75,6 @@
                     </th>
                     <th class="mdl-data-table__cell--non-numeric">Rule Priority</th>
                     <th class="mdl-data-table__cell--non-numeric">Name</th>
-                    <th class="mdl-data-table__cell--non-numeric">Direction</th>
                     <th class="mdl-data-table__cell--non-numeric">Source IP Address</th>
                     <th class="mdl-data-table__cell--non-numeric">Destination IP Address</th>
                     <th>Source Port</th>
@@ -92,8 +91,6 @@
                     </td>
                     <td class="mdl-data-table__cell--non-numeric" style="text-align: left"><span class="mdl-data-table__label" title="Rule Priority">0</span></td>
                     <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label" title="Name">default</span></td>
-                    <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label" title="Direction">any</span>
-                    </td>
                     <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label" title="Source IP">any</span>
                     </td>
                     <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label" title="Dest IP">any</span>
@@ -147,13 +144,6 @@
                                                                                                title="Rule Priority">{{index_rule}}</span></td>
         <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                             title="Name">{{Name}}</span></td>
-        <td class="failed mdl-data-table__cell--non-numeric"><select>
-            <option value="{{Direction}}" selected disabled hidden>{{Direction}}</option>
-            <option value="in">In</option>
-            <option value="out">Out</option>
-            <option value="any">Any</option>
-            </select>
-        </td>
         <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                             title="Source IP">{{Source IP}}</span></td>
         <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"

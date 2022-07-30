@@ -8,7 +8,6 @@
 Rule::Rule(){
     this->hit_count = 0;
     this->name = "default"; //To avoid name clashes with this invalid rule
-    this->direction = "none";
     this->src_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "none");
     this->dest_ip = std::make_tuple(pcpp::IPv4Address("0.0.0.0"), 0, "none");
     this->src_port = std::make_pair(MAX_PORT+1, MAX_PORT+1);
@@ -18,13 +17,12 @@ Rule::Rule(){
     this->action = "none";
     this->isInvalid = true;
 }
-Rule::Rule(const string &name, const string &direction, const string &src_ip,
+Rule::Rule(const string &name, const string &src_ip,
            const string &dest_ip, const string &src_port, const string &dest_port, const string &protocol,
            const string &ack,
            const string &action) {
     this->hit_count = 0;
     this->name = name;
-    this->direction = ParseDirection(direction);
     this->src_ip = ParseIP(src_ip);
     this->dest_ip = ParseIP(dest_ip);
     this->src_port = ParsePort(src_port);
@@ -55,14 +53,6 @@ string Rule::getAction() const {
 
 void Rule::setAction(const string &p_action) {
     action = ParseAction(p_action);
-}
-
-string Rule::getDirection() const {
-    return direction;
-}
-
-void Rule::setDirection(const string &p_direction) {
-    direction = ParseDirection(p_direction);
 }
 
 std::tuple<pcpp::IPv4Address, uint16_t, string> Rule::getSrcIp() const {
@@ -158,14 +148,6 @@ std::vector<string> Rule::split_ip(const string &s) {
 
     res.push_back (s.substr (pos_start));
     return res;
-}
-std::string Rule::ParseDirection(string dir){
-    strToFunc(dir, ::tolower);
-    if(std::find(DIR_DEF.begin(), DIR_DEF.end(), dir) != DIR_DEF.end()){
-        return dir;
-    }
-    //std::cout << "PARSE DIR:" << dir << std::endl;
-    throw BadParse("Rule Direction", dir);
 }
 std::string Rule::ParseAction(string p_action) {
     strToFunc(p_action, ::tolower);
