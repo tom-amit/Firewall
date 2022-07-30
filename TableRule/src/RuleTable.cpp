@@ -15,7 +15,7 @@ template <typename t> void move(std::vector<t>& v, size_t oldIndex, size_t newIn
 
 RuleTable::RuleTable() : len(1), display_padding(22) {
 	table = std::vector<unique_ptr<Rule>>{};
-	table.emplace_back(new Rule(string("default"), string("any"), string("any"), string("any"),
+	table.emplace_back(new Rule(string("default"), string("any"), string("any"),
 	                            string("any"), string("any"), string("any"), string("any"),
 	                            string("drop")));
 }

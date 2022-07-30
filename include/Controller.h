@@ -87,7 +87,7 @@ public:
 	 * @brief resets the firewall
 	 * @return True
 	 */
-    [[nodiscard]] bool reset_firewall() const;
+	bool reset_firewall() const;
 
 	/**
 	 * @brief gets the hit count for each rule in the table

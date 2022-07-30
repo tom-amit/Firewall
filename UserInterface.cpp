@@ -89,11 +89,10 @@ public:
         bool ret;
         if (args.empty()){
             ret = control.add_rule({});
-        }
+        }//
         else{
             ret = control.add_rule(
-                    {args_str[0], args_str[1], args_str[2], args_str[3], args_str[4], args_str[5], args_str[6], args_str[7],
-                     args_str[8]});
+                    {args_str[0], args_str[1], args_str[2], args_str[3], args_str[4], args_str[5], args_str[6], args_str[7]});//
         }
         if (ret) {
             return JSValueMakeBoolean(thisObject.context(), true);
@@ -121,7 +120,7 @@ public:
         }
         bool ret = control.edit_rule(
                 {args_str[0], args_str[1], args_str[2], args_str[3], args_str[4], args_str[5], args_str[6], args_str[7],
-                 args_str[8], args_str[9]});
+                 args_str[8]});
         if (ret) {
             return JSValueMakeBoolean(thisObject.context(), true);
         } else {
@@ -148,7 +147,7 @@ public:
         args_str[0] += ".json";
         std::ofstream outfile;
         outfile.open(args_str[0], std::ios_base::app & std::ofstream::trunc);
-        outfile << args_str[1] << std::endl; //
+        outfile << args_str[1] << std::endl;
         outfile.close();
 
         return JSValueMakeBoolean(thisObject.context(), true);

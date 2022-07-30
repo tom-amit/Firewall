@@ -44,7 +44,7 @@
         <div class="mdl-data-tabledynamic__title">
             <h2 class="mdl-data-tabledynamic__title-text">Rules</h2>
             <div class="mdl-data-tabledynamic__actions">
-                <a ng-controller="NICSModal" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect add-row"
+                <a ng-controller="NICSModal" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
                     ng-click="select($event)" id="choose_nics">
                     Change NICS
                 </a>
@@ -134,7 +134,7 @@
     </div>
 </script>
 <script id="basketItemTemplateReady" type="text/template">
-    <tr class="failed data-row">
+    <tr class="data-row">
         <td>
             <label class="checkbox-label" for="{{id}}">
                 <input type="checkbox" id="{{id}}" class="checkbox">
@@ -152,7 +152,7 @@
                                                             title="Source Port">{{Source Port}}</span></td>
         <td class="mdl-data-table__cell--non-numeric"><span class="mdl-data-table__label add-table-content"
                                                             title="Dest Port">{{Destination Port}}</span></td>
-        <td class="failed mdl-data-table__cell--non-numeric"><select>
+        <td class="mdl-data-table__cell--non-numeric"><select>
             <option value="{{Protocol}}" selected disabled hidden>{{Protocol}}</option>
             <option value="TCP">TCP</option>
             <option value="UDP">UDP</option>
@@ -160,7 +160,7 @@
 
         </select>
         </td>
-        <td class="failed mdl-data-table__cell--non-numeric"><select>
+        <td class="mdl-data-table__cell--non-numeric"><select>
             <option value="{{ACK}}" selected disabled hidden>{{ACK}}</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -168,7 +168,7 @@
 
         </select>
         </td>
-        <td class="failed mdl-data-table__cell--non-numeric"><select>
+        <td class="mdl-data-table__cell--non-numeric"><select>
             <option value="{{ACTION}}" selected disabled hidden>{{ACTION}}</option>
             <option value="allow">Allow</option>
             <option value="drop">Drop</option>

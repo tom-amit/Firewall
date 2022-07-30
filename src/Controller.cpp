@@ -68,7 +68,7 @@ bool Controller::add_rule(const std::vector<string> &args) {
         ret = firewall->table->AddEmptyRule();
     }
     else{
-        ret = firewall->table->AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+        ret = firewall->table->AddRule(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
     }
     show_rules({});
     return ret.has_value();
@@ -82,7 +82,7 @@ bool Controller::remove_rule(const std::vector<string> &args) {
 
 bool Controller::edit_rule(const std::vector<std::string> &args) {
     uint16_t id = std::stoi(args[0]);
-    std::optional<string> ret = firewall->table->EditRule(id, args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]);
+    std::optional<string> ret = firewall->table->EditRule(id, args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
     show_rules({});
     return ret.has_value();
 

@@ -1,4 +1,4 @@
-const titles = ["Name", "Sourdce IP", "Destination IP", "Source Port", "Destination Port", "Protocol", "ACK", "Action"];
+const titles = ["Name", "Source IP", "Destination IP", "Source Port", "Destination Port", "Protocol", "ACK", "Action"];
 const n = titles.length;
 var loader = document.createElement('input');
 loader.type = 'file';
@@ -51,13 +51,13 @@ loader.onchange = function (e) {
 };
 
 function addReadyRow(ruleArray) {
-    const _row = $(".mdl-data-dynamictable tbody").find('tr');
     const template = $('#basketItemTemplateReady').html();
     let _newRow = template.replace(/{{index_rule}}/g, 1);
     _newRow = _newRow.replace(/{{id}}/gi, 'checkbox-' + new Date().getTime());
     $(".mdl-data-dynamictable tbody").find('tr').each(function () {
         $(this).find("span.index").text(parseInt($(this).find("span.index").text()) + 1);
     });
+    let invalidArray = []
     for (let i = 0; i < n; i++) {
         text = ruleArray[i];
         if (text === null) {
@@ -66,7 +66,7 @@ function addReadyRow(ruleArray) {
         console.log("ruleArray[" + i + "] = " + text);
 
         if(checkValidity(text, i, globalRuleSet.length, false) === false){
-            $(_newRow).find("td").eq(i+1).addClass("failed");
+            invalidArray.push(i);
         }
         _newRow = _newRow.replace(new RegExp("{{" + titles[i] + "}}", "gi"), text);
     }
@@ -87,15 +87,18 @@ function addReadyRow(ruleArray) {
     }
     if (ret === false) {
         console.log("Ready rule addition failed!");
+        if(isGUI){
+            AddRule()
+        }
     }
     else{
         console.log("Ready rule addition succeeded!");
     }
-    if (!check && ret) {
-        //remove "failed" class from _newRow
-        _newRow = _newRow.replace(/failed/gi, "");
-    }
     $(".mdl-data-dynamictable tbody tr:last").before(_newRow);
+     let added = $(".mdl-data-dynamictable tbody tr").eq(-2);
+     for (let i = 0; i < invalidArray.length; i++) {
+        $(added).find("td").eq(invalidArray[i]+2).addClass("failed");
+    }
 }
 
 function addNewRow() {
@@ -131,7 +134,7 @@ $(".remove-row").on("click", function () {
 });
 $(document).on("click", ".checkbox", function () {
     var _tableRow = $(this).parents("tr:first");
-    if ($(this).hasClass("is-checked") === false) {
+    if ($(this).prop("checked")) {
         _tableRow.addClass("is-selected");
     } else {
         _tableRow.removeClass("is-selected");
@@ -174,17 +177,15 @@ function ruleModify(_input, _col){
     let _temp = _col.parents("tr");
     let j, i;
     let flag = false;
+    let ret;
     for (j = 0; j < n; j++){
         let tr_temp = $("tbody").find("tr")[j];
         if (tr_temp === $(_col).parents("tr")[0]) {
             for (i = 1; i <= n; i++) {
                 if ($(_col.parents("tr")).find("td.mdl-data-table__cell--non-numeric")[i] === _col[0]) {
                     console.log("INDEX " + (j) + ", " + (i-1));
-                    var ret =  checkValidity(_input.val(), i-1, j);
-                    if (ret === false) {
-                        _col.addClass("failed");
-                    }
-                    else {
+                    ret =  checkValidity(_input.val(), i-1, j);
+                    if (ret){
                         _col.removeClass("failed");
                         globalRuleSet[j][titles[i-1]] = _input.val();
                         flag = true;
@@ -199,7 +200,6 @@ function ruleModify(_input, _col){
         return;
     }
     console.log("TEST: " + globalRuleSet);
-    //check if globalRuleSet[j] does not contain nulls
     $(_col).find(".mdl-dialog__addContent").remove();
 
     //we use prevAll and not nextAll since firewall indexing is a vector, hence highest priority is index 0 and so on.
@@ -226,6 +226,7 @@ function ruleModify(_input, _col){
             console.log("Rule modification succeeded!");
         }
     }
+    return ret
 }
 //when select is changed, update the rule
 $(document).on("change", "select", function () {
@@ -240,8 +241,10 @@ $(document).on("click", ".save", function () {
     var _input = $(this).parents("td").find("input");
     if (_textfield.hasClass("is-invalid") === false && $.trim(_input.val()) !== "") {
         var _col = $(this).parents("td");
-        $(_col).find("span")[1].innerHTML = _input.val();
-        ruleModify(_input, _col);
+        let ret = ruleModify(_input, _col);
+        if (ret) {
+            $(_col).find("span").text($(_input).val());
+        }
     }
 });
 

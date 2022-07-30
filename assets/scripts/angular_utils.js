@@ -279,7 +279,6 @@ mod.controller('dataLoader', function($scope, $mdDialog, Notification) {
         });
     };
 });
-loader.click();
 mod.controller("NICSModal", function ($scope, $mdDialog) {
     //use later for nics vari   ables
     // $scope.status = "  ";
@@ -352,7 +351,7 @@ mod.controller("ruleModifications", function ($scope, $mdDialog) {
         $(".mdl-data-dynamictable tbody").find('tr.is-selected').each(function () {
             var _index = $(this).nextAll().length;
            if (tempIndices === undefined) {
-               tempIndices = "Rules: " + 1;
+               tempIndices = "Rules: " + _index;
            }
            else{
                 tempIndices += ", " +  _index;
