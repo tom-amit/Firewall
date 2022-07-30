@@ -26,13 +26,11 @@ struct CookieWithDir {
  * @brief Callback function for when a packet arrives, does the packet routing
  * @param packet The packet that arrived
  * @param dev The PcapLiveDevice that caught the packet
- * @param cookieWithDir a parameter that is transferred to all calls of this function, contains needed shared information
+ * @param cookie a parameter that is transferred to all calls of this function, contains needed shared information
  */
-static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookieWithDir)
+static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie)
 {
-    auto typedCookieWithDir = static_cast<CookieWithDir *>(cookieWithDir);
-    auto typedCookie = typedCookieWithDir->cookie.get();
-    auto dir = typedCookieWithDir->dir;
+    auto typedCookie = static_cast<Cookie*>(cookie);
 
     pcpp::Packet parsedPacket(packet);
 
@@ -90,7 +88,7 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
             return;
 
         /// check that the packet passes the RuleTable
-        if (!typedCookie->table->ParsePacket(parsedPacket, dir))
+        if (!typedCookie->table->ParsePacket(parsedPacket))
             return;
 
         //std::cout << "allowed packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
@@ -155,10 +153,8 @@ void Firewall::OpenLiveDevices() {
 
 void Firewall::StartLiveDevicesCapture() {
     auto *cookie = (new Cookie(&arpAwaitingPackets, table));
-    auto *cookieWithDir1 = (new CookieWithDir(cookie, "out"));
-    auto *cookieWithDir2 = (new CookieWithDir(cookie, "in"));
-    std::get<0>(dev1)->startCapture(onPacketArrives, cookieWithDir1);
-    std::get<0>(dev2)->startCapture(onPacketArrives, cookieWithDir2);
+    std::get<0>(dev1)->startCapture(onPacketArrives, cookie);
+    std::get<0>(dev2)->startCapture(onPacketArrives, cookie);
 }
 void Firewall::CloseLiveDevices() {
 	std::get<0>(dev1)->close();
