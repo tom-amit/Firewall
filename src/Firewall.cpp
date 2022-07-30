@@ -70,8 +70,14 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
         if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>() == nullptr)
             return;
 
+        auto ipv4Layer = parsedPacket.getLayerOfType<pcpp::IPv4Layer>();
+
+        /// check if the packet is destined for the firewall, if so then drop it
+        if (ipv4Layer->getDstIPv4Address() == std::get<1>(NICS::getDeviceList()[0]) || ipv4Layer->getDstIPv4Address() == std::get<1>(NICS::getDeviceList()[1]))
+            return;
+
         /// check for expired TTL
-        if (parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive < 2) {
+        if (ipv4Layer->getIPv4Header()->timeToLive < 2) {
             Firewall::SendTTLExpiredPacket(parsedPacket, dev);
             return;
         }
@@ -79,7 +85,7 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
         auto *ethernet = parsedPacket.getLayerOfType<pcpp::EthLayer>();
 
         /// get the device for the destination ip
-        auto targetDev = NICS::GetDeviceForIP(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address());
+        auto targetDev = NICS::GetDeviceForIP(ipv4Layer->getDstIPv4Address());
         if (targetDev == nullptr)
             return;
 
@@ -90,7 +96,7 @@ static void onPacketArrives(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, 
         //std::cout << "allowed packet:" << std::endl << parsedPacket.toString(true) << std::endl << std::endl;
 
         /// update TTL
-        parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getIPv4Header()->timeToLive -= 1;
+        ipv4Layer->getIPv4Header()->timeToLive -= 1;
 
         ethernet->setSourceMac(pcpp::MacAddress(targetDev->getMacAddress()));
         pcpp::MacAddress *macAddress = ArpTable::Lookup(parsedPacket.getLayerOfType<pcpp::IPv4Layer>()->getDstIPv4Address());
