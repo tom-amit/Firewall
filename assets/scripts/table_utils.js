@@ -3,13 +3,13 @@ const n = titles.length;
 var loader = document.createElement('input');
 loader.type = 'file';
 var globalRuleSet = [];
-const isGUI=false;
+const isGUI=true;
 
 
 setInterval(function () {
     if (isGUI){
         let update = RetrieveHitCounts();
-        //console.log("update:" + update);
+        console.log("update:" + update);
         let i = 0;
         $("tbody").find("tr").each(function () {
             $(this).find(".hit_count_class").text(update[i]);
@@ -87,9 +87,6 @@ function addReadyRow(ruleArray) {
     }
     if (ret === false) {
         console.log("Ready rule addition failed!");
-        if(isGUI){
-            AddRule()
-        }
     }
     else{
         console.log("Ready rule addition succeeded!");
