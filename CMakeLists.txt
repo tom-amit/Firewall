@@ -13,7 +13,6 @@ set(CMAKE_CXX_STANDARD 17)
 # popen()/pclose() are not C++ standards
 set(CMAKE_CXX_EXTENSIONS ON)
 
-
 # Project Debug Variables
 set(TABLE_RULE_ONLY 0)
 

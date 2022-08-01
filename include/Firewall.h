@@ -8,7 +8,6 @@
 #include <IcmpLayer.h>
 #include "NICS.h"
 #include "ArpTable.h"
-
 /**
  * @brief a packet and an ip of arp entry missing
  */

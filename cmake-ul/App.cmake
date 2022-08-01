@@ -42,6 +42,9 @@ MACRO(LINK_GUI source_list)
     SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
     SET(CMAKE_INSTALL_RPATH $ORIGIN)
 
+    # Get project directory and add it as a definition to the target
+    set(PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    add_definitions( -DSRC_DIR="${PROJECT_DIR}/rules" )
     add_executable(${APP_NAME} ${source_list})
 
     # Copy all binaries to target directory
@@ -66,5 +69,6 @@ MACRO(LINK_GUI source_list)
     #  COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_RESOURCES_DIR}" "${ASSETS_PATH}/resources")
 
     add_dependencies(${APP_NAME} UltralightSDK)
+
 
 ENDMACRO()

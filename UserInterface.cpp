@@ -10,27 +10,10 @@
 #include <net/if.h>
 #include <cmath>
 
+// add_definitions( -DSRC_DIR=${PROJECT_DIR} )
+
 using namespace ultralight;
-///
-///  Welcome to Sample 4!
-///
-///  In this sample we'll show how to integrate C++ code with JavaScript.
-///
-///  We will introduce the DOMReady event and use it to bind a C++ callback to
-///  a JavaScript function on our page. Later, when that callback is triggered,
-///  we will execute some JavaScript to update a hidden message on the page.
-///
-///  __JavaScriptCore and AppCore__
-///
-///  Ultralight integrates the full JavaScriptCore engine (the same JS engine
-///  in Safari on macOS and iOS). The SDK includes full C API bindings to
-///  JavaScriptCore which gives you a great deal of flexibility but can be a
-///  little daunting for first-time users.
-///
-///  To help simplify things, AppCore provides a simple C++ wrapper over
-///  JavaScriptCore (@see JSHelpers.h). We'll be using this wrapper for the
-///  sake of convenience in this sample.
-///
+
 class GUI : public LoadListener, ViewListener {
     RefPtr<Overlay> overlay_;
     Controller control;
@@ -135,7 +118,7 @@ public:
 	 * @return a JSValue representing the result of the function.
 	 */
 
-	const string dir = "../../rules";
+	const string dir = SRC_DIR;
 
 	JSValue SaveRules(const JSObject &thisObject, const JSArgs &args) {
         std::vector<string> args_str;
