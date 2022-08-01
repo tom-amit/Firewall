@@ -9,8 +9,6 @@
 #include <unistd.h>
 #include <net/if.h>
 #include <cmath>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 using namespace ultralight;
 ///
