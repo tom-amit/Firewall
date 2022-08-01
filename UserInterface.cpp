@@ -8,7 +8,10 @@
 #include <fstream>
 #include <unistd.h>
 #include <net/if.h>
-#include <math.h>
+#include <cmath>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 using namespace ultralight;
 ///
 ///  Welcome to Sample 4!
@@ -134,6 +137,8 @@ public:
 	 * @return a JSValue representing the result of the function.
 	 */
 
+	const string dir = "../../rules";
+
 	JSValue SaveRules(const JSObject &thisObject, const JSArgs &args) {
         std::vector<string> args_str;
 
@@ -144,12 +149,14 @@ public:
             std::string str = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
             args_str.push_back(str);
         }
-        args_str[0] += ".json";
+		if (args_str[0].size() < 5 || args_str[0].substr(args_str[0].size() - 5) != ".json")
+			args_str[0] += ".json";
+		args_str[0] = dir + "/" + args_str[0];
         std::ofstream outfile;
-        outfile.open(args_str[0], std::ios_base::app & std::ofstream::trunc);
+        outfile.open(args_str[0],  std::ios::out | std::ios::in | std::ios::trunc);
         outfile << args_str[1] << std::endl;
         outfile.close();
-
+		system(("chmod 777 " + args_str[0]).c_str());
         return JSValueMakeBoolean(thisObject.context(), true);
     }
 
@@ -166,6 +173,11 @@ public:
         ultralight::String ustr = ultralight::String((Char16 *) JSStringGetCharactersPtr(s),
                                                      (size_t) JSStringGetLength(s));
         args_str  = std::string((char *) ustr.utf8().data(), ustr.utf8().length());
+
+		if (args_str.size() < 5 || args_str.substr(args_str.size() - 5) != ".json")
+			args_str += ".json";
+		args_str = dir + "/" + args_str;
+
 
         std::ifstream infile(args_str);
 	    if (!infile.good()) {

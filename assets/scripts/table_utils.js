@@ -40,6 +40,7 @@ function loadJSON(e){
         }
         addReadyRow(_arr);
     }
+    componentHandler.upgradeAllRegistered();
     loader.value="";
 }
 
@@ -58,17 +59,26 @@ function addReadyRow(ruleArray) {
         $(this).find("span.index").text(parseInt($(this).find("span.index").text()) + 1);
     });
     let invalidArray = []
+    let text;
     for (let i = 0; i < n; i++) {
         text = ruleArray[i];
         if (text === null) {
-            text = "Add " + titles[i];
-        }
-        console.log("ruleArray[" + i + "] = " + text);
-
-        if(checkValidity(text, i, globalRuleSet.length, false) === false){
+            if (titles[i].includes("Port")) {
+                text = "Add Port";
+            }
+            else{
+                text = "Add " + titles[i];
+            }
             invalidArray.push(i);
+        } else {
+            console.log(titles[i] + " not null")
+            if (checkValidity(text, i, globalRuleSet.length, false) === false) {
+
+                invalidArray.push(i);
+            }
         }
         _newRow = _newRow.replace(new RegExp("{{" + titles[i] + "}}", "gi"), text);
+        console.log("ruleArray[" + i + "] = " + text);
     }
     globalRuleSet.push(createTemplate());
     for (let i = 0; i < n; i++) {

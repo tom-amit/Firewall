@@ -206,7 +206,6 @@ mod.controller("tableCtrl", function($scope, Notification) {
 mod.controller('dataLoader', function($scope, $mdDialog, Notification) {
     $scope.saveJSON = function () {
         //read path from save-textfield
-        var src = "rules/"
         var _path = $("#save-textfield").val();
         if (_path.length <= 0) {
             Notification.error({
@@ -215,7 +214,7 @@ mod.controller('dataLoader', function($scope, $mdDialog, Notification) {
             });
             return
         }
-        var _fullPath = src + _path;
+        var _fullPath = _path;
         var _json = JSON.stringify(globalRuleSet);
         let ret = true;
         if (isGUI){
@@ -256,13 +255,12 @@ mod.controller('dataLoader', function($scope, $mdDialog, Notification) {
         $mdDialog.show(confirm).then(function() {
             let ret = true;
             if(isGUI){
-                var src = "rules/"
                 var _path = $("#load-textfield").val();
                 console.log("VALUE: " + _path);
                 if (_path.length <= 0) {
                     return
                 }
-                var _fullPath = src + _path + ".json";
+                var _fullPath = _path;
                 ret = LoadRules(_fullPath);
                 console.log("RET: " + ret);
                 if(ret === ""){
