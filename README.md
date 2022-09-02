@@ -60,6 +60,7 @@ Ultralight is the utility that gives you a visual interface.
 # <u>Building the firewall</u>
 
 ```shell
+git clone https://github.com/tom-amit/Firewall.git --depth 1
 cd $FIREWALL_DOWNLOAD_PATH
 mkdir build && cd build
 cmake .. # OPTIONAL: -DGUI_ON=1

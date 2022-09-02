@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD 17)
 # popen()/pclose() are not C++ standards
 set(CMAKE_CXX_EXTENSIONS ON)
 
+
 # Project Debug Variables
 set(TABLE_RULE_ONLY 0)
 
@@ -43,7 +44,7 @@ else ()
         add_executable(${PE_NAME} main.cpp ${FIREWALL_SRC_FILES} ${TABLERULE_SRC_FILES})
 
     endif ()
-    target_link_libraries(${PE_NAME} PUBLIC PcapPlusPlus::PcapPP)
+    target_link_libraries(${PE_NAME} PUBLIC PcapPlusPlus::Pcap++)
 
     set_target_properties(${PE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
             "${CMAKE_BINARY_DIR}/bin")
